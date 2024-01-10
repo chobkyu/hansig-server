@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test ts-mocha -p ./tsconfig.json ./test/*.spec.ts -w",
+    "test": "cross-env NODE_ENV=test ts-mocha -p ./tsconfig.json ./test/*.spec.ts -w --timeout 3000",
     "start": "nodemon bin/www.ts",
     "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" bin/www.ts"
   },

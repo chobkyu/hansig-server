@@ -6,10 +6,16 @@ const authJWT = (req:Request,res:Response,next:NextFunction) => {
         const token = req.headers.authorization.split('Bearer ')[1];
         const result = verify(token);
 
+        //console.log(result)
         if(result.success){
-            req.body.user.id = result.id;
-            req.body.user.userId = result.userId;
-            req.body.user.userNickName = result.userNickName;
+            //console.log(result.decodedData)
+            const userData = {
+                id : result.decodedData.id,
+                userId : result.decodedData.userId,
+                userNickName : result.decodedData.userNickName
+            }
+            
+            req.body.userData = userData
             next();
         } else{
             res.status(401).send({
@@ -17,6 +23,11 @@ const authJWT = (req:Request,res:Response,next:NextFunction) => {
                 message:result.msg
             });
         }
+    }else{
+        res.status(401).send({
+            ok:false,
+            message:'you have not token'
+        })
     }
 }
 

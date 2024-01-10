@@ -5,7 +5,7 @@ const should = require('should');
 /**회원 가입 시 */
 describe('post /user is..', function () {
     let testData = {
-        userId:'test',
+        userId:'test2',
         userPw:'1234',
         userName:'test_name',
         userNickName:'giwon'
@@ -17,7 +17,7 @@ describe('post /user is..', function () {
             .send(testData)
             .expect(201)
             .end((err:any,res:any) => {
-                console.log(res.body);
+                //console.log(res.body);
             });
     });
 
@@ -34,7 +34,7 @@ describe('post /user is..', function () {
                 .send(body)
                 .expect(201)
                 .end(done)
-        }); 
+        });  
 
     });
     describe('fail..',()=>{
@@ -153,20 +153,23 @@ describe('post /user/login...',function(){
 
 
 /**유저 정보 읽을 시 */
-describe('GET /users/userinfo/:id ',function() {
-    describe('success',async () => {
+describe('GET /users/userinfo ',function() {
+    describe('success', async ()=> {
         let body:any;
         before(done=> {
             request(app)
-                .get('/users/userinfo/32')
+                .get('/users/userinfo')
+                .set("authorization","Bearer testtoken")
                 .end((err:any,res:any) => {
+                    console.log(res.body.header)
                     body = res.body.data;
                     console.log(body);
                     done();
                 });
         });
 
-        it('유저 아이디가 포함되어야 한다.', async () =>{
+        it('유저 아이디가 포함되어야 한다.', function(){
+            console.log(body)
             body.should.have.property('userId');
         });
 
@@ -182,32 +185,33 @@ describe('GET /users/userinfo/:id ',function() {
             body.should.have.property('userImgs');
         });
 
-
     });
 
     describe('fail...',async () => {
         it('해당 유저가 없을 때 404 리턴',async () => {
             request(app)
                 .get('/users/userinfo/99999')
+                .set("Authorizaiton","Bearer testtoken")
                 .expect(404)
                 .end(async (err:any, res:any) =>{
                     console.log(res.body);
                 })
         });
 
-        it('number 형식의 id가 아닐 때 400리턴',async() => {
-            request(app)
-                .get('/users/userinfo/기원이')
-                .expect(400)
-                .end(async (err:any, res:any) => {
-                    console.log(res.body);
-                });
-        })
+        //어차피 string 값으로 path로 인식해서 안됨(테스트 코드에서)
+        // it('number 형식의 id가 아닐 때 400리턴',async() => {
+        //     request(app)
+        //         .get('/users/userinfo/기원이')
+        //         .expect(400)
+        //         .end(async (err:any, res:any) => {
+        //             console.log(res);
+        //         });
+        // })
     });
-})
+});
 
 /**유저 정보 수정 시 */
-describe('/patch user/info', function(){
+describe('/patch users/info', function(){
     describe('success',async () => {
         let testData = {
             userId:'test',
@@ -216,7 +220,8 @@ describe('/patch user/info', function(){
         }
         it('201으로 응답한다', (done) => {
             request(app)
-                .post('/users')
+                .patch('/users/info')
+                .set("authorization","Bearer testtoken")
                 .send(testData)
                 .expect(201)
                 .end(done)
@@ -230,6 +235,7 @@ describe('/patch user/info', function(){
             }
             request(app)
                 .patch('/users/info')
+                .set("authorization","Bearer testtoken")
                 .send(testData)
                 .expect(400)
                 .end(done);
@@ -241,6 +247,7 @@ describe('/patch user/info', function(){
             }
             request(app)
                 .patch('/users/info')
+                .set("authorization","Bearer testtoken")
                 .send(testData)
                 .expect(400)
                 .end(done);
@@ -254,7 +261,7 @@ describe('/patch user/info', function(){
             }
             request(app)
                 .patch('/users/info')
-                .set("Authorizaiton","Bearer testtoken")
+                .set("authorization","Bearer testtokerrn")
                 .send(testData)
                 .expect(401)
                 .end(done);
@@ -263,3 +270,14 @@ describe('/patch user/info', function(){
         
     });
 });
+
+describe('/delete users/deleteTestUser',function(){
+    describe('success...',async () => {
+        it('204로 응답한다.', (done) => {
+            request(app)
+            .delete('/users/deleteTestUser')
+            .expect(204)
+            .end(done)
+        })
+    })
+})

@@ -8,7 +8,11 @@ const output = {
     getUser: async (req:Request,res:Response) => {
         try{
             const userservice = new UserService();
-            const id = parseInt(req.params.id);
+            const id = parseInt(req.body.userData.id);
+            console.log(req.body);
+            //number 타입 id가 아닐시
+            if(Number.isNaN(id)) return res.json({id}).status(400).end();
+
             const response = await userservice.getUser(id);
 
             if(!response.success) {
@@ -18,6 +22,7 @@ const output = {
 
             const data = response.data;
             //console.log(data)
+            
             return res.json({data});
         }catch(err){
             console.log(err);
@@ -64,8 +69,32 @@ const process = {
     /**유저 정보 업데이트 */
     updateUserData : async(req:Request,res:Response) => {
         try{
-            console.log('test')
+            const userservice = new UserService();
+            console.log(req.body)
+            
+            const response = await userservice.updateUserInfo(req.body);
+
+            if(response.success) return res.status(201).end();
+            else return res.status(response.status).end();
+
             return res.status(400)
+        }catch(err){
+            console.log(err);
+            return res.status(500).end();
+        }
+    },
+
+    //테스트 계정 삭제용
+    deleteTestUser :async (req:Request, res:Response) => {
+        try{
+            const userservice = new UserService();
+            const response = await userservice.deleteTestUser();
+
+            if(response.success){
+                return res.status(204).end();
+            }else{
+                return res.status(404).end();
+            }
         }catch(err){
             console.log(err);
             return res.status(500).end();
