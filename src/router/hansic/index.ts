@@ -15,7 +15,7 @@ const router = express.Router();
 router.get('/all',ctrl.output.getAll);
 router.get('/loc/:id',ctrl.output.getFromLocation);
 router.get('/:id',ctrl.output.get);
-/*
+
 router.post('/:id',ctrl.process.create);
 router.patch('/:id',ctrl.process.update);
 router.delete('/:id',ctrl.process.delete);
@@ -29,5 +29,5 @@ router.get('/:id/menu/:menuId',ctrl.output.menu.get);
 router.get('/:id/comment',ctrl.output.comment.getAll);
 router.post('/:id/comment',ctrl.process.comment.create);
 router.delete('/:id/comment',ctrl.process.comment.delete);
-*/
+
 module.exports = router
