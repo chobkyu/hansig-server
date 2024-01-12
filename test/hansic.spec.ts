@@ -27,7 +27,7 @@ describe('GET /hansic/all ...', function () {
 
         before(done => {
             request(app)
-                .get('hansic/all')
+                .get('/hansic/all')
                 .expect(200)
                 .end((err: any, res: any) => {
                     body = res.body.data;
@@ -95,7 +95,7 @@ describe('GET /hansic/loc/:id ...', function () {
 
         before(done => {
             request(app)
-                .get('hansic/loc/1')
+                .get('/hansic/loc/1')
                 .expect(200)
                 .end((err: any, res: any) => {
                     body = res.body.data;
