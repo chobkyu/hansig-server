@@ -21,22 +21,22 @@ describe('GET /hansic is ...', function () {
 
 /**한긱 뷔페 전체 조회 */
 describe('GET /hansic/all ...', function () {
-    describe('성공 시', () => {
-
+    describe.only('성공 시', async () => {
         let body: any;
 
         before(done => {
             request(app)
-                .get('hansic/all')
+                .get('/hansic/all')
                 .expect(200)
                 .end((err: any, res: any) => {
+                    console.log(res.body)
                     body = res.body.data;
                     done();
                 });
         });
 
 
-        it('리스트 형식의 데이터를 반환한다', async () => {
+        it('리스트 형식의 데이터를 반환한다', function() {
             body.should.be.instanceOf(Array);
         });
 

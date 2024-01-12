@@ -12,65 +12,57 @@ const prisma = new PrismaClient();
 ㄴ 리뷰 댓글 삭제 시
 */
 
-class HansicService{
-    async getHansicDate(){
-        try{
+class HansicService {
+    async getHansicDate() {
+        try {
             const data = await prisma.hansics.findMany();
-            
-            return {data,success:true}
-        }catch(err){
+
+            return { data, success: true }
+        } catch (err) {
             console.error(err);
-            return {success:false}
+            return { success: false }
         }
     }
-    async get(restaurantId:number):Promise<any>
-    {
-        try{
-            const data = await prisma.hansics.findUnique({where:{id:restaurantId,},});
-            if(data)
-            {
-                return {data,success:true};
+    async get(restaurantId: number): Promise<any> {
+        try {
+            const data = await prisma.hansics.findUnique({ where: { id: restaurantId, }, });
+            if (data) {
+                return { data, success: true };
             }
-            else
-            {
-                return {success:false};
+            else {
+                return { success: false };
             }
-        }catch(err){
-            return {success:false}
+        } catch (err) {
+            return { success: false }
         }
     }
-    async getFromLocation(locationId:number):Promise<any> 
-    {
-        try{
-            const data = await prisma.hansics.findMany({where:{location_id:locationId},take:10});
-            if(data)
-            {
-                return {data,success:true};
+    async getFromLocation(locationId: number): Promise<any> {
+        try {
+            const data = await prisma.hansics.findMany({ where: { location_id: locationId }, take: 10 });
+            if (data) {
+                return { data, success: true };
             }
-            else
-            {
-                return {success:false};
+            else {
+                return { success: false };
             }
-        }catch(err){
-            return {success:false}
+        } catch (err) {
+            return { success: false }
         }
 
     }
-    async getAll():Promise<hansics[]|false>
-    {
-        try{
+    async getAll(): Promise<hansics[] | false> {
+        try {
             const data = await prisma.hansics.findMany({
-                take: 10,});
-                
-            if(data)
-            {
+                take: 10,
+            });
+
+            if (data) {
                 return data;
             }
-            else
-            {
+            else {
                 return false;
             }
-        }catch(err){
+        } catch (err) {
             return false
         }
     }
@@ -84,7 +76,7 @@ class HansicService{
     //         try{
     //             const data = await prisma.review.findMany();
     //             //console.log(data)
-                
+
     //             return {data,success:true}
     //         }catch(err){
     //             console.error(err);
@@ -95,7 +87,7 @@ class HansicService{
     //         try{
     //             const data = await prisma.hansics.findMany();
     //             //console.log(data)
-                
+
     //             return {data,success:true}
     //         }catch(err){
     //             console.error(err);
