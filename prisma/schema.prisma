@@ -24,6 +24,8 @@ model user {
   userImgs userImgs[]
   reviews review[]
   menus menu[]
+  userGrade userGrade @relation(fields:[userGradeId],references:[id])
+  userGradeId Int
 }
 
 model userImgs {
@@ -33,6 +35,13 @@ model userImgs {
   user user @relation(fields:[userId],references:[id])
   userId Int
   
+}
+
+model userGrade {
+  id Int @id @default(autoincrement())
+  userGrade String? @db.VarChar(10)
+  description String? @db.VarChar(100)
+  user user[]
 }
 
 model location {
