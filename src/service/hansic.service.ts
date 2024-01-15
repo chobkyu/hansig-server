@@ -42,12 +42,24 @@ class HansicService {
   async getFromLocation(locationId: number): Promise<any> {
     try {
       const data = await prisma.hansics.findMany(
-          {where : {location_id : locationId}, take : 10});
-      if (data) {
-        return {data, success : true};
-      } else {
-        return {success : false};
-      }
+        {include : {loacation : true, sicdangImgs : true},where:{location_id:locationId}, take : 10});
+    if (data) {
+      const rtdata =
+          await Promise.all(data.map(element => ({
+                                       id : element.id,
+                                       name : element.name,
+                                       addr : element.addr,
+                                       google_star : element.google_star,
+                                       userStar : element.userStar,
+                                       location_id : element.location_id,
+                                       location : element.loacation.location,
+                                       imgUrl : element.sicdangImgs
+                                     })))
+      console.log(rtdata);
+      return rtdata;
+    } else {
+      return false;
+    }
     } catch (err) {
       return { success: false }
     }
