@@ -26,7 +26,7 @@ const output = {
       } else {
         const response = await hansicService.get(id);
         if(response.success){
-        return res.json(response.data);
+        return res.json(response);
     }
     else
     {
@@ -45,7 +45,7 @@ const output = {
       } else {
         if (id > 0 && id < 13) {
           const response = await hansicService.getFromLocation(id);
-          return res.json(response.data);
+          return res.json({data:response});
         } else {
           return res.status(404).end();
         }

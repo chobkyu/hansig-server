@@ -39,10 +39,11 @@ class HansicService {
       return { success: false }
     }
   }
-  async getFromLocation(locationId: number): Promise<any> {
+  async getFromLocation(locationId: number): Promise<any[]|false> {
     try {
       const data = await prisma.hansics.findMany(
         {include : {loacation : true, sicdangImgs : true},where:{location_id:locationId}, take : 10});
+        console.log(data);
     if (data) {
       const rtdata =
           await Promise.all(data.map(element => ({
@@ -61,7 +62,7 @@ class HansicService {
       return false;
     }
     } catch (err) {
-      return { success: false }
+      return false;
     }
   }
   async getAll(): Promise<any[]|false> {

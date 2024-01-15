@@ -21,7 +21,7 @@ describe('GET /hansic is ...', function () {
 
 /**한긱 뷔페 전체 조회 */
 describe('GET /hansic/all ...', function () {
-    describe.only('성공 시', async () => {
+    describe('성공 시', async () => {
         let body: any;
 
         before(done => {
@@ -90,7 +90,7 @@ describe('GET /hansic/all ...', function () {
 describe('GET /hansic/loc/:id ...', function () {
 
 
-    describe('성공 시', () => {
+    describe.only('성공 시', () => {
         let body: any;
 
         before(done => {
