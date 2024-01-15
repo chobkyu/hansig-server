@@ -39,7 +39,8 @@ class UserService {
                     userId:user.userId,
                     userPw:user.userPw,
                     userName:user.userName,
-                    userNickName:user.userNickName
+                    userNickName:user.userNickName,
+                    userGradeId : 1
                 }
             });
             return {success:true,status:201};
