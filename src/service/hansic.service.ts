@@ -25,18 +25,28 @@ class HansicService {
   }
   async get(restaurantId: number): Promise<any> {
     try {
-      const data = await prisma.hansics.findUnique({
-        where : {
+      const data = await prisma.hansics.findFirst({include : {loacation : true, sicdangImgs : true},where : {
           id : restaurantId,
         },
       });
+      console.log(data);
       if (data) {
-        return {data, success : true};
+        const rtdata={ 
+          id : data.id,
+          name : data.name,
+          addr : data.addr,
+          google_star : data.google_star,
+          userStar : data.userStar,
+          location_id : data.location_id,
+          location : data.loacation.location,
+          imgUrl : data.sicdangImgs}
+          console.log(rtdata);
+        return rtdata;
       } else {
-        return {success : false};
+        return false;
       }
     } catch (err) {
-      return { success: false }
+      return false;
     }
   }
   async getFromLocation(locationId: number): Promise<any[]|false> {
@@ -62,7 +72,7 @@ class HansicService {
       return false;
     }
     } catch (err) {
-      return false;
+      return false
     }
   }
   async getAll(): Promise<any[]|false> {

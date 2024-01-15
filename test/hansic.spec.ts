@@ -90,7 +90,7 @@ describe('GET /hansic/all ...', function () {
 describe('GET /hansic/loc/:id ...', function () {
 
 
-    describe.only('성공 시', () => {
+    describe('성공 시', () => {
         let body: any;
 
         before(done => {
@@ -180,7 +180,7 @@ describe('GET /hansic/:id ...', function () {
 
         before(done => {
             request(app)
-                .get('/hansic/100')
+                .get('/hansic/101')
                 .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body.data;
@@ -194,7 +194,7 @@ describe('GET /hansic/:id ...', function () {
         });
 
         it('해당 데이터의 id는 요청 id와 값이 일치해야 한다.',async () => {
-            body.id.should.equal(100);
+            body.id.should.equal(101);
         });
 
         it('해당 데이터는 name을 포함 하어야 한다.', async () => {

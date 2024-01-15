@@ -22,17 +22,17 @@ const output = {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(401);
+        return res.status(400).end();
       } else {
         const response = await hansicService.get(id);
-        if(response.success){
-        return res.json(response);
+        if(response){
+         return res.json({data:response});
+        }
+        else
+        {
+          return res.status(400).end();
+        }
     }
-    else
-    {
-        return res.status(204).end();
-    }
-      }
     } catch (err) {
       return res.status(500).end();
     }
@@ -41,13 +41,13 @@ const output = {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
-        return res.status(401);
+        return res.status(400).end();
       } else {
         if (id > 0 && id < 13) {
           const response = await hansicService.getFromLocation(id);
           return res.json({data:response});
         } else {
-          return res.status(404).end();
+          return res.status(400).end();
         }
       }
     } catch (err) {
