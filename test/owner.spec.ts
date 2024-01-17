@@ -321,9 +321,65 @@ describe('get /owner/menu/:id', function() {
                     done();
                 });
         });
-
      
     });
 });
 
 
+/**메뉴 삭제 시 */
+describe('delete /owner/menu/:id', function () {
+    describe('성공 시',() => {
+        it('204를 응답한다.',(done) => {
+            request(app)
+                .delete('/owner/menu/1') //테스트용 메뉴 생성 예정
+                .set("authorization","Bearer testtoken") //테스트용 토큰 생성 예정
+                .expect(204)
+                .end(done)
+        });
+
+    });
+
+    describe('실패 시',() => {
+        it('id가 숫자가 아닐 경우 400으로 응답',(done) => {
+            request(app)
+                .delete('/owner/menu/제육')
+                .set("authorization","Bearer testtoken")
+                .expect(400)
+                .end(done)
+        });
+
+        it('없는 메뉴일 경우 404로 응답',(done) => {
+            request(app)
+                .delete('/owner/menu/0')
+                .set("authorization","Bearer testtoken")
+                .expect(404)
+                .end(done)
+        });
+
+        it('권한이 없을 경우 401로 응답',(done) => {
+            request(app)
+                .delete('/owner/menu/1')
+                .set("authorization","Bearer testtoken") //토큰 생성 예정
+                .expect(400)
+                .end(done)
+        });
+
+        it('로그인이 안되어 있을 시 401로 응답',(done) => {
+            request(app)
+                .delete('/owner/menu/1')
+                .expect(400)
+                .end(done)
+        });
+    });
+});
+
+/**수정 시 */
+describe('patch /owner/menu/:id',function () {
+    describe('성공 시',() => {
+        
+    });
+
+    describe('실패 시',() => {
+
+    });
+});
