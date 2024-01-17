@@ -169,6 +169,84 @@ describe('post /owner/login ',function () {
                 .send(body)
                 .expect(401)
                 .end(done);
-        })
+        });
+    });
+});
+
+
+/**메뉴 입력 시 */
+describe('post /owner/menu',function () {
+    describe('성공 시 ',()=>{
+        let menu = {
+            name : '제육볶음',
+            useFlag: 'true',
+            userId : 58, //테스트 시 쓸 계정과 가게 생성 예정
+            hansicsId : 101,
+            price : 2000,
+            imgUrl : 'test.png'
+        };
+
+        let body : any;
+
+        it('성공 시 201로 응답한다.',done => {
+            request(app)
+                .post('/owner/menu')
+                .send(menu)
+                .expect(201)
+                .end(done);
+        });
+    });
+
+    describe('실패 시',() => {
+        it('입력 값이 잘못 되었을 경우 400으로 응답한다.', (done) => {
+            let menu = {
+                name : 1234,
+                useFlag: 'true',
+                userId : 58, //테스트 시 쓸 계정과 가게 생성 예정
+                hansicsId : 101,
+                price : 2000,
+                imgUrl : 'test.png'
+            };
+
+            request(app)
+                .post('/owner/menu')
+                .send(menu)
+                .expect(400)
+                .end(done);
+        });
+
+        it('입력 값이 누락 되었을 경우 400으로 응답한다.',(done) => {
+            let menu = {
+                useFlag: 'true',
+                userId : 58, //테스트 시 쓸 계정과 가게 생성 예정
+                hansicsId : 101,
+                price : 2000,
+                imgUrl : 'test.png'
+            };
+
+            request(app)
+                .post('/owner/menu')
+                .send(menu)
+                .expect(400)
+                .end(done);
+        });
+
+        it('다른 입력 값이 들어왔을 경우 400으로 응답한다.',(done) => {
+            let menu = {
+                name : 1234,
+                useFlag: 'true',
+                userId : 58, //테스트 시 쓸 계정과 가게 생성 예정
+                hansicsId : 101,
+                price : 2000,
+                imgUrl : 'test.png',
+                hansics : 5
+            };
+
+            request(app)
+                .post('/owner/menu')
+                .send(menu)
+                .expect(400)
+                .end(done);
+        });
     });
 })

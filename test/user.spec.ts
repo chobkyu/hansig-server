@@ -78,7 +78,7 @@ describe('post /user is..', function () {
             .post('/users')
             .send(body)
             .expect(409)
-            .end(done)
+            .end(done);
         });
     })
 });
