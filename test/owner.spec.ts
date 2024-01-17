@@ -249,4 +249,81 @@ describe('post /owner/menu',function () {
                 .end(done);
         });
     });
-})
+});
+
+/**메뉴 조회 시 (id는 식당 id) */
+describe('get /owner/menu/:id', function() {
+    describe('성공 시',()=>{
+        let body:any;
+        before(done => {
+            request(app)
+                .get('/owner/menu/1')
+                .set("authorization","Bearer testtoken")
+                .end((err:any,res:any) => {
+                    body = res.body.data;
+                    done();
+                });
+        });
+
+        it('리스트가 리턴되어야 한다', function () {
+            body.shold.be.instanceOf(Array);
+        });
+
+        it('리스트 각 요소에는 id가 포함되어야 한다', function () {
+            body.should.have.property('id');
+        });
+
+        it('해당 식당 id는 요청 id와 일치해야 한다.', function (){
+            body.id.shoud.be.equal(1);
+        });
+
+        it('리스트 각 요소에는 name이 포함되어야 한다', function () {
+            body.should.have.property('name');
+        });
+
+        it('리스트 각 요소에는 price이 포함되어야 한다', function () {
+            body.should.have.property('price');
+        });
+
+        it('리스트 각 요소에는 imgUrl이 포함되어야 한다', function () {
+            body.should.have.property('imgUrl');
+        });
+
+        it('리스트가 null이면 204 리턴',(done) => {
+            request(app)
+                .get('/owner/menu/2')
+                .set("authorization","Bearer testtoken")
+                .expect(204)
+                .end((err:any,res:any)=>{
+                    done();
+                });
+        });
+        
+    });
+
+    describe('실패 시',() => {
+        it('없는 id면 404 리턴',(done) => {
+            request(app)
+                .get('/owner/menu/0')
+                .set("authorization","Bearer testtoken")
+                .expect(404)
+                .end((err:any,res:any)=>{
+                    done();
+                });
+        });
+
+        /** 이건 나중에 메뉴 조회를 다른 사용자들도 할 수 있으면 수정 예정 */
+        it('로그인이 안되어 있으면 401 리턴',(done) => {
+            request(app)
+                .get('/owner/menu/0')
+                .expect(401)
+                .end((err:any,res:any)=>{
+                    done();
+                });
+        });
+
+     
+    });
+});
+
+
