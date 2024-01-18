@@ -152,7 +152,7 @@ describe('GET /hansic/loc/:id ...', function () {
     describe('실패 시 ', async () => {
         it('id 입력 시 타입이 number가 아니면 400 리턴', async () => {
             request(app)
-                .get('/hansic/loc/서울')
+                .get(encodeURIComponent('/hansic/loc/서울'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
                     console.log(res.body);
@@ -230,7 +230,7 @@ describe('GET /hansic/:id ...', function () {
         
     });
 
-    describe.only('실패 시', async () => {
+    describe('실패 시', async () => {
         it('해당 데이터를 찾을 수 없을 시 404 리턴', async () => {
             request(app)
                 .get('/hansic/200000')
@@ -243,7 +243,7 @@ describe('GET /hansic/:id ...', function () {
 
         it('잘못된 id 입력 시 400 리턴', async () => {
             request(app)
-                .get('/hansic/기원이한뷔')
+                .get(encodeURIComponent('/hansic/기원이한뷔'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
                     console.log(res.body);
