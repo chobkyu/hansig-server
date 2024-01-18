@@ -150,7 +150,7 @@ describe('GET /hansic/loc/:id ...', function () {
     });
 
     describe('실패 시 ', async () => {
-        it('id 입력 시 타입이 nuber가 아니면 400 리턴', async () => {
+        it('id 입력 시 타입이 number가 아니면 400 리턴', async () => {
             request(app)
                 .get('/hansic/loc/서울')
                 .expect(400)
@@ -180,7 +180,7 @@ describe('GET /hansic/:id ...', function () {
 
         before(done => {
             request(app)
-                .get('/hansic/101')
+                .get('/hansic/1804')
                 .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body.data;
@@ -194,7 +194,7 @@ describe('GET /hansic/:id ...', function () {
         });
 
         it('해당 데이터의 id는 요청 id와 값이 일치해야 한다.',async () => {
-            body.id.should.equal(101);
+            body.id.should.equal(1804);
         });
 
         it('해당 데이터는 name을 포함 하어야 한다.', async () => {
@@ -230,13 +230,14 @@ describe('GET /hansic/:id ...', function () {
         
     });
 
-    describe('실패 시', async () => {
+    describe.only('실패 시', async () => {
         it('해당 데이터를 찾을 수 없을 시 404 리턴', async () => {
             request(app)
                 .get('/hansic/200000')
                 .expect(404)
                 .end(async (err: any, res: any) => {
                     console.log(res.body);
+                    console.log(res.status);
                 });
         });
 

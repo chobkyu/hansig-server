@@ -40,10 +40,11 @@ const output = {
   getFromLocation : async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
+      console.log(id);
       if (isNaN(id)) {
         return res.status(400).end();
       } else {
-        if (id > 0 && id < 13) {
+        if ((id > 0) && (id < 13)) {
           const response = await hansicService.getFromLocation(id);
           return res.json({data:response});
         } else {
@@ -53,7 +54,7 @@ const output = {
     } catch (err) {
       return res.status(500).end();
     }
-  }
+  },
   // create:async(req:Request,res:Response)=>
   // {
   //     const restaurantId= req.params.id;

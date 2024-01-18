@@ -17,7 +17,7 @@ describe('post /user is..', function () {
             .send(testData)
             .expect(201)
             .end((err:any,res:any) => {
-                //console.log(res.body);
+                console.log(res.body);
             });
     });
 
