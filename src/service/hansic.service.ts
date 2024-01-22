@@ -16,7 +16,7 @@ class HansicService {
   async getHansicDate() {
     try {
       const data =
-          await prisma.hansics.findMany({include : {loacation : true}});
+          await prisma.hansics.findMany({include : {location : true}});
       return { data, success: true }
     } catch (err) {
       console.error(err);
@@ -25,7 +25,7 @@ class HansicService {
   }
   async get(restaurantId: number): Promise<any> {
     try {
-      const data = await prisma.hansics.findFirst({include : {loacation : true, sicdangImgs : true},where : {
+      const data = await prisma.hansics.findFirst({include : {location : true, sicdangImgs : true},where : {
           id : restaurantId,
         },
       });
@@ -38,7 +38,7 @@ class HansicService {
           google_star : data.google_star,
           userStar : data.userStar,
           location_id : data.location_id,
-          location : data.loacation.location,
+          location : data.location.location,
           imgUrl : data.sicdangImgs}
           console.log(rtdata);
         return rtdata;
@@ -52,7 +52,7 @@ class HansicService {
   async getFromLocation(locationId: number): Promise<any[]|false> {
     try {
       const data = await prisma.hansics.findMany(
-        {include : {loacation : true, sicdangImgs : true},where:{location_id:locationId}, take : 10});
+        {include : {location : true, sicdangImgs : true},where:{location_id:locationId}, take : 10});
         console.log(data);
     if (data) {
       const rtdata =
@@ -63,7 +63,7 @@ class HansicService {
                                        google_star : element.google_star,
                                        userStar : element.userStar,
                                        location_id : element.location_id,
-                                       location : element.loacation.location,
+                                       location : element.location.location,
                                        imgUrl : element.sicdangImgs
                                      })))
       console.log(rtdata);
@@ -78,7 +78,7 @@ class HansicService {
   async getAll(): Promise<any[]|false> {
     try {
       const data = await prisma.hansics.findMany(
-          {include : {loacation : true, sicdangImgs : true}, take : 10});
+          {include : {location : true, sicdangImgs : true}, take : 10});
       if (data) {
         const rtdata =
             await Promise.all(data.map(element => ({
@@ -88,7 +88,7 @@ class HansicService {
                                          google_star : element.google_star,
                                          userStar : element.userStar,
                                          location_id : element.location_id,
-                                         location : element.loacation.location,
+                                         location : element.location.location,
                                          imgUrl : element.sicdangImgs
                                        })))
         console.log(rtdata);

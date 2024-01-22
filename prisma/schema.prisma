@@ -7,13 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model books {
   id          Int     @id @default(autoincrement())
   name        String? @db.VarChar(100)
   description String?
 }
-
-
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model user {
   id Int @id @default(autoincrement())
@@ -114,6 +113,9 @@ model reviewImg {
 model reviewComment {
   id Int @id @default(autoincrement())
   comment String? @db.VarChar(500)
+  review review @relation(fields:[reviewId],references:[id])
+  reviewId Int
+ String? @db.VarChar(500)
   review review @relation(fields:[reviewId],references:[id])
   reviewId Int
 }

@@ -23,8 +23,7 @@ const output = {
             }
 
             const data = response.data;
-            //console.log(data)
-            return res.json({data});
+            return res.json({data}).status(201);
         }catch(err){
             console.log(err);
             return res.status(500).end();
@@ -38,7 +37,7 @@ const process = {
         try{
             //console.log(req.body)
             const response = await userservice.insertUser(req.body);
-            
+            console.log(response);
             if(response.success){
                 return res.status(201).end();
             }
