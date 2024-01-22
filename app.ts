@@ -3,8 +3,10 @@ import morgan from "morgan"
 require("dotenv").config();
 const app = express();
 const cors = require('cors');
+
 const hansic = require('./src/router/hansic')
 const user = require('./src/router/users')
+const owner = require('./src/router/owner');
 
 if(process.env.NODE_ENV!=='test'){
     app.use(morgan('dev'))
@@ -21,6 +23,7 @@ app.use(cors());
 
 app.use('/hansic',hansic);
 app.use('/users',user);
+app.use('/owner',owner);
 
 
 

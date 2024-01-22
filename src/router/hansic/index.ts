@@ -30,4 +30,4 @@ router.get('/:id',ctrl.output.get);
 // router.post('/:id/comment',ctrl.process.comment.create);
 // router.delete('/:id/comment',ctrl.process.comment.delete);
 
-module.exports = router
+module.exports = router;
