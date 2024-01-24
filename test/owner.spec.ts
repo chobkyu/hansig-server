@@ -376,7 +376,7 @@ describe('delete /owner/menu/:id', function () {
 /**수정 시 */
 describe('patch /owner/menu/:id',function () {
     describe('성공 시',() => {
-        
+
     });
 
     describe('실패 시',() => {
