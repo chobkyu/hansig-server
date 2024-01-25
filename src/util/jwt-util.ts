@@ -23,6 +23,11 @@ module.exports = {
             return {success:true,decodedData:{id:1,userId:'test',userNickName:'giwon'}}  //테스트용 코드
         }
 
+        if(token == 'ownertoken') {
+            console.log('test owner token');
+            return {success:true, decodedDate:{}} //테스트용 오너 아이디 내용 추가 예정
+        }
+
         try{
             decoded = jwt.verify(token,secret);
             return {success:true, decodedData : decoded}

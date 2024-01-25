@@ -10,7 +10,10 @@ describe('post /owner',function () {
             userPw:'1234',
             userName:'test_owner',
             userNickName:'ElonMusk',
-            ownerNum:1234
+            ownerNum:'1234',
+            hansicdangName: '기원한뷔',
+            hansicdangAddr:'하남시 어딘가',
+            location_id:1
         }
 
         it('201로 응답한다.',(done) => {

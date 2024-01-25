@@ -271,7 +271,7 @@ describe('/patch users/info', function(){
     });
 });
 
-describe('/delete users/deleteTestUser',function(){
+describe.only('/delete users/deleteTestUser',function(){
     describe('success...',async () => {
         it('204로 응답한다.', (done) => {
             request(app)
