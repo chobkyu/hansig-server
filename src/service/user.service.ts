@@ -21,12 +21,12 @@ class UserService {
 
             //아이디 중복 체크
             const checkId = await this.checkId(user.userId);
-            console.log(checkId);
             if(!checkId.success) return {success:false,status:409};
 
             //닉네임 중복 체크
             if(user.userNickName!= null){
                 const checkNickName = await this.checkNickName(user.userNickName);
+                
                 if(!checkNickName.success) return {success:false, status:409};
             }
            

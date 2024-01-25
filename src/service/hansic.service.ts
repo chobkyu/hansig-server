@@ -23,6 +23,7 @@ class HansicService {
       return { success: false }
     }
   }
+  //식당id로 조회
   async get(restaurantId: number): Promise<any> {
     try {
       const data = await prisma.hansics.findFirst({include : {location : true, sicdangImgs : true},where : {
@@ -31,17 +32,7 @@ class HansicService {
       });
       console.log(data);
       if (data) {
-        const rtdata={ 
-          id : data.id,
-          name : data.name,
-          addr : data.addr,
-          google_star : data.google_star,
-          userStar : data.userStar,
-          location_id : data.location_id,
-          location : data.location.location,
-          imgUrl : data.sicdangImgs}
-          console.log(rtdata);
-        return rtdata;
+        return data;
       } else {
         return false;
       }
@@ -49,25 +40,14 @@ class HansicService {
       return false;
     }
   }
+  //지역id로 조회
   async getFromLocation(locationId: number): Promise<any[]|false> {
     try {
       const data = await prisma.hansics.findMany(
-        {include : {location : true, sicdangImgs : true},where:{location_id:locationId}, take : 10});
+        {include : {location : true, sicdangImgs :true},where:{location_id:locationId}, take : 10});
         console.log(data);
     if (data) {
-      const rtdata =
-          await Promise.all(data.map(element => ({
-                                       id : element.id,
-                                       name : element.name,
-                                       addr : element.addr,
-                                       google_star : element.google_star,
-                                       userStar : element.userStar,
-                                       location_id : element.location_id,
-                                       location : element.location.location,
-                                       imgUrl : element.sicdangImgs
-                                     })))
-      console.log(rtdata);
-      return rtdata;
+      return data;
     } else {
       return false;
     }
@@ -75,24 +55,13 @@ class HansicService {
       return false
     }
   }
+  //전체조회
   async getAll(): Promise<any[]|false> {
     try {
       const data = await prisma.hansics.findMany(
           {include : {location : true, sicdangImgs : true}, take : 10});
       if (data) {
-        const rtdata =
-            await Promise.all(data.map(element => ({
-                                         id : element.id,
-                                         name : element.name,
-                                         addr : element.addr,
-                                         google_star : element.google_star,
-                                         userStar : element.userStar,
-                                         location_id : element.location_id,
-                                         location : element.location.location,
-                                         imgUrl : element.sicdangImgs
-                                       })))
-        console.log(rtdata);
-        return rtdata;
+        return data;
       } else {
         return false;
       }
