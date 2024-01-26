@@ -46,7 +46,7 @@ export class UserService {
             return {success:true,status:201};
         }catch(err){
             console.error(err);
-            return {success:false}
+            return {success:false,status:500}
         }
     }
 
@@ -104,7 +104,7 @@ export class UserService {
 
         }catch(err){
             console.log(err);
-            return {success:false};
+            return {success:false,status:400};
         }
     }
 
@@ -172,11 +172,11 @@ export class UserService {
 
             if(res?.userId==null) return {success:false,status:404,msg:userId};
 
-            return {success:true,data:res};
+            return {success:true,data:res,status:200};
 
         }catch(err){
             console.log(err);
-            return {success:false};
+            return {success:false,status:500};
         }
     }
 
@@ -208,11 +208,11 @@ export class UserService {
                 }
             });
 
-            return {success:true};
+            return {success:true,status:201};
 
         }catch(err){
             console.error(err);
-            return {success:false};
+            return {success:false,status:500};
         }
     }
 

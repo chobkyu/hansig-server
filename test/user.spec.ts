@@ -3,7 +3,7 @@ const request = require('supertest')
 const should = require('should');
 
 /**회원 가입 시 */
-describe('post /user is..', function () {
+describe.only('post /user is..', function () {
     let testData = {
         userId:'test2',
         userPw:'1234',
@@ -271,7 +271,7 @@ describe('/patch users/info', function(){
     });
 });
 
-describe.only('/delete users/deleteTestUser',function(){
+describe('/delete users/deleteTestUser',function(){
     describe('success...',async () => {
         it('204로 응답한다.', (done) => {
             request(app)
