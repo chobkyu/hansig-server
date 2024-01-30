@@ -9,7 +9,6 @@ const jwt = require('../util/jwt-util');
 const prisma = new PrismaClient();
 
 export class UserService {
-   
     /**회원 가입 */
     async insertUser(body:user){
         const user:user = body;
@@ -27,6 +26,7 @@ export class UserService {
             //닉네임 중복 체크
             if(user.userNickName!= null){
                 const checkNickName = await this.checkNickName(user.userNickName);
+                
                 if(!checkNickName.success) return {success:false, status:409};
             }
            
@@ -40,7 +40,7 @@ export class UserService {
                     userPw:user.userPw,
                     userName:user.userName,
                     userNickName:user.userNickName,
-                    userGradeId : 1
+                    userGrade:{connect:{id:1}}
                 }
             });
 

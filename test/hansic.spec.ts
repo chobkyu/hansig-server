@@ -21,22 +21,22 @@ describe('GET /hansic is ...', function () {
 
 /**한긱 뷔페 전체 조회 */
 describe('GET /hansic/all ...', function () {
-    describe('성공 시', () => {
-
+    describe('성공 시', async () => {
         let body: any;
 
         before(done => {
             request(app)
-                .get('hansic/all')
+                .get('/hansic/all')
                 .expect(200)
                 .end((err: any, res: any) => {
+                    console.log(res.body)
                     body = res.body.data;
                     done();
                 });
         });
 
 
-        it('리스트 형식의 데이터를 반환한다', async () => {
+        it('리스트 형식의 데이터를 반환한다', function() {
             body.should.be.instanceOf(Array);
         });
 
@@ -95,7 +95,7 @@ describe('GET /hansic/loc/:id ...', function () {
 
         before(done => {
             request(app)
-                .get('hansic/loc/1')
+                .get('/hansic/loc/1')
                 .expect(200)
                 .end((err: any, res: any) => {
                     body = res.body.data;
@@ -150,9 +150,9 @@ describe('GET /hansic/loc/:id ...', function () {
     });
 
     describe('실패 시 ', async () => {
-        it('id 입력 시 타입이 nuber가 아니면 400 리턴', async () => {
+        it('id 입력 시 타입이 number가 아니면 400 리턴', async () => {
             request(app)
-                .get('/hansic/loc/서울')
+                .get(encodeURIComponent('/hansic/loc/서울'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
                     console.log(res.body);
@@ -180,7 +180,7 @@ describe('GET /hansic/:id ...', function () {
 
         before(done => {
             request(app)
-                .get('/hansic/100')
+                .get('/hansic/1804')
                 .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body.data;
@@ -194,7 +194,7 @@ describe('GET /hansic/:id ...', function () {
         });
 
         it('해당 데이터의 id는 요청 id와 값이 일치해야 한다.',async () => {
-            body.id.should.equal(100);
+            body.id.should.equal(1804);
         });
 
         it('해당 데이터는 name을 포함 하어야 한다.', async () => {
@@ -237,12 +237,13 @@ describe('GET /hansic/:id ...', function () {
                 .expect(404)
                 .end(async (err: any, res: any) => {
                     console.log(res.body);
+                    console.log(res.status);
                 });
         });
 
         it('잘못된 id 입력 시 400 리턴', async () => {
             request(app)
-                .get('/hansic/기원이한뷔')
+                .get(encodeURIComponent('/hansic/기원이한뷔'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
                     console.log(res.body);
@@ -250,8 +251,3 @@ describe('GET /hansic/:id ...', function () {
         });
     });
 });
-
-
-
-
-

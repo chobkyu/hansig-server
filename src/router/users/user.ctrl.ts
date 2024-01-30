@@ -1,8 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
 import { UserService } from "../../service/user.service";
 import express,{Express,Request,Response} from 'express';
-
+const prisma = new PrismaClient();
 const userService = new UserService();
 
 
@@ -24,9 +23,7 @@ const output = {
             }
 
             const data = response.data;
-            //console.log(data)
-            
-            return res.json({data});
+            return res.json({data}).status(201);
         }catch(err){
             console.log(err);
             return res.status(500).end();
@@ -40,7 +37,6 @@ const process = {
         try{
             //console.log(req.body)
             const response = await userService.insertUser(req.body);
-            
             if(response.success){
                 return res.status(201).json(response).end();
             }
@@ -57,7 +53,6 @@ const process = {
         try{
             console.log(req.body);
             const response = await userService.login(req.body);
-
             if(response.success) return res.json(response);
             else return res.status(response.status).end();
 
@@ -87,8 +82,7 @@ const process = {
     //테스트 계정 삭제용
     deleteTestUser :async (req:Request, res:Response) => {
         try{
-            const userservice = new UserService();
-            const response = await userservice.deleteTestUser();
+            const response = await userService.deleteTestUser();
 
             if(response.success){
                 return res.status(204).end();
