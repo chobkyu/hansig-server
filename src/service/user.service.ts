@@ -1,14 +1,14 @@
-import { Login } from "../interface/login";
+import { Login } from "../interface/user/login";
 import { success } from "../interface/success";
-import { UpdateInfoDto } from "../interface/updataInfo";
-import { user } from "../interface/user";
+import { UpdateInfoDto } from "../interface/user/updataInfo";
+import { user } from "../interface/user/user";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
 const jwt = require('../util/jwt-util');
 
 const prisma = new PrismaClient();
 
-class UserService {
+export class UserService {
     /**회원 가입 */
     async insertUser(body:user){
         const user:user = body;
@@ -34,7 +34,7 @@ class UserService {
             //비밀번호 암호화
             user.userPw = await this.hashing(user.userPw);
 
-            await prisma.user.create({
+            const res = await prisma.user.create({
                 data:{
                     userId:user.userId,
                     userPw:user.userPw,
@@ -43,10 +43,15 @@ class UserService {
                     userGrade:{connect:{id:1}}
                 }
             });
-            return {success:true,status:201};
+
+            console.log(res);
+            /**회원가입 후 토큰 발행 */
+            const accessToken = jwt.sign(res);
+            return {success:true,status:201,token:accessToken};
+
         }catch(err){
             console.error(err);
-            return {success:false}
+            return {success:false,status:500}
         }
     }
 
@@ -104,7 +109,7 @@ class UserService {
 
         }catch(err){
             console.log(err);
-            return {success:false};
+            return {success:false,status:400};
         }
     }
 
@@ -172,11 +177,11 @@ class UserService {
 
             if(res?.userId==null) return {success:false,status:404,msg:userId};
 
-            return {success:true,data:res};
+            return {success:true,data:res,status:200};
 
         }catch(err){
             console.log(err);
-            return {success:false};
+            return {success:false,status:500};
         }
     }
 
@@ -208,11 +213,11 @@ class UserService {
                 }
             });
 
-            return {success:true};
+            return {success:true,status:201};
 
         }catch(err){
             console.error(err);
-            return {success:false};
+            return {success:false,status:500};
         }
     }
 
@@ -236,4 +241,3 @@ class UserService {
 }
 
 
-module.exports = UserService

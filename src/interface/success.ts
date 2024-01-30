@@ -1,3 +1,4 @@
 export interface success{
-    success:boolean
+    success:boolean,
+    status?:number
 }

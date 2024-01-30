@@ -10,7 +10,10 @@ describe('post /owner',function () {
             userPw:'1234',
             userName:'test_owner',
             userNickName:'ElonMusk',
-            ownerNum:1234
+            ownerNum:'1234',
+            hansicdangName: '기원한뷔',
+            hansicdangAddr:'하남시 어딘가',
+            location_id:1
         }
 
         it('201로 응답한다.',(done) => {
@@ -376,7 +379,7 @@ describe('delete /owner/menu/:id', function () {
 /**수정 시 */
 describe('patch /owner/menu/:id',function () {
     describe('성공 시',() => {
-        
+
     });
 
     describe('실패 시',() => {

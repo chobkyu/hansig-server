@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { UserService } from "../../service/user.service";
 import express,{Express,Request,Response} from 'express';
 const prisma = new PrismaClient();
-const UserServiceClass = require('../../service/user.service');
-const userservice = new UserServiceClass();
+const userService = new UserService();
 
 
 const output = {
@@ -15,7 +15,7 @@ const output = {
             //number 타입 id가 아닐시
             if(Number.isNaN(id)) return res.json({id}).status(400).end();
 
-            const response = await userservice.getUser(id);
+            const response = await userService.getUser(id);
 
             if(!response.success) {
                 console.log(response)
@@ -36,10 +36,9 @@ const process = {
     insertUser : async (req:Request,res:Response) => {
         try{
             //console.log(req.body)
-            const response = await userservice.insertUser(req.body);
-            console.log(response);
+            const response = await userService.insertUser(req.body);
             if(response.success){
-                return res.status(201).end();
+                return res.status(201).json(response).end();
             }
             return res.status(response.status).end();
         }catch(err){
@@ -53,8 +52,7 @@ const process = {
     login : async(req:Request,res:Response) => {
         try{
             console.log(req.body);
-            const response = await userservice.login(req.body);
-
+            const response = await userService.login(req.body);
             if(response.success) return res.json(response);
             else return res.status(response.status).end();
 
@@ -69,7 +67,7 @@ const process = {
         try{
             console.log(req.body)
             
-            const response = await userservice.updateUserInfo(req.body);
+            const response = await userService.updateUserInfo(req.body);
 
             if(response.success) return res.status(201).end();
             else return res.status(response.status).end();
@@ -84,7 +82,7 @@ const process = {
     //테스트 계정 삭제용
     deleteTestUser :async (req:Request, res:Response) => {
         try{
-            const response = await userservice.deleteTestUser();
+            const response = await userService.deleteTestUser();
 
             if(response.success){
                 return res.status(204).end();
