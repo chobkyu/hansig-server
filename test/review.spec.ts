@@ -86,7 +86,7 @@ describe('post /review/:id',function() {
 
 
 /**리뷰 수정 시  id는 리뷰*/
-describe.only('patch /review/update/:id',function () {
+describe('patch /review/update/:id',function () {
     describe('성공 시',() => {
         let testData : Review = {
             review : '맛있어요!!',
@@ -222,8 +222,98 @@ describe.only('patch /review/update/:id',function () {
                 .send(testData)
                 .expect(401)
                 .end(done);
+        });
+
+    });
+});
+
+/**리뷰 조회 시 id는 리뷰 id */
+describe.only('get /reivew/:id ',function() {
+    describe('성공 시 해당 리뷰 리턴',() => {
+        let body : any;
+
+        before(done => {
+            request(app)
+                .get('review/1')
+                .expect(200)
+                .end((err:any, res:any) => {
+                    body = res.body;
+                    done();
+                });
+        });
+
+        it('review가 포함 되어야 한다.',async () => {
+            body.should.have.property('review');
+        });
+
+        it('review는 string이여야 한다.', async () => {
+            body.review.should.be.instanceOf(String);
+        });
+
+        it('star가 포함되어야 한다.',async () => {
+            body.should.have.property('star');
+        });
+
+        it('star는 number여야 한다.', async () => {
+            body.star.should.be.instanceOf(Number);
+        });
+
+        it('imgUrl이 포함되어야 한다.',async () => {
+            body.should.have.property('imgUrl');
+        });
+
+        it('imgUrl은 배열이여야 한다.', async () => {
+            body.imgUrl.should.be.instanceOf(Array<string>); //이거 통과 안되면 그냥 Array로
+        });
+
+        it('user가 포함되어야 한다.',async () => {
+            body.should.have.property('user');
+        });
+
+        it('user.userNickName가 포함되어야 한다.',async () => {
+            body.user.should.have.property('userNickName');
+        });
+
+        it('user.userNickName는 string여야 한다.', async () => {
+            body.user.userNickName.review.should.be.instanceOf(String);
+        });
+
+        it('user.id가 포함되어야 한다.',async () => {
+            body.user.should.have.property('id');
+        });
+
+        it('user.id는 number여야 한다.', async () => {
+            body.user.id.should.be.instanceOf(Number);
+        });
+
+        it('reviewComment가 포함되어야 한다.',async () => {
+            body.should.have.property('reviewComment');
         })
 
-    })
+        it('reviewComment는 Array여야 한다',async () => {
+            body.reviewComment.shoud.be.instanceOf(Array);
+        });
+    });
+
+    describe('실패 시',() => {
+        it('없는 리뷰 조회 시 404로 응답한다',(done) => {
+            request(app)
+                .get('review/0')
+                .expect(404)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+
+        it('잘못된 파라미터일 시 400으로 응답한다',(done) => {
+            request(app)
+                .get('review/sigdang')
+                .expect(400)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+
+    });
 });
 
