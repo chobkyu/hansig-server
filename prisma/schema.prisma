@@ -127,7 +127,4 @@ model reviewComment {
   comment String? @db.VarChar(500)
   review review @relation(fields:[reviewId],references:[id])
   reviewId Int
- String? @db.VarChar(500)
-  review review @relation(fields:[reviewId],references:[id])
-  reviewId Int
 }

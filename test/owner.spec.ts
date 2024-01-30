@@ -92,7 +92,7 @@ describe('post /owner',function () {
 });
 
 /**사업자로 로그인 시 */
-describe('post /owner/login ',function () {
+describe.only('post /owner/login ',function () {
     describe('success',() =>{
         let body = {
             userId:'owner1',

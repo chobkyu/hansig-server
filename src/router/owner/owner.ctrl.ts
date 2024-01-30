@@ -1,6 +1,6 @@
 import express,{Express,Request,Response} from 'express';
 import { OwnerService } from '../../service/owner.service';
-
+import { Login } from '../../interface/user/login';
 const ownerService = new OwnerService();
 
 const output = {
@@ -21,9 +21,19 @@ const process = {
     },
 
     ownerSignIn : async (req:Request,res:Response) => {
-
+        try{
+            const response = await ownerService.ownerSignIn(req.body);
+            if(response.success){
+            return res.json(response);}
+            else
+            {
+                return res.status(response.status).end();
+            }
+        }catch(err){
+            console.error(err);
+            return res.status(500).end();
+        }
     },
-
     ownerMenu :async (req:Request, res:Response) => {
         
     },
