@@ -42,7 +42,7 @@ const process = {
             const response = await userService.insertUser(req.body);
             
             if(response.success){
-                return res.status(201).end();
+                return res.status(201).json(response).end();
             }
             return res.status(response.status).end();
         }catch(err){
