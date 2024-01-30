@@ -34,7 +34,7 @@ export class UserService {
             //비밀번호 암호화
             user.userPw = await this.hashing(user.userPw);
 
-            await prisma.user.create({
+            const res = await prisma.user.create({
                 data:{
                     userId:user.userId,
                     userPw:user.userPw,
@@ -43,7 +43,12 @@ export class UserService {
                     userGradeId : 1
                 }
             });
-            return {success:true,status:201};
+
+            console.log(res);
+            /**회원가입 후 토큰 발행 */
+            const accessToken = jwt.sign(res);
+            return {success:true,status:201,token:accessToken};
+
         }catch(err){
             console.error(err);
             return {success:false,status:500}

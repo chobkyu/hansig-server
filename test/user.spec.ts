@@ -11,6 +11,7 @@ describe('post /user is..', function () {
         userNickName:'giwon'
     }
 
+    let body:any;
     before(() => {
         request(app)
             .post('/users')
@@ -18,6 +19,7 @@ describe('post /user is..', function () {
             .expect(201)
             .end((err:any,res:any) => {
                 //console.log(res.body);
+                body = res.body;
             });
     });
 
