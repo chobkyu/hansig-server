@@ -228,7 +228,7 @@ describe('patch /review/update/:id',function () {
 });
 
 /**리뷰 조회 시 id는 리뷰 id */
-describe.only('get /reivew/:id ',function() {
+describe('get /reivew/:id ',function() {
     describe('성공 시 해당 리뷰 리턴',() => {
         let body : any;
 
@@ -316,4 +316,93 @@ describe.only('get /reivew/:id ',function() {
 
     });
 });
+
+
+/**리뷰 리스트 조회 시  id는 식당 id*/
+describe('get /review/list/:id',() => {
+    describe('성공 시',() => {
+        let body:any;
+        before(done => {
+            request(app)
+            .get('/review/list/1084')
+            .expect(200)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+
+
+        it('review 리스트 조회',async () => {
+            body.should.be.instanceOf(Array);
+        });
+
+        it('imgUrl 을 포함해야 한다.',async () => {
+            body[0].shoud.have.property('imgUrl');
+        });
+
+        it('imgUrl은 배열이여야 한다.',async () => {
+            body[0].imgUrl.should.be.instanceOf(Array);
+        });
+
+        it('reviewComment 을 포함해야 한다.',async () => {
+            body[0].shoud.have.property('reviewComment');
+        });
+
+        it('reviewComment 배열이여야 한다.',async () => {
+            body[0].reviewComment.should.be.instanceOf(Array);
+        });
+    });
+
+    describe('실패 시',() =>{
+        it('없는 식당 조회 시 404로 응답한다',(done) => {
+            request(app)
+                .get('review/list/0')
+                .expect(404)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+
+        it('잘못된 파라미터일 시 400으로 응답한다',(done) => {
+            request(app)
+                .get('review/list/sigdang')
+                .expect(400)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
+});
+
+//리뷰 삭제 시
+describe('delete reivew/:id',() => {
+    describe('success', () => {
+        it('204로 응답',(done) => {
+            request(app)
+                .delete('/review/1')
+                .expect(204)
+                .end(done);
+        });
+    });
+
+    describe('fail..',() => {
+        it('없는 id일 시 404로 응답한다',(done) => {
+            request(app)
+                .delete('/review/0')
+                .set("authorization","Bearer testtokerrn")
+                .expect(404)
+                .end(done);
+        });
+
+        it('리뷰 작성자가 아닐 시 401로 응답한다.',(done) => {
+            request(app)
+                .delete('/review/1')
+                .set("authorization","Bearer ownertoken")
+                .expect(401)
+                .end(done);
+        });
+    })
+})
+
 
