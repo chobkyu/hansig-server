@@ -40,7 +40,7 @@ class HansicService {
   //지역id로 조회
   async getFromLocation(locationId: number): Promise<any[]|false> {
     try {
-      const data = await prisma.$queryRaw<any[]>`SELECT hs.id,hs.name,hs.addr,hs."userStar",hs.google_star,hs.location_id,ls.location,si."imgUrl" FROM hansics as hs INNER JOIN location as ls on hs.location_id=ls.id LEFT JOIN "sicdangImg" as si on hs.id=si."hansicsId" WHERE hs.location_id=${locationId} ORDER BY hs.id ASC LIMIT 10`;
+      const data = await prisma.$queryRaw<any[]>`SELECT hs.id,hs.name,hs.addr,hs."userStar",hs.google_star,hs.location_id,ls.location,si."imgUrl" FROM hansics as hs INNER JOIN location as ls on hs.location_id=ls.id LEFT JOIN "sicdangImg" as si on hs.id=si."hansicsId" WHERE hs.location_id=${locationId} ORDER BY hs.id ASC`;
         console.log(data);
     if (data) {
       return data;
@@ -54,7 +54,7 @@ class HansicService {
   //전체조회
   async getAll(): Promise<any[]|false> {
     try {
-      const data = await prisma.$queryRaw<any[]>`SELECT hs.id,hs.name,hs.addr,hs."userStar",hs.google_star,hs.location_id,ls.location,si."imgUrl" FROM hansics as hs INNER JOIN location as ls on hs.location_id=ls.id LEFT JOIN "sicdangImg" as si on hs.id=si."hansicsId" ORDER BY hs.id ASC LIMIT 10`;
+      const data = await prisma.$queryRaw<any[]>`SELECT hs.id,hs.name,hs.addr,hs."userStar",hs.google_star,hs.location_id,ls.location,si."imgUrl" FROM hansics as hs INNER JOIN location as ls on hs.location_id=ls.id LEFT JOIN "sicdangImg" as si on hs.id=si."hansicsId" ORDER BY hs.id ASC`;
       console.log(data);
       if (data) {
         return data;
