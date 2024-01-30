@@ -32,6 +32,7 @@ export class OwnerService {
 
             body.userPw = await userService.hashing(body.userPw);
             
+            //transcation
             prisma.$transaction(async (tx) => {
                 const insertUser = await tx.user.create({
                     data:{

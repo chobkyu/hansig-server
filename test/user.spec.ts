@@ -3,7 +3,7 @@ const request = require('supertest')
 const should = require('should');
 
 /**회원 가입 시 */
-describe.only('post /user is..', function () {
+describe('post /user is..', function () {
     let testData = {
         userId:'test2',
         userPw:'1234',
