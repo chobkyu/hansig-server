@@ -1,14 +1,14 @@
-import { Login } from "../interface/login";
+import { Login } from "../interface/user/login";
 import { success } from "../interface/success";
-import { UpdateInfoDto } from "../interface/updataInfo";
-import { user } from "../interface/user";
+import { UpdateInfoDto } from "../interface/user/updataInfo";
+import { user } from "../interface/user/user";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
 const jwt = require('../util/jwt-util');
 
 const prisma = new PrismaClient();
 
-class UserService {
+export class UserService {
    
     /**회원 가입 */
     async insertUser(body:user){
@@ -46,7 +46,7 @@ class UserService {
             return {success:true,status:201};
         }catch(err){
             console.error(err);
-            return {success:false}
+            return {success:false,status:500}
         }
     }
 
@@ -104,7 +104,7 @@ class UserService {
 
         }catch(err){
             console.log(err);
-            return {success:false};
+            return {success:false,status:400};
         }
     }
 
@@ -172,11 +172,11 @@ class UserService {
 
             if(res?.userId==null) return {success:false,status:404,msg:userId};
 
-            return {success:true,data:res};
+            return {success:true,data:res,status:200};
 
         }catch(err){
             console.log(err);
-            return {success:false};
+            return {success:false,status:500};
         }
     }
 
@@ -208,11 +208,11 @@ class UserService {
                 }
             });
 
-            return {success:true};
+            return {success:true,status:201};
 
         }catch(err){
             console.error(err);
-            return {success:false};
+            return {success:false,status:500};
         }
     }
 
@@ -236,4 +236,3 @@ class UserService {
 }
 
 
-module.exports = UserService
