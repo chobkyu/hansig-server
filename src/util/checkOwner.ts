@@ -1,6 +1,7 @@
 module.exports = {
     checkOwner : (ownerNum : number) => {
         //테스트용 오너
+        console.log(ownerNum);
         if(ownerNum == 1234){
             return {success:true};
         }

@@ -6,10 +6,10 @@ const should = require('should');
 describe('post /owner',function () {
     describe('success',() => {
         let testData = {
-            userId:'owner1',
+            userId:'owner3',
             userPw:'1234',
             userName:'test_owner',
-            userNickName:'ElonMusk',
+            userNickName:'ElonMusk1',
             ownerNum:'1234',
             hansicdangName: '기원한뷔',
             hansicdangAddr:'하남시 어딘가',
@@ -32,7 +32,10 @@ describe('post /owner',function () {
                 userPw:'1234',
                 userName:'test_owner',
                 userNickName:'ElonMusk',
-                ownerNum:12341234
+                ownerNum:12341234,
+                hansicdangName: '기원한뷔',
+                hansicdangAddr:'하남시 어딘가',
+                location_id:1
             }
             request(app)
                 .post('/owner')
@@ -47,7 +50,10 @@ describe('post /owner',function () {
                 userPw:'1234',
                 userName:'test_owner',
                 userNickName:'ElonMusk',
-                ownerNum:1234
+                ownerNum:'1234',
+                hansicdangName: '기원한뷔',
+                hansicdangAddr:'하남시 어딘가',
+                location_id:1
             }
 
             request(app)
@@ -63,6 +69,7 @@ describe('post /owner',function () {
                 userPw:'1234',
                 userName:'test_owner',
                 userNickName:'ElonMusk',
+                ownerNum:'1234'
             }
 
             request(app)
@@ -76,9 +83,12 @@ describe('post /owner',function () {
             let testData = {
                 userId:'owner2',
                 userPw:'1234',
-                userName:'test_owner',
+                userName:1234,
                 userNickName:'ElonMusk',
-                ownerNum:'fffff'
+                ownerNum:'1234',
+                hansicdangName: '기원한뷔',
+                hansicdangAddr:'하남시 어딘가',
+                location_id:1
             }
 
             request(app)
@@ -108,6 +118,7 @@ describe.only('post /owner/login ',function () {
                 .expect(201)
                 .end((err:any,res:any) => {
                     response = res.body;
+                    console.log(response);
                     done();
                 });
         });
@@ -163,7 +174,7 @@ describe.only('post /owner/login ',function () {
 
         it('사업자가 아닐 시 401로 응답한다.',(done) => {
             let body = {
-                userId: 'test1',
+                userId: 'test',
                 userPw: '1234'
             }
 

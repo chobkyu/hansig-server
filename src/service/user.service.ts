@@ -104,6 +104,8 @@ export class UserService {
                 }
             });
 
+            console.log(res);
+
             if(res) return {success:false};
             else return {success:true};
 
@@ -116,7 +118,7 @@ export class UserService {
     /**유저 로그인 */
     async login(body:Login) {
         const user = body;
-
+ 
         //데이터 체크
         const checkData = this.checkLoginData(user);
         if(!checkData.success) return {success:false,status:400};
@@ -142,11 +144,28 @@ export class UserService {
 
     /**로그인 데이터 체크 */
     checkLoginData(user:Login){
+        console.log(user);
+        const body = JSON.parse(JSON.stringify(user)); //깊은 복사
+        const checkOther = this.checkOther(body);
+        console.log(checkOther);
+        console.log('tlqkf js')
+        if(!checkOther.success) return {success:false,status:400};
+        
         if(user.userId == null || user.userPw ==null){
             return {success:false,status:400}
         }else if(typeof user.userId != "string" || typeof user.userPw != "string" ){
             return {success:false,status:400}
         }else return {success:true};
+    }
+
+    /**다른 값 체크 */
+    checkOther(body:any){
+        delete body.userId;
+        delete body.userPw;
+
+        console.log(body);
+        if(body && Object.keys(body).length === 0 && body.constructor === Object)return {success:true};
+        else return {success:false, status:400};
     }
 
 

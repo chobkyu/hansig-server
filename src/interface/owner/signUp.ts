@@ -3,7 +3,7 @@ export interface SignUpData {
     userPw: string,
     userName: string,
     userNickName : string,
-    onwerNum:string,
+    ownerNum:string,
     hansicdangName : string,
     hansicdangAddr:string,
     location_id:number
