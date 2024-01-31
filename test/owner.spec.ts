@@ -63,7 +63,7 @@ describe('post /owner',function () {
                 .end(done);
         });
 
-        it.only('입력값이 누락되었을 경우 400으로 응답',(done) => {
+        it('입력값이 누락되었을 경우 400으로 응답',(done) => {
             let testData = {
                 userId:'owner2',
                 userPw:'1234',
@@ -102,7 +102,7 @@ describe('post /owner',function () {
 });
 
 /**사업자로 로그인 시 */
-describe('post /owner/login ',function () {
+describe.only('post /owner/login ',function () {
     describe('success',() =>{
         let body = {
             userId:'owner1',
@@ -118,6 +118,7 @@ describe('post /owner/login ',function () {
                 .expect(201)
                 .end((err:any,res:any) => {
                     response = res.body;
+                    console.log(response);
                     done();
                 });
         });
@@ -173,7 +174,7 @@ describe('post /owner/login ',function () {
 
         it('사업자가 아닐 시 401로 응답한다.',(done) => {
             let body = {
-                userId: 'test1',
+                userId: 'test',
                 userPw: '1234'
             }
 

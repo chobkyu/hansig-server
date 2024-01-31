@@ -19,7 +19,7 @@ const process = {
                 return res.status(201).end();
             }
 
-            return res.status(response.statusCode).end();
+            return res.status(response.status).end();
         }catch(err){
             console.error(err);
             return res.status(500).end();
@@ -27,7 +27,19 @@ const process = {
     },
 
     ownerSignIn : async (req:Request,res:Response) => {
+        //사업자로 로그인
+        try{
+            const response = await ownerService.ownerSignIn(req.body);
 
+            if(response.success){
+                return res.status(201).json(response).end();
+            }
+
+            return res.status(response.status).end();
+        }catch(err){
+            console.error(err);
+            return res.status(500).end();
+        }
     },
 
     ownerMenu :async (req:Request, res:Response) => {
