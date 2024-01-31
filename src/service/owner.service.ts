@@ -20,7 +20,6 @@ export class OwnerService {
             const check = checkOwner(body.ownerNum);
             if(!check.success) return {statusCode:401,msg:'사업자 번호를 확인하세요',success:false};
 
-           
 
             //아이디 중복 체크
             const checkId = await userService.checkId(body.userId);
