@@ -3,7 +3,7 @@ const request = require('supertest')
 const should = require('should');
 
 /**사업자로 회원 가입 시 */
-describe.only('post /owner',function () {
+describe('post /owner',function () {
     describe('success',() => {
         let testData = {
             userId:'owner3',
@@ -63,7 +63,7 @@ describe.only('post /owner',function () {
                 .end(done);
         });
 
-        it('입력값이 누락되었을 경우 400으로 응답',(done) => {
+        it.only('입력값이 누락되었을 경우 400으로 응답',(done) => {
             let testData = {
                 userId:'owner2',
                 userPw:'1234',
