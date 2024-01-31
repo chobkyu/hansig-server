@@ -27,7 +27,7 @@ model user {
   userGradeId Int
   owners ownerData[]
   location location @relation(fields:[location_id],references:[id])
-  location_id Int
+  location_id Int @default(1)
 }
 
 model userImgs {
