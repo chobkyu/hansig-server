@@ -6,10 +6,10 @@ const should = require('should');
 describe('post /owner',function () {
     describe('success',() => {
         let testData = {
-            userId:'owner1',
+            userId:'owner3',
             userPw:'1234',
             userName:'test_owner',
-            userNickName:'ElonMusk',
+            userNickName:'ElonMusk1',
             ownerNum:'1234',
             hansicdangName: '기원한뷔',
             hansicdangAddr:'하남시 어딘가',
@@ -32,7 +32,10 @@ describe('post /owner',function () {
                 userPw:'1234',
                 userName:'test_owner',
                 userNickName:'ElonMusk',
-                ownerNum:12341234
+                ownerNum:12341234,
+                hansicdangName: '기원한뷔',
+                hansicdangAddr:'하남시 어딘가',
+                location_id:1
             }
             request(app)
                 .post('/owner')
@@ -47,7 +50,10 @@ describe('post /owner',function () {
                 userPw:'1234',
                 userName:'test_owner',
                 userNickName:'ElonMusk',
-                ownerNum:1234
+                ownerNum:'1234',
+                hansicdangName: '기원한뷔',
+                hansicdangAddr:'하남시 어딘가',
+                location_id:1
             }
 
             request(app)
@@ -57,12 +63,13 @@ describe('post /owner',function () {
                 .end(done);
         });
 
-        it('입력값이 누락되었을 경우 400으로 응답',(done) => {
+        it.only('입력값이 누락되었을 경우 400으로 응답',(done) => {
             let testData = {
                 userId:'owner2',
                 userPw:'1234',
                 userName:'test_owner',
                 userNickName:'ElonMusk',
+                ownerNum:'1234'
             }
 
             request(app)
@@ -76,9 +83,12 @@ describe('post /owner',function () {
             let testData = {
                 userId:'owner2',
                 userPw:'1234',
-                userName:'test_owner',
+                userName:1234,
                 userNickName:'ElonMusk',
-                ownerNum:'fffff'
+                ownerNum:'1234',
+                hansicdangName: '기원한뷔',
+                hansicdangAddr:'하남시 어딘가',
+                location_id:1
             }
 
             request(app)

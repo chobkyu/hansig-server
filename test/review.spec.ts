@@ -376,7 +376,7 @@ describe('get /review/list/:id',() => {
 });
 
 //리뷰 삭제 시
-describe.only('delete reivew/:id',() => {
+describe('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)

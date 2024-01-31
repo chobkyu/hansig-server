@@ -13,7 +13,13 @@ const process = {
     ownerSignUp :async (req:Request,res:Response) => {
         //사업자로 회원 가입
         try{
-            const response = ownerService.ownerSignUp(req.body);
+            const response = await ownerService.ownerSignUp(req.body);
+
+            if(response.success) {
+                return res.status(201).end();
+            }
+
+            return res.status(response.statusCode).end();
         }catch(err){
             console.error(err);
             return res.status(500).end();

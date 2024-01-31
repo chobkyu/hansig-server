@@ -104,6 +104,8 @@ export class UserService {
                 }
             });
 
+            console.log(res);
+
             if(res) return {success:false};
             else return {success:true};
 
