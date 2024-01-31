@@ -44,7 +44,7 @@ class HansicService {
         WHERE hs.id=${restaurantId}
       `;
 
-      console.log(data);
+      //console.log(data);
       if (data[0]) {
         return data[0];
       } else {
