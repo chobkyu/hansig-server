@@ -1,5 +1,5 @@
 import { hansics, PrismaClient } from "@prisma/client";
-
+const request = require('request');
 const prisma = new PrismaClient();
 /*
 ㄴ 리뷰 입력 시
@@ -100,6 +100,37 @@ class HansicService {
       return false
     }
   }
+
+  async tryGeo() {
+    try{
+      const option = {
+        uri:'https://dapi.kakao.com/v2/local/search/address',
+        qs:{
+          query:'을지로5가 274-11번지 1층 중구 서울특별시 KR'
+        },
+        headers: {Authorization: `KakaoAK ${process.env.kakao_api}`}
+      }
+
+      request(option,function(err:any,response:any,body:any) {
+        console.log(typeof body);
+        const obj = JSON.parse(body);
+        
+        console.log(obj["documents"][0].x)  //lng
+        console.log(obj["documents"][0].y)  //lat 
+
+        // console.log(response);
+        // console.log(err);
+
+      })
+
+      return true;
+    }catch(err){
+      console.error(err);
+      return false;
+    }
+  }
+
+
   // async create(restaurantId:number,req:Request):Promise<boolean>
   // {
   //     const requestBody=req.body;
