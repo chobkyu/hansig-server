@@ -1,43 +1,43 @@
-import {PrismaClient} from "@prisma/client";
-import express, {Express, Request, Response} from 'express';
+import { PrismaClient } from "@prisma/client";
+import express, { Express, Request, Response } from 'express';
 const prisma = new PrismaClient();
 const hansicServiceClass = require('../../service/hansic.service');
 const hansicService = new hansicServiceClass();
 const output = {
-  getAll : async (req: Request, res: Response) => {
-    try{
-    const response =await hansicService.getAll();
-    if (response){
-      return res.json({data:response});
+  getAll: async (req: Request, res: Response) => {
+    try {
+      const response = await hansicService.getAll();
+      if (response) {
+        return res.json({ data: response });
+      }else {
+        return res.status(204).end();
+      }
     }
-    else{
-      return res.status(204).end();
-    }}
-    catch(err)
-    {
+    catch (err) {
       return res.status(500).end();
     }
   },
-  get : async (req: Request, res: Response) => {
+
+  get: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
         return res.status(400).end();
       } else {
         const response = await hansicService.get(id);
-        if(response){
-         return res.json({data:response});
-        }
-        else
-        {
+        if (response) {
+          return res.json({ data: response });
+        }else {
           return res.status(400).end();
         }
-    }
+      }
     } catch (err) {
       return res.status(500).end();
     }
   },
-  getFromLocation : async (req: Request, res: Response) => {
+
+
+  getFromLocation: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       console.log(id);
@@ -46,7 +46,7 @@ const output = {
       } else {
         if ((id > 0) && (id < 13)) {
           const response = await hansicService.getFromLocation(id);
-          return res.json({data:response});
+          return res.json({ data: response });
         } else {
           return res.status(400).end();
         }
@@ -55,6 +55,18 @@ const output = {
       return res.status(500).end();
     }
   },
+
+  //주소 -> 좌표 변환
+  tryGeo : async (req:Request,res:Response) => {
+    try{
+      console.log('ctrl');
+      const response = await hansicService.convert();
+      return res.json(response).end();
+    }catch(err){
+      console.log(err);
+      return res.status(500).end();
+    }
+  }
   // create:async(req:Request,res:Response)=>
   // {
   //     const restaurantId= req.params.id;
@@ -82,11 +94,11 @@ const output = {
 }
 
 const process =
-    {
+{
 
 }
 
-    module.exports = {
-      output,
-      process
-    }
+module.exports = {
+  output,
+  process
+}

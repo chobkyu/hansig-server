@@ -26,6 +26,8 @@ model user {
   userGrade userGrade @relation(fields:[userGradeId],references:[id])
   userGradeId Int
   owners ownerData[]
+  location location @relation(fields:[location_id],references:[id])
+  location_id Int @default(1)
 }
 
 model userImgs {
@@ -58,6 +60,7 @@ model location {
   id Int @id @default(autoincrement())
   location String? @db.VarChar(50)
   hansics hansics[]
+  users user[]
 }
 
 model hansics {
@@ -66,6 +69,8 @@ model hansics {
   addr String? @db.VarChar(500)
   google_star String? @db.VarChar(100)
   userStar String? @db.VarChar(50)
+  lat Float? @default(0)
+  lng Float? @default(0)
   location location @relation(fields:[location_id],references:[id])
   location_id Int
   reviews review[]
@@ -127,7 +132,5 @@ model reviewComment {
   comment String? @db.VarChar(500)
   review review @relation(fields:[reviewId],references:[id])
   reviewId Int
- String? @db.VarChar(500)
-  review review @relation(fields:[reviewId],references:[id])
-  reviewId Int
+ 
 }
