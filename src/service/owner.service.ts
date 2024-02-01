@@ -156,7 +156,7 @@ export class OwnerService {
 
             if(res) return {success:true,status:201};
             else return {success:false,status:401};
-        }catch(err){
+        }catch(err){  
             console.error(err);
             return {success:false,status:500};
         }
