@@ -140,6 +140,7 @@ class HansicService {
     }
   }
 
+  //kakao api 호출, 주소 -> 좌표 변환
   async tryGeo(hansic:any) {
     try{
       const addr = hansic.addr
@@ -151,6 +152,7 @@ class HansicService {
         headers: {Authorization: `KakaoAK ${process.env.kakao_api}`}
       }
 
+      //카카오 api 호출
       request(option,async (err:any,response:any,body:any) => {
         console.log(body);
         const obj = JSON.parse(body);
@@ -165,9 +167,6 @@ class HansicService {
           
           await this.updateGeo(hansic.id,lng,lat);
         }
-       
-
-
       });
 
       return true;
