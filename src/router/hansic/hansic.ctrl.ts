@@ -56,6 +56,7 @@ const output = {
     }
   },
 
+  //주소 -> 좌표 변환
   tryGeo : async (req:Request,res:Response) => {
     try{
       console.log('ctrl');

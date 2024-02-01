@@ -90,8 +90,25 @@ class HansicService {
   //전체조회
   async getAll(): Promise<any[] | false> {
     try {
-      const data = await prisma.$queryRaw<any[]>`SELECT hs.id,hs.name,hs.addr,hs."userStar",hs.google_star,hs.location_id,ls.location,si."imgUrl" FROM hansics as hs INNER JOIN location as ls on hs.location_id=ls.id LEFT JOIN "sicdangImg" as si on hs.id=si."hansicsId" ORDER BY hs.id ASC`;
-      console.log(data);
+      const data = await prisma.$queryRaw<any[]>`
+        SELECT
+          hs.id,
+          hs.name,
+          hs.addr,
+          hs."userStar",
+          hs.google_star,
+          hs.location_id,
+          ls.location,
+          si."imgUrl" 
+        FROM hansics as hs 
+        INNER JOIN location as ls 
+        on hs.location_id=ls.id 
+        LEFT JOIN "sicdangImg" as si 
+        on hs.id=si."hansicsId" 
+        ORDER BY hs.id ASC
+      `;
+
+      //console.log(data);
       if (data) {
         return data;
       } else {
@@ -103,17 +120,16 @@ class HansicService {
     }
   }
 
+  //주소 -> 좌표 변환
   async convert(){
     try{
       const response :any = await this.getAll();
       console.log(response);
       for(var i = 0; i<response.length; i++){
-        console.log(response[i].addr);
+        //console.log(response[i].addr);
         
         if(response[i].addr!='주소 없음'){
-          setTimeout(async () => {
-            await this.tryGeo(response[i])
-          },3000);
+          await this.tryGeo(response[i])
 
         }
       }
@@ -139,7 +155,7 @@ class HansicService {
         console.log(body);
         const obj = JSON.parse(body);
         
-        if(obj["documents"] == null || obj["documents"] == undefined){
+        if(!obj["documents"]?.length){
           console.log('can not find address');
         }else{
           console.log(obj["documents"][0].x)  //lng
