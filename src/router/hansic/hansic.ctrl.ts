@@ -59,7 +59,7 @@ const output = {
   tryGeo : async (req:Request,res:Response) => {
     try{
       console.log('ctrl');
-      const response = await hansicService.tryGeo();
+      const response = await hansicService.convert();
       return res.json(response).end();
     }catch(err){
       console.log(err);

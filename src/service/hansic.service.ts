@@ -83,6 +83,7 @@ class HansicService {
         return false;
       }
     } catch (err) {
+      console.error(err);
       return false
     }
   }
@@ -97,36 +98,88 @@ class HansicService {
         return false;
       }
     } catch (err) {
+      console.error(err);
       return false
     }
   }
 
-  async tryGeo() {
+  async convert(){
     try{
+      const response :any = await this.getAll();
+      console.log(response);
+      for(var i = 0; i<response.length; i++){
+        console.log(response[i].addr);
+        
+        if(response[i].addr!='주소 없음'){
+          setTimeout(async () => {
+            await this.tryGeo(response[i])
+          },3000);
+
+        }
+      }
+      return {success:true};
+    }catch(err){
+      console.error(err);
+      return {success:false};
+    }
+  }
+
+  async tryGeo(hansic:any) {
+    try{
+      const addr = hansic.addr
       const option = {
         uri:'https://dapi.kakao.com/v2/local/search/address',
         qs:{
-          query:'을지로5가 274-11번지 1층 중구 서울특별시 KR'
+          query:addr
         },
         headers: {Authorization: `KakaoAK ${process.env.kakao_api}`}
       }
 
-      request(option,function(err:any,response:any,body:any) {
-        console.log(typeof body);
+      request(option,async (err:any,response:any,body:any) => {
+        console.log(body);
         const obj = JSON.parse(body);
         
-        console.log(obj["documents"][0].x)  //lng
-        console.log(obj["documents"][0].y)  //lat 
+        if(obj["documents"] == null || obj["documents"] == undefined){
+          console.log('can not find address');
+        }else{
+          console.log(obj["documents"][0].x)  //lng
+          console.log(obj["documents"][0].y)  //lat 
+          let lng = parseFloat(obj["documents"][0].x);
+          let lat = parseFloat(obj["documents"][0].y);
+          
+          await this.updateGeo(hansic.id,lng,lat);
+        }
+       
 
-        // console.log(response);
-        // console.log(err);
 
-      })
+      });
 
       return true;
     }catch(err){
       console.error(err);
       return false;
+    }
+  }
+
+  //좌표 데이터베이스에 저장
+  async updateGeo(id:number, lng:number, lat:number){
+    try{
+      const updateHansics = await prisma.hansics.update({
+        where : {
+          id:id,
+        },
+        data:{
+          lat:lat,
+          lng:lng,
+        }
+      });
+
+      console.log(updateHansics);
+
+      return {success:true};
+    }catch(err){
+      console.error(err);
+      return {success:false};
     }
   }
 
