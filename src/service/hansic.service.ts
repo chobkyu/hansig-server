@@ -34,6 +34,8 @@ class HansicService {
           hs."userStar",
           hs.google_star,
           hs.location_id,
+          hs.lat,
+          hs.lng,
           ls.location,
           si."imgUrl" 
         FROM hansics as hs 
@@ -65,6 +67,8 @@ class HansicService {
           hs."userStar",
           hs.google_star,
           hs.location_id,
+          hs.lat,
+          hs.lng,
           ls.location,
           si."imgUrl"
         FROM hansics as hs 
@@ -98,6 +102,8 @@ class HansicService {
           hs."userStar",
           hs.google_star,
           hs.location_id,
+          hs.lat,
+          hs.lng,
           ls.location,
           si."imgUrl" 
         FROM hansics as hs 
