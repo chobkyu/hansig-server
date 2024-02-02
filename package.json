@@ -6,6 +6,7 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test ts-mocha -p ./tsconfig.json ./test/*.spec.ts -w --timeout 3000",
     "start": "nodemon bin/www.ts",
+    "build": "tsc -p .",
     "dev": "nodemon --watch \"*.ts\" --exec \"ts-node\" bin/www.ts"
   },
   "author": "",
