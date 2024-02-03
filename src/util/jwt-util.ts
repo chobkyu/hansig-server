@@ -1,7 +1,7 @@
 const {promisify} = require('util');
 const jwt = require('jsonwebtoken');
 const secret ='test_secret';
-
+const refreshSecret='test_refresh_secret';
 module.exports = {
     sign : (user:any) => {
         const payload = {

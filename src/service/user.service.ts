@@ -135,6 +135,7 @@ export class UserService {
 
         if(check) { //로그인 성공
             const accessToken = jwt.sign(res);
+            //const refreshToekn
             return {success:true,status:201,token:accessToken};
         }else return { //로그인 실패
             success:false, status:400
@@ -192,7 +193,7 @@ export class UserService {
                     id:userId
                 }
             });
-
+            console.log(res);
 
             if(res?.userId==null) return {success:false,status:404,msg:userId};
 
