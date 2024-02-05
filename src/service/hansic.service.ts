@@ -23,6 +23,7 @@ class HansicService {
       return { success: false }
     }
   }
+  //좌표로 조회
   async getByPlace(lat:Number,lng:Number)
   {
     try {

@@ -67,7 +67,7 @@ const output = {
       return res.status(500).end();
     }
   },
-//좌표를 쿼리로 받아 hansic리턴
+//좌표를 쿼리로 받아 검색
   getByPlace:async(req:Request,res:Response)=>
   {
     try{
