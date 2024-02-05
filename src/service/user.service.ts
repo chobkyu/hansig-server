@@ -40,7 +40,8 @@ export class UserService {
                     userPw:user.userPw,
                     userName:user.userName,
                     userNickName:user.userNickName,
-                    userGrade:{connect:{id:1}}
+                    userGrade:{connect:{id:1}},
+                    location:{connect:{id:1}},
                 }
             });
 

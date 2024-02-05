@@ -1,7 +1,7 @@
 const app = require('../app')
 const request = require('supertest')
 const should = require('should');
-
+//https://www.youtube.com/watch?v=lvjDDn9cpL4
 /**사업자로 회원 가입 시 */
 describe('post /owner',function () {
     describe('success',() => {

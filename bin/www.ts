@@ -1,9 +1,9 @@
 const app = require('../app')
 
-const server = app.listen(8080,() => {
+const server = app.listen(5000,() => {
     console.log(`
         ##############################################
-        🛡️      Server listening on port : 8080     🛡️
+        🛡️      Server listening on port : 5000     🛡️
         ##############################################
     `)
 }).on("error",(err: any) => {
