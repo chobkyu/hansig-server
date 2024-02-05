@@ -23,6 +23,39 @@ class HansicService {
       return { success: false }
     }
   }
+  async getByPlace(lat:Number,lng:Number)
+  {
+    try {
+      const data = await prisma.$queryRaw<any[]>`
+        SELECT
+          hs.id,
+          hs.name,
+          hs.addr,
+          hs."userStar",
+          hs.google_star,
+          hs.location_id,
+          hs.lat,
+          hs.lng,
+          ls.location,
+          si."imgUrl"
+        FROM hansics as hs 
+        INNER JOIN location as ls 
+        on hs.location_id=ls.id 
+        LEFT JOIN "sicdangImg" as si 
+        on hs.id=si."hansicsId" WHERE hs.lat=${lat} AND hs.lng=${lng} 
+        ORDER BY hs.id ASC
+      `;
+      console.log(data);
+      if (data) {
+        return data;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.error(err);
+      return false
+    }
+  }
   //식당id로 조회
   async get(restaurantId: number): Promise<any> {
     try {

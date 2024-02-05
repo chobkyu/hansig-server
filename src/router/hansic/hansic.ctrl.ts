@@ -66,6 +66,25 @@ const output = {
       console.log(err);
       return res.status(500).end();
     }
+  },
+//좌표를 쿼리로 받아 hansic리턴
+  getByPlace:async(req:Request,res:Response)=>
+  {
+    try{
+      const lat=req.query.lat;
+      const lng=req.query.lng;
+      const response = await hansicService.getByPlace(Number(lat),Number(lng));
+      if(response){
+      return res.json({data:response[0]}).end();
+    }
+    else
+    {
+      return res.status(404).end();
+    }
+    }catch(err){
+      console.log(err);
+      return res.status(500).end();
+    }
   }
   // create:async(req:Request,res:Response)=>
   // {
