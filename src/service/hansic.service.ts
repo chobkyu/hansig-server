@@ -112,6 +112,7 @@ class HansicService {
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
         on hs.id=si."hansicsId" 
+        where lat != 0
         ORDER BY hs.id ASC
       `;
 
