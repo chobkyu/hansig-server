@@ -71,8 +71,6 @@ const process = {
 
             if(response.success) return res.status(201).end();
             else return res.status(response.status).end();
-
-            return res.status(400)
         }catch(err){
             console.log(err);
             return res.status(500).end();

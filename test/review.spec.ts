@@ -374,7 +374,138 @@ describe('get /review/list/:id',() => {
         });
     });
 });
+//리뷰 댓글 입력시
+/*
+로그인 필요
+string commen,reviewId만 있으면됨.
+*/
+describe('post /review/reply/:id',() => {
+    describe('성공 시',() => {
+        let body:any;
+        let data:String="멋져";
+        before(done => {
+            request(app)
+            .post('/review/reply/1')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(201)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+    });
+    describe('실패 시',() =>{
+        it('로그인이 안되어있을시 401로 응답한다.',(done) => {
+            let data:String="멋져";
+            let body;
+            request(app)
+            .post('/review/reply/1')
+            .send(data)
+            .expect(401)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
 
+        it('찾을수 없는 id일시 404으로 응답한다',(done) => {
+            let data:String="멋져";
+            let body;
+            request(app)
+            .post('/review/reply/10700')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(404)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        it('다른 입력 값이 들어왔을경우 400으로 응답한다',(done) => {
+            let data="굿";
+            let body;
+            request(app)
+            .post('/review/reply/서울')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(400)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        it('입력값(comment)이 누락되었을경우 400으로 응답한다',(done) => {
+            let data="";
+            let body;
+            request(app)
+            .post('/review/reply/1')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(400)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        it('입력값(id)이 누락되었을경우 400으로 응답한다',(done) => {
+            let data="";
+            let body;
+            request(app)
+            .post('/review/reply/')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(400)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        
+    });
+});
+//리뷰 코멘트 삭제시
+describe('delete /review/reply/:id',() => {
+    describe('실패 시',() =>{
+        it('권한이 없을 시 401로 응답한다.',(done) => {
+            let body;
+            request(app)
+            .delete('/review/reply/1')
+            .expect(401)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+
+        it('찾을수 없는 id일시 404으로 응답한다',(done) => {
+            let body;
+            request(app)
+            .delete('/review/reply/10700')
+            .set("authorization","Bearer testtoken")
+            .expect(404)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        
+    });
+    describe('성공 시',() => {
+        let body:any;
+        before(done => {
+            request(app)
+            .delete('/review/reply/1')
+            .set("authorization","Bearer testtoken")
+            .expect(204)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+    });
+    
+});
 //리뷰 삭제 시
 describe('delete reivew/:id',() => {
     describe('success', () => {
@@ -404,5 +535,4 @@ describe('delete reivew/:id',() => {
         });
     })
 })
-
 
