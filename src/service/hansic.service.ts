@@ -1,6 +1,7 @@
 import { hansics, PrismaClient } from "@prisma/client";
 const request = require('request');
 const prisma = new PrismaClient();
+const logger = require('../util/winston');
 /*
 ㄴ 리뷰 입력 시
 ㄴ 리뷰 수정 시
@@ -19,7 +20,7 @@ class HansicService {
         await prisma.hansics.findMany({ include: { location: true } });
       return { data, success: true }
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       return { success: false }
     }
   }
@@ -80,7 +81,7 @@ class HansicService {
         WHERE hs.id=${restaurantId}
       `;
 
-      //console.log(data);
+      //logger.info(data);
       if (data[0]) {
         return data[0];
       } else {
@@ -109,18 +110,19 @@ class HansicService {
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" WHERE hs.location_id=${locationId} 
+        on hs.id=si."hansicsId" 
+        WHERE hs.location_id=${locationId} 
         ORDER BY hs.id ASC
       `;
       
-      console.log(data);
+      logger.info(data);
       if (data) {
         return data;
       } else {
         return false;
       }
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       return false
     }
   }
@@ -144,17 +146,18 @@ class HansicService {
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
         on hs.id=si."hansicsId" 
+        where lat != 0
         ORDER BY hs.id ASC
       `;
 
-      //console.log(data);
+      logger.info(data);
       if (data) {
         return data;
       } else {
         return false;
       }
     } catch (err) {
-      console.error(err);
+      logger.error(err);
       return false
     }
   }
@@ -163,9 +166,9 @@ class HansicService {
   async convert(){
     try{
       const response :any = await this.getAll();
-      console.log(response);
+      logger.info(response);
       for(var i = 0; i<response.length; i++){
-        //console.log(response[i].addr);
+        //logger.info(response[i].addr);
         
         if(response[i].addr!='주소 없음'){
           await this.tryGeo(response[i])
@@ -174,7 +177,7 @@ class HansicService {
       }
       return {success:true};
     }catch(err){
-      console.error(err);
+      logger.error(err);
       return {success:false};
     }
   }
@@ -193,14 +196,14 @@ class HansicService {
 
       //카카오 api 호출
       request(option,async (err:any,response:any,body:any) => {
-        console.log(body);
+        logger.info(body);
         const obj = JSON.parse(body);
         
         if(!obj["documents"]?.length){
-          console.log('can not find address');
+          logger.info('can not find address');
         }else{
-          console.log(obj["documents"][0].x)  //lng
-          console.log(obj["documents"][0].y)  //lat 
+          logger.info(obj["documents"][0].x)  //lng
+          logger.info(obj["documents"][0].y)  //lat 
           let lng = parseFloat(obj["documents"][0].x);
           let lat = parseFloat(obj["documents"][0].y);
           
@@ -210,7 +213,7 @@ class HansicService {
 
       return true;
     }catch(err){
-      console.error(err);
+      logger.error(err);
       return false;
     }
   }
@@ -228,11 +231,11 @@ class HansicService {
         }
       });
 
-      console.log(updateHansics);
+      logger.info(updateHansics);
 
       return {success:true};
     }catch(err){
-      console.error(err);
+      logger.error(err);
       return {success:false};
     }
   }
@@ -247,22 +250,22 @@ class HansicService {
   //     async getAll(){
   //         try{
   //             const data = await prisma.review.findMany();
-  //             //console.log(data)
+  //             //logger.info(data)
 
   //             return {data,success:true}
   //         }catch(err){
-  //             console.error(err);
+  //             logger.error(err);
   //             return {success:false}
   //         }
   //     },
   //     async get(req:Request){
   //         try{
   //             const data = await prisma.hansics.findMany();
-  //             //console.log(data)
+  //             //logger.info(data)
 
   //             return {data,success:true}
   //         }catch(err){
-  //             console.error(err);
+  //             logger.error(err);
   //             return {success:false}
   //         }
   //     },
