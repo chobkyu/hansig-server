@@ -9,7 +9,7 @@ const output = {
       const response = await hansicService.getAll();
       if (response) {
         return res.json({ data: response });
-      }else {
+      } else {
         return res.status(204).end();
       }
     }
@@ -27,7 +27,7 @@ const output = {
         const response = await hansicService.get(id);
         if (response) {
           return res.json({ data: response });
-        }else {
+        } else {
           return res.status(400).end();
         }
       }
@@ -57,31 +57,29 @@ const output = {
   },
 
   //주소 -> 좌표 변환
-  tryGeo : async (req:Request,res:Response) => {
-    try{
+  tryGeo: async (req: Request, res: Response) => {
+    try {
       console.log('ctrl');
       const response = await hansicService.convert();
       return res.json(response).end();
-    }catch(err){
+    } catch (err) {
       console.log(err);
       return res.status(500).end();
     }
   },
-//좌표를 쿼리로 받아 검색
-  getByPlace:async(req:Request,res:Response)=>
-  {
-    try{
-      const lat=req.query.lat;
-      const lng=req.query.lng;
-      const response = await hansicService.getByPlace(Number(lat),Number(lng));
-      if(response){
-      return res.json({data:response[0]}).end();
-    }
-    else
-    {
-      return res.status(404).end();
-    }
-    }catch(err){
+  //좌표를 쿼리로 받아 검색
+  getByPlace: async (req: Request, res: Response) => {
+    try {
+      const lat = req.query.lat;
+      const lng = req.query.lng;
+      const response = await hansicService.getByPlace(Number(lat), Number(lng));
+      if (response) {
+        return res.json({ data: response[0] }).end();
+      }
+      else {
+        return res.status(404).end();
+      }
+    } catch (err) {
       console.log(err);
       return res.status(500).end();
     }

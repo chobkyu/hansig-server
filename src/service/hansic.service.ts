@@ -44,7 +44,8 @@ class HansicService {
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" WHERE hs.lat=${lat} AND hs.lng=${lng} 
+        on hs.id=si."hansicsId"
+        WHERE hs.lat=${lat} or hs.lng=${lng} 
         ORDER BY hs.id ASC
       `;
       console.log(data);
