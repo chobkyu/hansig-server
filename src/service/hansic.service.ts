@@ -76,8 +76,8 @@ class HansicService {
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" W
-        HERE hs.location_id=${locationId} 
+        on hs.id=si."hansicsId" 
+        WHERE hs.location_id=${locationId} 
         ORDER BY hs.id ASC
       `;
       
