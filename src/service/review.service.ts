@@ -24,9 +24,12 @@ class reviewService
         return true;
     }
     //리뷰작성
-    async writeReview(inputreview:Review,userInfo:number,restaurantInfo:number):Promise<success>
+    async writeReview(inputreview:Review,userInfo:Number,restaurantInfo:Number)
     {
-        const success=await prisma.review.create({data:{review:inputreview.review,star:inputreview.star,hansicsId:restaurantInfo,userId:userInfo}});
+        try{
+        console.log(inputreview,userInfo,restaurantInfo);
+        const success=await prisma.review.create({data:{review:inputreview.review,star:Number(inputreview.star),hansicsId:Number(restaurantInfo),userId:Number(userInfo),useFlag:true}});
+        console.log(success);
         if(!success)
         {
             return {success:false};
@@ -42,6 +45,11 @@ class reviewService
             }
         }
         return {success:true};
+    }
+    catch(err)
+    {
+        console.log(err);
+    }
     }
     async updateReview(review:any):Promise<any>
     {

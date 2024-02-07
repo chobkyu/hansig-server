@@ -174,7 +174,7 @@ describe('GET /hansic/loc/:id ...', function () {
 });
 
 
-describe.only('GET /hansic/:id ...', function () {
+describe('GET /hansic/:id ...', function () {
     describe('성공 시', async () => {
         let body : any;
 
