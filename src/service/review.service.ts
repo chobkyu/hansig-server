@@ -24,18 +24,18 @@ class reviewService
         return true;
     }
     //리뷰작성
-    async writeReview(inputreview:Review,userInfo:Number,restaurantInfo:Number)
+    async writeReview(inputReview:Review,userInfo:Number,restaurantInfo:Number)
     {
         try{
-        console.log(inputreview,userInfo,restaurantInfo);
-        const success=await prisma.review.create({data:{review:inputreview.review,star:Number(inputreview.star),hansicsId:Number(restaurantInfo),userId:Number(userInfo),useFlag:true}});
+        console.log(inputReview,userInfo,restaurantInfo);
+        const success=await prisma.review.create({data:{review:inputReview.review,star:Number(inputReview.star),hansicsId:Number(restaurantInfo),userId:Number(userInfo),useFlag:true}});
         console.log(success);
         if(!success)
         {
             return {success:false};
         }
-        if(inputreview.img){
-            for(let i in inputreview.img)
+        if(inputReview.img){
+            for(let i in inputReview.img)
             {
                 const img=await prisma.reviewImg.create({data:{imgUrl:i,reviewId:success.id}});
                 if(!img)
@@ -55,9 +55,21 @@ class reviewService
     {
         return true;
     }
-    async deleteReview(review:any):Promise<any>
+    async deleteReview(deleteReviewId:number,userInfo:number):Promise<any>
     {
-        return true;
+        try{
+            const success=await prisma.review.delete({where:{id:Number(deleteReviewId),userId:Number(userInfo)}});
+            console.log(success);
+            if(!success)
+            {
+                return {success:false};
+            }
+            return {success:true};
+        }
+        catch(err)
+        {
+            console.error(err);
+        }
     }
 }
 module.exports=reviewService

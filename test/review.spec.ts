@@ -507,11 +507,12 @@ describe('delete /review/reply/:id',() => {
     
 });
 //리뷰 삭제 시
-describe('delete reivew/:id',() => {
+describe.only('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)
-                .delete('/review/1')
+                .delete('/review/2')
+                .set("authorization","Bearer testtoken")
                 .expect(204)
                 .end(done);
         });
@@ -521,7 +522,7 @@ describe('delete reivew/:id',() => {
         it('없는 id일 시 404로 응답한다',(done) => {
             request(app)
                 .delete('/review/0')
-                .set("authorization","Bearer testtokerrn")
+                .set("authorization","Bearer testtoken")
                 .expect(404)
                 .end(done);
         });

@@ -58,10 +58,14 @@ const process=
     },
     async deleteReview (req:Request,res:Response):Promise<any>
     {
-        const isSuccess=await reviewService.deleteReview(req.body);
-        if(isSuccess)
+        const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
+        if(isSuccess.success)
         {
-            return res.status(201).end();
+            return res.status(204).end();
+        }
+        else
+        {
+            return res.status(404).end();
         }
     }
 }
