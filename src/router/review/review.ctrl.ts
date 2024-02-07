@@ -1,8 +1,11 @@
 import {PrismaClient} from "@prisma/client";
 import express, {Express, Request, Response} from 'express';
+import { UserService } from "../../service/user.service";
+import { Login } from "../../interface/user/login";
 const prisma = new PrismaClient();
 const reviewServiceClass = require('../../service/review.service');
 const reviewService = new reviewServiceClass();
+const userService=new UserService();
 const output={
     async getReview (req:Request,res:Response):Promise<any>
     {
@@ -33,10 +36,16 @@ const process=
 {
     async writeReview (req:Request,res:Response):Promise<any>
     {
-        const isSuccess=await reviewService.writeReview(req.body);
-        if(isSuccess)
+        const userInfo=req.body.userData;
+        const reviewId=req.params.id;
+        const isSuccess=await reviewService.writeReview(req.body,userInfo.id,reviewId);
+        if(isSuccess.success)
         {
             return res.status(201).end();
+        }
+        else
+        {
+            return res.status(404).end();
         }
     },
     async updateReview (req:Request,res:Response):Promise<any>
