@@ -60,7 +60,7 @@ class HansicService {
   //식당id로 조회
   async get(restaurantId: number): Promise<any> {
     try {
-      const data = await prisma.$queryRaw<any>`
+      const data = await prisma.$queryRaw<any[]>`
         SELECT 
           hs.id,
           hs.name,
@@ -71,17 +71,20 @@ class HansicService {
           hs.lat,
           hs.lng,
           ls.location,
-          si."imgUrl" 
+          si."imgUrl",
+          rd.count
         FROM hansics as hs 
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" 
+        on hs.id=si."hansicsId"
+        LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
+		on hs.id=rd."hansicsId"
         WHERE hs.id=${restaurantId}
       `;
-
-      //console.log(data);
       if (data[0]) {
+        console.log(data[0]);
+        data[0].count=Number(data[0].count);
         return data[0];
       } else {
         return false;
