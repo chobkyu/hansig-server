@@ -41,7 +41,6 @@ export class UserService {
                     userName:user.userName,
                     userNickName:user.userNickName,
                     userGrade:{connect:{id:1}},
-                    location:{connect:{id:1}},
                 }
             });
 
@@ -136,6 +135,7 @@ export class UserService {
 
         if(check) { //로그인 성공
             const accessToken = jwt.sign(res);
+            //const refreshToekn
             return {success:true,status:201,token:accessToken};
         }else return { //로그인 실패
             success:false, status:400
@@ -193,7 +193,7 @@ export class UserService {
                     id:userId
                 }
             });
-
+            console.log(res);
 
             if(res?.userId==null) return {success:false,status:404,msg:userId};
 
@@ -211,15 +211,17 @@ export class UserService {
         try{
             const updateUserId = userInfoDto.userData.id;
 
-            const user : user = {
+            const user  = {
                 userId : userInfoDto.userId,
                 userName : userInfoDto.userName,
                 userNickName : userInfoDto.userNickName,
-                userPw :'mockpw'  //refactoring...
+                userPw : userInfoDto.userPw, //refactoring...
+                location_id : userInfoDto.locationId
             }
 
-            const check = this.checkData(user);
-            if(!check.success) return {success:false,status:400};
+            //업데이트는 타입 체크만 할 예정
+            // const check = this.checkData(user);
+            //if(!check.success) return {success:false,status:400};
             
 
             const updateUser = await prisma.user.updateMany({
@@ -229,7 +231,8 @@ export class UserService {
                 data : {
                     userId : userInfoDto.userId,
                     userNickName : userInfoDto.userNickName,
-                    userName : userInfoDto.userName
+                    userName : userInfoDto.userName,
+                    location_id : userInfoDto.locationId
                 }
             });
 

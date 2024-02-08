@@ -15,6 +15,7 @@ const router = express.Router();
 router.get('/all',ctrl.output.getAll);
 router.get('/loc/:id',ctrl.output.getFromLocation);
 router.get('/get/geo',ctrl.output.tryGeo);
+router.get('/place',ctrl.output.getByPlace);
 router.get('/:id',ctrl.output.get);
 // router.post('/:id',ctrl.process.create);
 // router.patch('/:id',ctrl.process.update);
