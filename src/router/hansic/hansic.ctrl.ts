@@ -26,8 +26,10 @@ const output = {
       } else {
         const response = await hansicService.get(id);
         if (response) {
-          return res.json({ data: response });
-        } else {
+          response.count=Number(response.count);
+          console.log(response.count,typeof response.count);
+          return res.json({data:response});
+        }else {
           return res.status(400).end();
         }
       }
