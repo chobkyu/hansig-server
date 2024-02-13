@@ -31,7 +31,7 @@ const output={
         const reviewList=await reviewService.getReviewList(Number(req.params.id));
         if(reviewList)
         {
-            return res.json({data:reviewList});
+            return res.json(reviewList);
         }
         else
         {

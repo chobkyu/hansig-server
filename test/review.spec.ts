@@ -229,7 +229,7 @@ describe('patch /review/update/:id',function () {
 });
 
 /**리뷰 조회 시 id는 리뷰 id */
-describe.only('get /review/:id ',function() {
+describe('get /review/:id ',function() {
     describe('성공 시 해당 리뷰 리턴',() => {
         let body : any;
         before(done => {
@@ -319,7 +319,7 @@ describe.only('get /review/:id ',function() {
 
 
 /**리뷰 리스트 조회 시  id는 식당 id*/
-describe('get /review/list/:id',() => {
+describe.only('get /review/list/:id',() => {
     describe('성공 시',() => {
         let body:any;
         before(done => {
@@ -495,7 +495,7 @@ describe('delete /review/reply/:id',() => {
         let body:any;
         before(done => {
             request(app)
-            .delete('/review/reply/1')
+            .delete('/review/reply/28')
             .set("authorization","Bearer testtoken")
             .expect(204)
             .end((err:any,res:any) => {
@@ -511,7 +511,7 @@ describe('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)
-                .delete('/review/2')
+                .delete('/review/28')
                 .set("authorization","Bearer testtoken")
                 .expect(204)
                 .end(done);

@@ -8,16 +8,17 @@ class reviewService
 {//리뷰 아이디로 리뷰조회
     async getReview(id:number):Promise<any|false>
     {try{
-        const review=await prisma.review.findUnique({where:{id:id}});
-        console.log(review);
+        const [review,reviewComment,reviewImg]=await Promise.all([prisma.review.findUnique({select:{review:true,star:true,user:{select:{id:true,userNickName:true}}},where:{id:id}}),prisma.reviewComment.findMany({where:{reviewId:id}}),prisma.reviewImg.findMany({select:{imgUrl:true},where:{reviewId:id}})]);
+        console.log(review,reviewComment,reviewImg);
         if(review)
         {
-            return review;
+            return {review:review.review,star:review.star,user:review.user,reviewComment:reviewComment,imgUrl:reviewImg};
         }
         else
         {
             return false;
-        }}
+        }
+    }
         catch(err)
         {
             console.log("err");
@@ -26,9 +27,20 @@ class reviewService
     async getReviewList(restaurantId:number):Promise<any[]|any>
     {
         try{
-        const review=await prisma.review.findMany({where:{hansicsId:restaurantId}});
+        const review=await prisma.$queryRaw<any[]>`SELECT 
+        rv.id,
+        rv.star,
+        rv.review,
+         STRING_AGG(rc.comment, ', ') AS comment,
+         STRING_AGG(ri."imgUrl", ', ') AS "imgUrl"
+        FROM hansic.review as rv
+        LEFT JOIN hansic."reviewComment" as rc ON  rv.id=rc."reviewId"
+        LEFT JOIN hansic."reviewImg"as ri ON rv.id=ri."reviewId"
+        WHERE rv."hansicsId"=${restaurantId}
+        GROUP BY rv.id`;
         if(review)
         {
+            console.log(review);
             return review;
         }
         else
