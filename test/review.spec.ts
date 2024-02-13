@@ -4,6 +4,7 @@ const app = require('../app')
 const request = require('supertest')
 
 /**리뷰 입력 시 ...  id는 식당 id */
+
 describe('post /review/:id',function() {
     let testData : Review = {
         review : '맛있어요',
@@ -228,16 +229,15 @@ describe('patch /review/update/:id',function () {
 });
 
 /**리뷰 조회 시 id는 리뷰 id */
-describe('get /reivew/:id ',function() {
+describe.only('get /review/:id ',function() {
     describe('성공 시 해당 리뷰 리턴',() => {
         let body : any;
-
         before(done => {
             request(app)
-                .get('review/1')
+                .get('/review/3')
                 .expect(200)
                 .end((err:any, res:any) => {
-                    body = res.body;
+                    body = res.body.data;
                     done();
                 });
         });
@@ -298,7 +298,7 @@ describe('get /reivew/:id ',function() {
     describe('실패 시',() => {
         it('없는 리뷰 조회 시 404로 응답한다',(done) => {
             request(app)
-                .get('review/0')
+                .get('/review/0')
                 .expect(404)
                 .end((err:any, res:any) => {
                     done();
@@ -307,7 +307,7 @@ describe('get /reivew/:id ',function() {
 
         it('잘못된 파라미터일 시 400으로 응답한다',(done) => {
             request(app)
-                .get('review/sigdang')
+                .get('/review/sigdang')
                 .expect(400)
                 .end((err:any, res:any) => {
                     done();
@@ -324,7 +324,7 @@ describe('get /review/list/:id',() => {
         let body:any;
         before(done => {
             request(app)
-            .get('/review/list/1084')
+            .get('/review/list/1804')
             .expect(200)
             .end((err:any,res:any) => {
                 body = res.body;
@@ -507,7 +507,7 @@ describe('delete /review/reply/:id',() => {
     
 });
 //리뷰 삭제 시
-describe.only('delete reivew/:id',() => {
+describe('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)

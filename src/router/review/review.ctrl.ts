@@ -9,19 +9,26 @@ const userService=new UserService();
 const output={
     async getReview (req:Request,res:Response):Promise<any>
     {
-        const review=await reviewService.getReview(req.params.id);
+        try{console.log("getReview");
+        const review=await reviewService.getReview(Number(req.params.id));
+        console.log(review);
         if(review)
         {
             return res.json({data:review});
         }
         else
         {
-            return res.status(204).end();
+            return res.status(404).end();
+        }}
+        catch(err)
+        {
+            console.error(err);
         }
     },
     async getReviewList (req:Request,res:Response):Promise<any>
     {
-        const reviewList=await reviewService.getReviewList(req.params.id);
+        console.log("getReviewList");
+        const reviewList=await reviewService.getReviewList(Number(req.params.id));
         if(reviewList)
         {
             return res.json({data:reviewList});
@@ -36,6 +43,7 @@ const process=
 {
     async writeReview (req:Request,res:Response):Promise<any>
     {
+        console.log("writeReview");
         const userInfo=req.body.userData;
         const reviewId=req.params.id;
         const isSuccess=await reviewService.writeReview(req.body,userInfo.id,reviewId);
@@ -49,7 +57,7 @@ const process=
         }
     },
     async updateReview (req:Request,res:Response):Promise<any>
-    {
+    {console.log("updateReview");
         const isSuccess=await reviewService.updateReview(req.body);
         if(isSuccess)
         {
@@ -57,7 +65,7 @@ const process=
         }
     },
     async deleteReview (req:Request,res:Response):Promise<any>
-    {
+    {console.log("deleteReview");
         const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
         if(isSuccess.success)
         {

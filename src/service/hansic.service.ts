@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
 ㄴ 리뷰 댓글 삭제 시
 */
 
-class HansicService {
+export class HansicService {
   async getHansicDate() {
     try {
       const data =

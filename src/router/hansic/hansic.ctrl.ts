@@ -17,7 +17,22 @@ const output = {
       return res.status(500).end();
     }
   },
-
+  getByPlace: async (req: Request, res: Response) => {
+    try {
+      const lat = req.query.lat;
+      const lng = req.query.lng;
+      const response = await hansicService.getByPlace(Number(lat), Number(lng));
+      if (response) {
+        return res.json({ data: response[0] }).end();
+      }
+      else {
+        return res.status(404).end();
+      }
+    } catch (err) {
+      console.log(err);
+      return res.status(500).end();
+    }
+  },
   get: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
@@ -26,8 +41,6 @@ const output = {
       } else {
         const response = await hansicService.get(id);
         if (response) {
-          response.count=Number(response.count);
-          console.log(response.count,typeof response.count);
           return res.json({data:response});
         }else {
           return res.status(400).end();
@@ -64,25 +77,6 @@ const output = {
       console.log('ctrl');
       const response = await hansicService.convert();
       return res.json(response).end();
-    }catch(err){
-      console.log(err);
-      return res.status(500).end();
-    }
-  },
-//좌표를 쿼리로 받아 검색
-  getByPlace:async(req:Request,res:Response)=>
-  {
-    try{
-      const lat=req.query.lat;
-      const lng=req.query.lng;
-      const response = await hansicService.getByPlace(Number(lat),Number(lng));
-      if(response){
-      return res.json({data:response[0]}).end();
-    }
-    else
-    {
-      return res.status(404).end();
-    }
     }catch(err){
       console.log(err);
       return res.status(500).end();

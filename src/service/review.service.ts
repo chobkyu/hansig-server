@@ -6,9 +6,27 @@ import { user } from "../interface/user/user";
 const prisma = new PrismaClient();
 class reviewService
 {//리뷰 아이디로 리뷰조회
-    async getReview(id:number):Promise<any>
-    {
+    async getReview(id:number):Promise<any|false>
+    {try{
         const review=await prisma.review.findUnique({where:{id:id}});
+        console.log(review);
+        if(review)
+        {
+            return review;
+        }
+        else
+        {
+            return false;
+        }}
+        catch(err)
+        {
+            console.log("err");
+        }
+    }//식당 id로 리뷰조회
+    async getReviewList(restaurantId:number):Promise<any[]|any>
+    {
+        try{
+        const review=await prisma.review.findMany({where:{hansicsId:restaurantId}});
         if(review)
         {
             return review;
@@ -17,11 +35,11 @@ class reviewService
         {
             return false;
         }
-        return true;
-    }//식당 id로 리뷰조회
-    async getReviewList(restaurantId:number):Promise<any>
+    }
+    catch(err)
     {
-        return true;
+
+    }
     }
     //리뷰작성
     async writeReview(inputReview:Review,userInfo:Number,restaurantInfo:Number)
@@ -48,11 +66,12 @@ class reviewService
     }
     catch(err)
     {
-        console.log(err);
+        console.error(err);
     }
     }
     async updateReview(review:any):Promise<any>
     {
+
         return true;
     }
     async deleteReview(deleteReviewId:number,userInfo:number):Promise<any>
