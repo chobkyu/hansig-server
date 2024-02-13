@@ -81,10 +81,33 @@ class reviewService
         console.error(err);
     }
     }
-    async updateReview(review:any):Promise<any>
+    async updateReview(inputReview:Review,userInfo:Number,reviewInfo:Number):Promise<any|false>
     {
+try{
+    const review=await prisma.review.findUnique({where:{id:Number(reviewInfo)}});
+    if(review?.userId===userInfo)
+    {
+        const updatedReview=await prisma.review.update({data:{review:inputReview.review,star:inputReview.star},where:{id:Number(reviewInfo)}})
+        if(inputReview.img){
+            for(let i in inputReview.img)
+            {
+                const img=await prisma.reviewImg.create({data:{imgUrl:i,reviewId:updatedReview.id}});
+                if(!img)
+                {
+                    return {success:false};
+                }
+            }
+        }
+    }
+    else
+    {
+        return false;
+    }
+}
+catch(err)
+{
 
-        return true;
+}
     }
     async deleteReview(deleteReviewId:number,userInfo:number):Promise<any>
     {

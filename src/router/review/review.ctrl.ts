@@ -27,6 +27,7 @@ const output={
     },
     async getReviewList (req:Request,res:Response):Promise<any>
     {
+        try{
         console.log("getReviewList");
         const reviewList=await reviewService.getReviewList(Number(req.params.id));
         if(reviewList)
@@ -36,6 +37,10 @@ const output={
         else
         {
             return res.status(204).end();
+        }}
+        catch(err)
+        {
+            console.error(err);
         }
     }
 }
@@ -43,6 +48,7 @@ const process=
 {
     async writeReview (req:Request,res:Response):Promise<any>
     {
+        try{
         console.log("writeReview");
         const userInfo=req.body.userData;
         const reviewId=req.params.id;
@@ -54,18 +60,34 @@ const process=
         else
         {
             return res.status(404).end();
+        }}
+        catch(err)
+        {
+            console.error(err);
         }
     },
     async updateReview (req:Request,res:Response):Promise<any>
-    {console.log("updateReview");
-        const isSuccess=await reviewService.updateReview(req.body);
+    {
+        try{console.log("updateReview");
+        const userInfo=req.body.userData;
+        const reviewId=req.params.id;
+        const isSuccess=await reviewService.updateReview(req.body,userInfo.id,reviewId);
         if(isSuccess)
         {
+
             return res.status(201).end();
+        }
+        else
+        {
+            return res.status(404).end();
+        }}catch(err)
+        {
+            console.error(err);
         }
     },
     async deleteReview (req:Request,res:Response):Promise<any>
-    {console.log("deleteReview");
+    {
+        try{console.log("deleteReview");
         const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
         if(isSuccess.success)
         {
@@ -74,6 +96,9 @@ const process=
         else
         {
             return res.status(404).end();
+        }}catch(err)
+        {
+            console.error(err);
         }
     }
 }
