@@ -1,8 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { SignUpData } from "../interface/owner/signUp";
 import { UserService } from "./user.service";
 import { Login } from "../interface/user/login";
 import bcrypt from "bcrypt";
+import { MenuData, checkMenuDataCount } from "../interface/owner/menu";
 
 const { checkOwner } = require("../util/checkOwner");
 const jwt = require("../util/jwt-util");
@@ -26,54 +27,54 @@ export class OwnerService {
           success: false,
         };
 
-      // //아이디 중복 체크
-      // const checkId = await userService.checkId(body.userId);
-      // if(!checkId.success) return {success:false,status:409};
+      //아이디 중복 체크
+      const checkId = await userService.checkId(body.userId);
+      if (!checkId.success) return { success: false, status: 409 };
 
-      // //닉네임 중복 체크
-      // if(body.userNickName!= null){
-      //     const checkNickName = await userService.checkNickName(body.userNickName);
-      //     if(!checkNickName.success) return {success:false, status:409};
-      // }
+      //닉네임 중복 체크
+      if (body.userNickName != null) {
+        const checkNickName = await userService.checkNickName(
+          body.userNickName
+        );
+        if (!checkNickName.success) return { success: false, status: 409 };
+      }
 
-      // body.userPw = await userService.hashing(body.userPw);
+      body.userPw = await userService.hashing(body.userPw);
 
-      // //transcation
-      // prisma.$transaction(async (tx) => {
-      //     //유저 insert
-      //     const insertUser = await tx.user.create({
-      //         data:{
-      //             userId:body.userId,
-      //             userPw:body.userPw,
-      //             userName:body.userName,
-      //             userNickName:body.userNickName,
-      //             userGradeId : 3
-      //         }
-      //     });
+      //transcation
+      prisma.$transaction(async (tx) => {
+        //유저 insert
+        const insertUser = await tx.user.create({
+          data: {
+            userId: body.userId,
+            userPw: body.userPw,
+            userName: body.userName,
+            userNickName: body.userNickName,
+            userGradeId: 3,
+          },
+        });
 
-      //     //insert 한뷔
-      //     const insertHansicdang = await tx.hansics.create({
-      //         data:{
-      //             name:body.hansicdangName,
-      //             addr : body.hansicdangAddr,
-      //             userStar: '0',
-      //             google_star:'0',
-      //             location_id:body.location_id
-      //         }
-      //     });
+        //insert 한뷔
+        const insertHansicdang = await tx.hansics.create({
+          data: {
+            name: body.hansicdangName,
+            addr: body.hansicdangAddr,
+            userStar: "0",
+            google_star: "0",
+            location_id: body.location_id,
+          },
+        });
 
-      //     //오너 테이블 입력
-      //     const insertOwner = await tx.ownerData.create({
-      //         data:{
-      //             ownerNum : body.ownerNum,
-      //             isApproved : false,
-      //             hansicsId:insertHansicdang.id,
-      //             userId:insertUser.id
-      //         }
-      //     });
-
-      //     return {success:true, status:201};
-      // });
+        //오너 테이블 입력
+        const insertOwner = await tx.ownerData.create({
+          data: {
+            ownerNum: body.ownerNum,
+            isApproved: false,
+            hansicsId: insertHansicdang.id,
+            userId: insertUser.id,
+          },
+        });
+      });
 
       return { success: true, status: 201 };
     } catch (err) {
@@ -181,6 +182,150 @@ export class OwnerService {
 
       if (res) return { success: true, status: 201 };
       else return { success: false, status: 401 };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  //메뉴 입력
+  insertMenu = async (menuData: MenuData) => {
+    try {
+      //입력값 유효성 확인
+      const dataCheck = await this.insertMenuDataCheck(menuData);
+      if (!dataCheck.success)
+        return {
+          success: false,
+          status: 400,
+          msg: "데이터를 제대로 입력했는지 확인하세요",
+        };
+
+      //트랜잭션
+      prisma.$transaction(async (tx) => {
+        //menu insert
+        const insertMenuInfo = await tx.menu.create({
+          data: {
+            name: menuData.name,
+            useFlag: true,
+            userId: menuData.userData.id,
+            hansicsId: menuData.hansicsId,
+            price: menuData.price,
+          },
+        });
+
+        //menuImg insert
+        const insertMenuImgInfo = await tx.menuImg.create({
+          data: {
+            imgUrl: menuData.menuImg,
+            useFlag: true,
+            menuId: insertMenuInfo.id,
+          },
+        });
+      });
+
+      return { success: true, status: 201 };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  //메뉴 입력 데이터 체크
+  insertMenuDataCheck = async (menuData: MenuData) => {
+    try {
+      //다른 데이터 입력 방지
+      const count = Object.keys(menuData).length;
+      if (!checkMenuDataCount(count)) return { success: false };
+
+      //데이터 누락 및 타입 체크
+      if (
+        typeof menuData?.name !== "string" ||
+        typeof menuData?.userData?.id !== "number" ||
+        typeof menuData?.hansicsId !== "number" ||
+        typeof menuData?.price !== "number" ||
+        typeof menuData?.menuImg !== "string"
+      )
+        return { success: false };
+      else return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  //메뉴 읽기
+  getMenuList = async (id: number) => {
+    try {
+      //입력값 타입 확인
+      if (typeof id !== "number") return { success: false, status: 400 };
+      //DB에 hansicsId 존재 확인
+      const idCheck = await this.validateHansicsId(id);
+      if (!idCheck.success) return { success: false, status: 400 };
+
+      //string을 sql로 변환
+      const query = Prisma.sql`
+        SELECT
+          menu.id, menu.name, menu."userId", menu."hansicsId", menu.price, "menuImg"."imgUrl"
+        FROM (SELECT * FROM menu WHERE "hansicsId" = ${id} AND "useFlag" = true) as menu
+        INNER JOIN "menuImg"
+        ON menu.id = "menuImg"."menuId";
+      `;
+      //결과
+      const menuList = await prisma.$queryRaw(query);
+
+      return { success: true, status: 200, menuList };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  //hansicsId 존재 확인 여부
+  validateHansicsId = async (id: number) => {
+    try {
+      const hansicsId = await prisma.hansics.findUnique({
+        where: {
+          id: id,
+        },
+      });
+      if (!hansicsId) return { success: false };
+      return { success: true };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  //메뉴 수정
+  updateMenu = async (menuData: MenuData) => {
+    try {
+      //입력값 유효성 확인
+      const dataCheck = await this.insertMenuDataCheck(menuData);
+      if (!dataCheck.success) return { success: false, status: 400 };
+
+      /*트랜잭션
+      - menu DB에 수정
+      - menuImg DB에 수정
+       */
+      return { success: true, status: 201 };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  //메뉴 삭제
+  deleteMenu = async (menuData: MenuData) => {
+    try {
+      //입력값 유효성 확인
+      const dataCheck = await this.insertMenuDataCheck(menuData);
+      if (!dataCheck.success) return { success: false, status: 400 };
+
+      /*트랜잭션
+      - menu DB에 useFlag 수정
+      - menuImg DB에 useFlag 수정
+       */
+      return { success: true, status: 201 };
     } catch (err) {
       console.error(err);
       return { success: false, status: 500 };
