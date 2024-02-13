@@ -334,4 +334,32 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
     });
 });
 
+//한식 뷔페 즐겨 찾기
+describe('post /hansic/star/:id',()=>{
+    describe('성공 시',async () =>{
+        it('성공 시 201을 리턴한다',async (done) =>{
+            request(app)
+                .post('/hansic/star/1796')
+                .expect(201)
+                .end(done);
+        });
+    });
+
+    describe('실패 시',async () => {
+        it('해당 데이터를 찾을 수 없을 때는 404 리턴',async (done) => {
+            request(app)
+                .post('/hansic/star/0')
+                .expect(404)
+                .end(done);
+        });
+
+        it('사용자가 유효하지 않는 입력을 했을 시 400 리턴', async (done) => {
+            request(app)
+                .post('/hansic/star/hiyo')
+                .expect(400)
+                .end(done);
+        });
+    });
+});
+
 

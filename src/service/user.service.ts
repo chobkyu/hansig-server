@@ -5,6 +5,7 @@ import { user } from "../interface/user/user";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
 const jwt = require('../util/jwt-util');
+const logger = require('../util/winston');
 
 const prisma = new PrismaClient();
 
@@ -241,6 +242,17 @@ export class UserService {
         }catch(err){
             console.error(err);
             return {success:false,status:500};
+        }
+    }
+
+    async getLocation() {
+        try{
+            const locations = await prisma.location.findMany();
+            
+            return {data:locations};
+        }catch(err){
+            logger.error(err);
+            return {success:false, status:500};
         }
     }
 
