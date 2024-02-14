@@ -2,17 +2,19 @@ import {PrismaClient} from "@prisma/client";
 import express, {Express, Request, Response} from 'express';
 import { UserService } from "../../service/user.service";
 import { Login } from "../../interface/user/login";
+import { Logger } from "winston";
+const logger=new Logger();
 const prisma = new PrismaClient();
 const reviewServiceClass = require('../../service/review.service');
 const reviewService = new reviewServiceClass();
 const userService=new UserService();
 const output={
+    //리뷰id로 리뷰 얻어오기
     async getReview (req:Request,res:Response):Promise<any>
     {
-        try{console.log("getReview");
+        try{
         const review=await reviewService.getReview(Number(req.params.id));
-        console.log(review);
-        if(review)
+        if(review)//검색결과가 있으면
         {
             return res.json({data:review});
         }
@@ -22,14 +24,15 @@ const output={
         }}
         catch(err)
         {
-            console.error(err);
+            logger.error(err);
         }
     },
+    //식당id로 리뷰리스트 얻어오기
     async getReviewList (req:Request,res:Response):Promise<any>
     {
         try{
-        console.log("getReviewList");
         const reviewList=await reviewService.getReviewList(Number(req.params.id));
+        //검색결과가 있으면
         if(reviewList)
         {
             return res.json(reviewList);
@@ -39,7 +42,7 @@ const output={
         }}
         catch(err)
         {
-            console.error(err);
+            logger.error(err);
         }
     }
 }
@@ -48,11 +51,10 @@ const process =
     async writeReview (req:Request,res:Response):Promise<any>
     {
         try{
-        console.log("writeReview");
         const userInfo=req.body.userData;
         const reviewId=req.params.id;
         const isSuccess=await reviewService.writeReview(req.body,userInfo.id,reviewId);
-        if(isSuccess.success)
+        if(isSuccess)//작성성공시
         {
             return res.status(201).end();
         }
@@ -62,33 +64,35 @@ const process =
         }}
         catch(err)
         {
-            console.error(err);
+            logger.error(err);
         }
     },
     async updateReview (req:Request,res:Response):Promise<any>
     {
-        try{console.log("updateReview");
+        try{
         const userInfo=req.body.userData;
         const reviewId=req.params.id;
-        const isSuccess=await reviewService.updateReview(req.body,userInfo.id,reviewId);
-        if(isSuccess)
+        const updatedReview=await reviewService.updateReview(req.body,userInfo.id,reviewId);
+        if(updatedReview)//update성공시
         {
-
-            return res.status(201).end();
+            updatedReview.user={};
+            updatedReview.user.id=userInfo.id;
+            updatedReview.user.userNickName=userInfo.userNickName;
+            return res.json(updatedReview);
         }
         else
         {
-            return res.status(404).end();
+            return res.status(400).end();
         }}catch(err)
         {
-            console.error(err);
+            logger.error(err);
         }
     },
     async deleteReview (req:Request,res:Response):Promise<any>
     {
-        try{console.log("deleteReview");
+        try{
         const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
-        if(isSuccess.success)
+        if(isSuccess)//삭제성공시
         {
             return res.status(204).end();
         }
@@ -97,7 +101,7 @@ const process =
             return res.status(404).end();
         }}catch(err)
         {
-            console.error(err);
+            logger.error(err);
         }
     }
 }

@@ -1,5 +1,6 @@
 import { hansics, PrismaClient } from "@prisma/client";
 import { favoriteDto } from "../interface/hansic/favorite";
+import { log } from "winston";
 const request = require('request');
 const prisma = new PrismaClient();
 const logger = require('../util/winston');
@@ -26,79 +27,106 @@ export class HansicService {
     }
   }
   //좌표로 조회
-  async getByPlace(lat:Number,lng:Number)
+  async getByPlace(lat:Number,lng:Number,userId?:Number)
   {
     try {
+      let favorite;
+      //좌표로 단일 검색
       const data = await prisma.$queryRaw<any[]>`
-        SELECT
-          hs.id,
-          hs.name,
-          hs.addr,
-          hs."userStar",
-          hs.google_star,
-          hs.location_id,
-          hs.lat,
-          hs.lng,
-          ls.location,
-          si."imgUrl"
-        FROM hansics as hs 
-        INNER JOIN location as ls 
-        on hs.location_id=ls.id 
-        LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId"
+      SELECT 
+      hs.id,
+      hs.name,
+      hs.addr,
+      hs."userStar",
+      hs.google_star,
+      hs.location_id,
+      hs.lat,
+      hs.lng,
+      ls.location,
+      si."imgUrl",
+      rd.count
+    FROM hansics as hs 
+    INNER JOIN location as ls 
+    on hs.location_id=ls.id 
+    LEFT JOIN "sicdangImg" as si 
+    on hs.id=si."hansicsId"
+    LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
+on hs.id=rd."hansicsId"
         WHERE hs.lat=${lat} or hs.lng=${lng} 
-        ORDER BY hs.id ASC
       `;
-      console.log(data);
-      if (data) {
-        return data;
-      } else {
-        return false;
+  //user정보가 넘어왔을시 favorite확인
+      if(userId)
+      {
+        favorite=await prisma.favorites.findFirst({where:{userId:Number(userId),hansicsId:data[0].id}});
       }
-    } catch (err) {
-      console.error(err);
-      return false
-    }
-  }
-  //식당id로 조회
-  async get(restaurantId: number): Promise<any> {
-    try {
-      const data = await prisma.$queryRaw<any[]>`
-        SELECT 
-          hs.id,
-          hs.name,
-          hs.addr,
-          hs."userStar",
-          hs.google_star,
-          hs.location_id,
-          hs.lat,
-          hs.lng,
-          ls.location,
-          si."imgUrl",
-          rd.count
-        FROM hansics as hs 
-        INNER JOIN location as ls 
-        on hs.location_id=ls.id 
-        LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId"
-        LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
-		on hs.id=rd."hansicsId"
-        WHERE hs.id=${restaurantId}
-      `;
-      //logger.info(data);
-
-      if (data[0]) {
-        console.log(data[0]);
+      else{
+        //유저정보가 넘어오지 않은경우
+      favorite=false;
+      }  
+      if (data.length>0) {
         data[0].count=Number(data[0].count);
+        //즐겨찾기 되어 있으면 true
+        data[0].favorite=favorite?true:false;
         return data[0];
       } else {
         return false;
       }
+     
     } catch (err) {
+      logger.error(err);
+      return false
+    }
+  }
+  //식당id로 단일 조회
+  async get(restaurantId: number,userId?:number): Promise<Object|false> {
+    try {  let favorite;
+      const data = await prisma.$queryRaw<any[]>`
+    SELECT 
+      hs.id,
+      hs.name,
+      hs.addr,
+      hs."userStar",
+      hs.google_star,
+      hs.location_id,
+      hs.lat,
+      hs.lng,
+      ls.location,
+      si."imgUrl",
+      rd.count
+    FROM hansics as hs 
+    INNER JOIN location as ls 
+    on hs.location_id=ls.id 
+    LEFT JOIN "sicdangImg" as si 
+    on hs.id=si."hansicsId"
+    LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
+on hs.id=rd."hansicsId"
+    WHERE hs.id=${restaurantId}
+  `;
+  //user정보가 넘어왔을시 favorite확인
+      if(userId)
+      {
+        favorite=await prisma.favorites.findFirst({where:{userId:userId,hansicsId:restaurantId}});
+        
+      }
+      else{
+        //유저정보가 넘어오지 않은경우
+      favorite=false;
+      }  
+      if (data.length>0) {
+        data[0].count=Number(data[0].count);
+        //즐겨찾기 되어 있으면 true
+        data[0].favorite=favorite?true:false;
+        return data[0];
+      } else {
+        return false;
+      }
+    
+    } catch (err) {
+      logger.error(err);
       return false;
     }
   }
-  //지역id로 조회
+  //지역id로 지역내 식당리스트 조회
   async getFromLocation(locationId: number): Promise<any[] | false> {
     try {
       const data = await prisma.$queryRaw<any[]>`

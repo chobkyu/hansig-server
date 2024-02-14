@@ -5,7 +5,7 @@ const request = require('supertest')
 
 /**리뷰 입력 시 ...  id는 식당 id */
 
-describe('post /review/:id',function() {
+describe.only('post /review/:id',function() {
     let testData : Review = {
         review : '맛있어요',
         star : 2,
@@ -87,7 +87,7 @@ describe('post /review/:id',function() {
 
 
 /**리뷰 수정 시  id는 리뷰*/
-describe('patch /review/update/:id',function () {
+describe.only('patch /review/update/:id',function () {
     describe('성공 시',() => {
         let testData : Review = {
             review : '맛있어요!!',
@@ -97,7 +97,7 @@ describe('patch /review/update/:id',function () {
         let body : any;
         before(done => {
             request(app)
-                .patch('/review/update/1')
+                .patch('/review/update/3')
                 .set("authorization","Bearer testtoken")
                 .send(testData)
                 .end((err:any,res:any) => {
@@ -122,12 +122,12 @@ describe('patch /review/update/:id',function () {
             body.star.should.be.instanceOf(Number);
         });
 
-        it('imgUrl이 포함되어야 한다.',async () => {
-            body.should.have.property('imgUrl');
+        it('reviewImgs이 포함되어야 한다.',async () => {
+            body.should.have.property('reviewImgs');
         });
 
-        it('imgUrl은 배열이여야 한다.', async () => {
-            body.imgUrl.should.be.instanceOf(Array<string>); //이거 통과 안되면 그냥 Array로
+        it('reviewImgs은 배열이여야 한다.', async () => {
+            body.reviewImgs.should.be.instanceOf(Array); //이거 통과 안되면 그냥 Array로
         });
 
         it('user가 포함되어야 한다.',async () => {
@@ -139,7 +139,7 @@ describe('patch /review/update/:id',function () {
         });
 
         it('user.userNickName는 string여야 한다.', async () => {
-            body.user.userNickName.review.should.be.instanceOf(String);
+            body.user.userNickName.should.be.instanceOf(String);
         });
 
         it('user.id가 포함되어야 한다.',async () => {
@@ -229,7 +229,7 @@ describe('patch /review/update/:id',function () {
 });
 
 /**리뷰 조회 시 id는 리뷰 id */
-describe('get /review/:id ',function() {
+describe.only('get /review/:id ',function() {
     describe('성공 시 해당 리뷰 리턴',() => {
         let body : any;
         before(done => {
@@ -258,12 +258,12 @@ describe('get /review/:id ',function() {
             body.star.should.be.instanceOf(Number);
         });
 
-        it('imgUrl이 포함되어야 한다.',async () => {
-            body.should.have.property('imgUrl');
+        it('reviewImgs이 포함되어야 한다.',async () => {
+            body.should.have.property('reviewImgs');
         });
 
-        it('imgUrl은 배열이여야 한다.', async () => {
-            body.imgUrl.should.be.instanceOf(Array<string>); //이거 통과 안되면 그냥 Array로
+        it('reviewImgs은 배열이여야 한다.', async () => {
+            body.reviewImgs.should.be.instanceOf(Array<string>); //이거 통과 안되면 그냥 Array로
         });
 
         it('user가 포함되어야 한다.',async () => {
@@ -275,7 +275,7 @@ describe('get /review/:id ',function() {
         });
 
         it('user.userNickName는 string여야 한다.', async () => {
-            body.user.userNickName.review.should.be.instanceOf(String);
+            body.user.userNickName.should.be.instanceOf(String);
         });
 
         it('user.id가 포함되어야 한다.',async () => {
@@ -286,12 +286,12 @@ describe('get /review/:id ',function() {
             body.user.id.should.be.instanceOf(Number);
         });
 
-        it('reviewComment가 포함되어야 한다.',async () => {
-            body.should.have.property('reviewComment');
+        it('reviewComments가 포함되어야 한다.',async () => {
+            body.should.have.property('reviewComments');
         })
 
-        it('reviewComment는 Array여야 한다',async () => {
-            body.reviewComment.shoud.be.instanceOf(Array);
+        it('reviewComments는 Array여야 한다',async () => {
+            body.reviewComments.should.be.instanceOf(Array);
         });
     });
 
@@ -319,7 +319,7 @@ describe('get /review/:id ',function() {
 
 
 /**리뷰 리스트 조회 시  id는 식당 id*/
-describe('get /review/list/:id',() => {
+describe.only('get /review/list/:id',() => {
     describe('성공 시',() => {
         let body:any;
         before(done => {
@@ -337,20 +337,20 @@ describe('get /review/list/:id',() => {
             body.should.be.instanceOf(Array);
         });
 
-        it('imgUrl 을 포함해야 한다.',async () => {
-            body[0].shoud.have.property('imgUrl');
+        it('reviewImgs 을 포함해야 한다.',async () => {
+            body[0].should.have.property('reviewImgs');
         });
 
-        it('imgUrl은 배열이여야 한다.',async () => {
-            body[0].imgUrl.should.be.instanceOf(Array);
+        it('reviewImgs은 배열이여야 한다.',async () => {
+            body[0].reviewImgs.should.be.instanceOf(Array);
         });
 
-        it('reviewComment 을 포함해야 한다.',async () => {
-            body[0].shoud.have.property('reviewComment');
+        it('reviewComments 을 포함해야 한다.',async () => {
+            body[0].should.have.property('reviewComments');
         });
 
-        it('reviewComment 배열이여야 한다.',async () => {
-            body[0].reviewComment.should.be.instanceOf(Array);
+        it('reviewComments 배열이여야 한다.',async () => {
+            body[0].reviewComments.should.be.instanceOf(Array);
         });
     });
 
@@ -507,11 +507,11 @@ describe('delete /review/reply/:id',() => {
     
 });
 //리뷰 삭제 시
-describe('delete reivew/:id',() => {
+describe.only('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)
-                .delete('/review/28')
+                .delete('/review/67')
                 .set("authorization","Bearer testtoken")
                 .expect(204)
                 .end(done);

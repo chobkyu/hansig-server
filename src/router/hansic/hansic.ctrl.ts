@@ -6,9 +6,11 @@ const hansicService = new hansicServiceClass();
 const logger = require('../../util/winston');
 
 const output = {
+  //전체조회
   getAll: async (req: Request, res: Response) => {
     try {
       const response = await hansicService.getAll();
+      //유효한 검색 결과가 있는지 확인
       if (response) {
         return res.json({ data: response });
       } else {
@@ -16,59 +18,64 @@ const output = {
       }
     }
     catch (err) {
+      logger.error(err);
       return res.status(500).end();
     }
   },
-  getByPlace: async (req: Request, res: Response) => {
-    try {
-      const lat = req.query.lat;
-      const lng = req.query.lng;
-      const response = await hansicService.getByPlace(Number(lat), Number(lng));
-      if (response) {
-        return res.json({ data: response[0] }).end();
-      }
-      else {
-        return res.status(404).end();
-      }
-    } catch (err) {
-      console.log(err);
-      return res.status(500).end();
-    }
-  },
+//id로 단일 식당 조회
   get: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
+      //id가 숫자인지 확인
       if (isNaN(id)) {
         return res.status(400).end();
       } else {
-        const response = await hansicService.get(id);
-        if (response) {
-          return res.json({data:response});
-        }else {
-          return res.status(400).end();
+        let userId=0;
+        //로그인되어있는지 확인
+        if(req.body.userData)
+        {
+          userId=req.body.userData.id;
         }
-      }
-    } catch (err) {
-      return res.status(500).end();
-    }
-  },
-
-
-  getFromLocation: async (req: Request, res: Response) => {
-    try {
-      const id = parseInt(req.params.id);
-      console.log(id);
-      if (isNaN(id)) {
-        return res.status(400).end();
-      } else {
-        if ((id > 0) && (id < 13)) {
-          const response = await hansicService.getFromLocation(id);
+        const response = await hansicService.get(id,userId);
+        //유효한 검색 결과가 있는지 확인
+        if (response) {
+          response.count = Number(response.count);
           return res.json({ data: response });
         } else {
           return res.status(400).end();
         }
       }
     } catch (err) {
+      logger.error(err);
+      return res.status(500).end();
+    }
+  },
+
+//지역 id로 지역내 식당조회
+  getFromLocation: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      console.log(id);
+      //로그인되어있는지 확인
+      if (isNaN(id)) {
+        return res.status(400).end();
+      } else {
+        //유효한 지역값인지 확인
+        if ((id > 0) && (id < 13)) {
+          const response = await hansicService.getFromLocation(id);
+          //유효한 검색 결과가 있는지 확인
+          if(response){
+          return res.json({ data: response });
+          }else
+          {
+            return res.status(404).end();
+          }
+        } else {
+          return res.status(400).end();
+        }
+      }
+    } catch (err) {
+      logger.error(err);
       return res.status(500).end();
     }
   },
@@ -80,7 +87,32 @@ const output = {
       const response = await hansicService.convert();
       return res.json(response).end();
     } catch (err) {
-      console.log(err);
+      logger.error(err);
+      return res.status(500).end();
+    }
+  },
+
+  //좌표를 쿼리로 받아 검색
+  getByPlace: async (req: Request, res: Response) => {
+    try {
+      const lat = req.query.lat;
+      const lng = req.query.lng;
+      let userId=0;
+      //로그인되어있는지 확인
+        if(req.body.userData)
+        {
+          userId=req.body.userData.id;
+        }
+      const response = await hansicService.getByPlace(Number(lat), Number(lng),userId);
+      //유효한 검색 결과가 있는지 확인
+      if (response) {
+        return res.json({ data: response });
+      }
+      else {
+        return res.status(404).end();
+      }
+    } catch (err) {
+      logger.error(err);
       return res.status(500).end();
     }
   }

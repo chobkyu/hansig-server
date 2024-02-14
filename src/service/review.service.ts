@@ -3,69 +3,63 @@ import { Review } from "../interface/review/review";
 import { success } from "../interface/success";
 import { UserService } from "./user.service";
 import { user } from "../interface/user/user";
+import { Logger } from "winston";
+const logger = new Logger();
 const prisma = new PrismaClient();
-class reviewService { // 리뷰 아이디로 리뷰조회
+class reviewService { 
+  // 리뷰와 리뷰코멘트들(reviewComments),imgUrl들(reviewImgs.imgUrl)을 리턴받는다
   async getReview(id: number): Promise<any|false> {
     try {
-        //id에 해당하는 리뷰,해당 리뷰의 리뷰코멘트,해당리뷰의 리뷰이미지 리턴
-      const [review, reviewComment, reviewImg] = await Promise.all([
-        prisma.review.findUnique({
+      const review= await prisma.review.findUnique({
           select : {
+            id:true,
             review : true,
             star : true,
-            user : {select : {id : true, userNickName : true}}
+            user : {select : {id : true, userNickName : true}},
+            reviewComments:true,
+        reviewImgs:{select:{imgUrl:true}}
           },
           where : {id : id}
-        }),
-        prisma.reviewComment.findMany({where : {reviewId : id}}),
-        prisma.reviewImg.findMany(
-            {select : {imgUrl : true}, where : {reviewId : id}})
-      ]);
-      console.log(review, reviewComment, reviewImg);
+        })
+        //검색결과가 있으면
       if (review) {
-        return {
-          review : review.review,
-          star : review.star,
-          user : review.user,
-          reviewComment : reviewComment,
-          imgUrl : reviewImg
-        };
-      } else {
-        return false;
-      }
-    } catch (err) {
-      console.log("err");
-    }
-  } // 식당 id로 리뷰조회
-  async getReviewList(restaurantId: number): Promise<any[]|any> {
-    try {
-      // 리뷰와 리뷰로 group by된 리뷰코멘트들(string),imgUrl들(string)을
-      // 리턴받는다
-      const review = await prisma.$queryRaw<any[]>`SELECT 
-        rv.id,
-        rv.star,
-        rv.review,
-         STRING_AGG(rc.comment, ', ') AS comment,
-         STRING_AGG(ri."imgUrl", ', ') AS "imgUrl"
-        FROM hansic.review as rv
-        LEFT JOIN hansic."reviewComment" as rc ON  rv.id=rc."reviewId"
-        LEFT JOIN hansic."reviewImg"as ri ON rv.id=ri."reviewId"
-        WHERE rv."hansicsId"=${restaurantId}
-        GROUP BY rv.id`;
-      if (review) {
-        console.log(review);
         return review;
       } else {
         return false;
       }
     } catch (err) {
+      logger.error(err);
+      return false;
+    }
+  }  
+  //한식당의 id로 해당식당의 리뷰들과 각 리뷰들의 유저정보,(user.id,user.userNickName) 리뷰코멘트들(reviewComments),imgUrl들(reviewImgs.imgUrl)을 리턴받는다
+  async getReviewList(restaurantId: number): Promise<any[]|any> {
+    try {
+      const review=await prisma.review.findMany({select : {
+        id:true,
+        review : true,
+        star : true,
+        user : {select : {id : true, userNickName : true}},
+        reviewComments:true,
+        reviewImgs:{select:{imgUrl:true}}
+      },
+      where : {hansicsId : restaurantId}})
+       //검색결과가 있으면
+      if (review) {
+        return review;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      logger.error(err);
+      return false;
     }
   }
   // 리뷰작성
   async writeReview(inputReview: Review, userInfo: Number,
-                    restaurantInfo: Number) {
+                    restaurantInfo: Number):Promise<boolean> 
+  {
     try {
-      console.log(inputReview, userInfo, restaurantInfo);
       const success = await prisma.review.create({
         data : {
           review : inputReview.review,
@@ -75,22 +69,23 @@ class reviewService { // 리뷰 아이디로 리뷰조회
           useFlag : true
         }
       });
-      console.log(success);
       if (!success) {
-        return {success : false};
+        return false;
       } // 리뷰 이미지 삽입
-      if (inputReview.img) {
-        for (let i in inputReview.img) {
-          const img = await prisma.reviewImg.create(
-              {data : {imgUrl : i, reviewId : success.id}});
-          if (!img) {
-            return {success : false};
-          }
-        }
-      }
-      return {success : true};
+      // if (inputReview.img) {
+      //   //이미지 배열 순회,수정필요
+      //   for (let i in inputReview.img) {
+      //     const img = await prisma.reviewImg.create(
+      //         {data : {imgUrl : i, reviewId : success.id}});
+      //     if (!img) {
+      //       return false;
+      //     }
+      //   }
+      // }
+      return true;
     } catch (err) {
-      console.error(err);
+      logger.error(err);
+      return false;
     }
   }
   async updateReview(inputReview: Review, userInfo: Number,
@@ -98,38 +93,44 @@ class reviewService { // 리뷰 아이디로 리뷰조회
     try {
       const review =
           await prisma.review.findUnique({where : {id : Number(reviewInfo)}});
-      if (review?.userId === userInfo) {
+      if (review?.userId === Number(userInfo)) {
         const updatedReview = await prisma.review.update({
           data : {review : inputReview.review, star : inputReview.star},
           where : {id : Number(reviewInfo)}
         })
-        // 업데이트 이미지 삽입
-        if (inputReview.img) {
-          for (let i in inputReview.img) {
-            const img = await prisma.reviewImg.create(
-                {data : {imgUrl : i, reviewId : updatedReview.id}});
-            if (!img) {
-              return {success : false};
-            }
-          }
-        }
+        // 새로운 이미지 삽입
+        // if (inputReview.img) {
+        //   for (let i in inputReview.img) {
+        //     const img = await prisma.reviewImg.create(
+        //         {data : {imgUrl : i, reviewId : updatedReview.id}});
+        //     if (!img) {
+        //       return false;
+        //     }
+        //   }
+        // }
+        const newReviewImage=await prisma.reviewImg.findMany({select:{imgUrl:true},where:{reviewId:updatedReview.id}});
+        const ReviewComments=await prisma.reviewComment.findMany({where:{reviewId:updatedReview.id}});
+        return {id:updatedReview.id,review:updatedReview.review,star:updatedReview.star,useFlag:updatedReview.useFlag,userId:updatedReview.userId,hansicsId:updatedReview.hansicsId,
+          reviewComments:ReviewComments,reviewImgs:newReviewImage};
       } else {
         return false;
       }
     } catch (err) {
+      logger.error(err);
+      return false;
     }
   }
-  async deleteReview(deleteReviewId: number, userInfo: number): Promise<any> {
+  async deleteReview(deleteReviewId: number, userInfo: number): Promise<boolean> {
     try {
       const success = await prisma.review.delete(
           {where : {id : Number(deleteReviewId), userId : Number(userInfo)}});
-      console.log(success);
       if (!success) {
-        return {success : false};
+        return false;
       }
-      return {success : true};
+      return true;
     } catch (err) {
-      console.error(err);
+      logger.error(err);
+      return false;
     }
   }
 }
