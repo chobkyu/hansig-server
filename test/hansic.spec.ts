@@ -174,7 +174,7 @@ describe('GET /hansic/loc/:id ...', function () {
 });
 
 
-describe.only('GET /hansic/:id ...', function () {
+describe('GET /hansic/:id ...', function () {
     describe('성공 시', async () => {
         let body : any;
 
@@ -252,3 +252,124 @@ describe.only('GET /hansic/:id ...', function () {
         });
     });
 });
+
+//좌표검색 기능 테스트
+describe('GET /hansic/place?lat=N&lng=E ...', function () {
+    describe('성공 시', async () => {
+        let body : any;
+        before(done => {
+            request(app)
+                .get('/hansic/place?lat=37.4860146411306&lng=126.89329203683')
+                .expect(200)
+                .end((err:any,res:any) => {
+                    body = res.body.data;
+                    console.log(body);
+                    done();
+                });
+        });
+
+        it('해당 데이터는 id를 포함 하어야 한다.', async () => {
+            body.should.have.property('id');
+        });
+
+        it('해당 데이터의 lat는 요청 lat와 값이 일치해야 한다.',async () => {
+            body.lat.should.equal(37.4860146411306);
+        });
+
+        it('해당 데이터의 lng는 요청 lng와 값이 일치해야 한다.',async () => {
+            body.lng.should.equal(126.89329203683);
+        });
+        it('해당 데이터는 name을 포함 하어야 한다.', async () => {
+            body.should.have.property('name');
+        });
+
+        it('해당 데이터는 addr를 포함 하어야 한다.', async () => {
+            body.should.have.property('addr');
+        });
+
+        it('해당 데이터는 useStar를 포함 하어야 한다.', async () => {
+            body.should.have.property('userStar');
+        });
+
+        it('해당 데이터는 google_star를 포함 하어야 한다.', async () => {
+            body.should.have.property('google_star');
+        });
+
+        it('해당 데이터는 location_id를 포함 하어야 한다.', async () => {
+            body.should.have.property('location_id');
+        });
+
+        it('해당 데이터는 location을 포함 하어야 한다.', async () => {
+            body.should.have.property('location');
+        });
+
+        it('해당 데이터는 imgUrl을 포함 하어야 한다.', async () => {
+            body.should.have.property('imgUrl');
+        });
+
+        /**리뷰 내용 포함... 추후 작성 예정 */
+
+        
+    });
+
+    describe('실패 시', async () => {
+        it('해당 데이터를 찾을 수 없을 시 404 리턴', async () => {
+            request(app)
+                .get('/hansic/place?lat=37&lng=126')
+                .expect(404)
+                .end(async (err: any, res: any) => {
+                    console.log(res.body);
+                    console.log(res.status);
+                });
+        });
+
+        it('잘못된 좌표 입력 시 400 리턴', async () => {
+            request(app)
+                .get(encodeURIComponent('/hansic/place?lat=-1&lng=-5'))
+                .expect(400)
+                .end(async (err: any, res: any) => {
+                    console.log(res.body);
+                });
+        });
+    });
+});
+
+//한식 뷔페 즐겨 찾기
+describe.only('post /hansic/star/:id', function (){
+    describe('성공 시', () =>{
+        it('성공 시 201을 리턴한다', (done) =>{
+            request(app)
+                .post('/hansic/star/1796')
+                .set("authorization","Bearer testtoken")
+                .expect(201)
+                .end(done);
+        });
+    });
+
+    describe('실패 시', () => {
+        it('해당 데이터를 찾을 수 없을 때는 404 리턴', (done) => {
+            request(app)
+                .post('/hansic/star/0')
+                .set("authorization","Bearer testtoken")
+                .expect(404)
+                .end(done);
+        });
+
+        it('사용자가 유효하지 않는 입력을 했을 시 400 리턴', (done) => {
+            request(app)
+                .post('/hansic/star/hiyo')
+                .set("authorization","Bearer testtoken")
+                .expect(400)
+                .end(done);
+        });
+
+        it('로그인이 안되어 있을 시 401 리턴',(done) => {
+            request(app)
+                .post('/hansic/star/1796')
+                .expect(401)
+                .end(done);
+        });
+    });
+});
+
+

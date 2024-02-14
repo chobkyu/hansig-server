@@ -14,6 +14,8 @@ model books {
   description String?
 }
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+
+//사용자 테이블
 model user {
   id Int @id @default(autoincrement())
   userId String? @db.VarChar(50)
@@ -28,8 +30,10 @@ model user {
   owners ownerData[]
   location location @relation(fields:[location_id],references:[id])
   location_id Int @default(1)
+  favorites favorites[]
 }
 
+//사용자 프로필 이미지 테이블
 model userImgs {
   id Int @id @default(autoincrement())
   imgUrl String? @db.VarChar(500)
@@ -39,6 +43,7 @@ model userImgs {
   
 }
 
+//유저 등급 테이블
 model userGrade {
   id Int @id @default(autoincrement())
   userGrade String? @db.VarChar(10)
@@ -46,6 +51,7 @@ model userGrade {
   users user[]
 }
 
+//사업자 정보 테이블
 model ownerData {
   id Int @id @default(autoincrement())
   ownerNum String? @db.VarChar(100)
@@ -56,6 +62,17 @@ model ownerData {
   userId Int
 }
 
+//즐겨찾기 테이블
+model favorites {
+  id Int @id @default(autoincrement())
+  user user @relation(fields:[userId],references:[id])
+  userId Int
+  hansics hansics @relation(fields:[hansicsId],references:[id])
+  hansicsId Int
+  useFlag Boolean @default(true)
+}
+
+//지역 정보 테이블
 model location {
   id Int @id @default(autoincrement())
   location String? @db.VarChar(50)
@@ -63,6 +80,7 @@ model location {
   users user[]
 }
 
+//한식 뷔페 테이블
 model hansics {
   id   Int     @id(map: "hansic_pkey") @default(autoincrement())
   name String? @db.VarChar(100)
@@ -77,8 +95,10 @@ model hansics {
   sicdangImgs sicdangImg[]
   menus menu[]
   owner ownerData?
+  favorites favorites[]
 }
 
+//한식 뷔페 이미지 테이블
 model sicdangImg {
   id Int @id @default(autoincrement())
   imgUrl String? @db.VarChar(500)
@@ -87,6 +107,7 @@ model sicdangImg {
   hansicsId Int
 }
 
+//한식 뷔페 메뉴 테이블
 model menu {
   id Int @id @default(autoincrement())
   name String? @db.VarChar(100)
@@ -99,6 +120,8 @@ model menu {
   menuImgs menuImg[]
 }
 
+
+//메뉴 이미지 테이블
 model menuImg {
   id Int @id @default(autoincrement())
   imgUrl String? @db.VarChar(500)
@@ -107,6 +130,7 @@ model menuImg {
   menuId Int
 }
 
+//한식 뷔페 리뷰 테이블
 model review {
   id Int @id @default(autoincrement())
   review String? @db.VarChar(1000)
@@ -120,6 +144,7 @@ model review {
   reviewComments reviewComment[]
 }
 
+//리뷰 삽입 이미지 테이블
 model reviewImg {
   id Int @id @default(autoincrement())
   imgUrl String? @db.VarChar(500)
@@ -127,10 +152,10 @@ model reviewImg {
   reviewId Int
 }
 
+//리뷰 관련 코멘트 테이블(댓글)
 model reviewComment {
   id Int @id @default(autoincrement())
   comment String? @db.VarChar(500)
   review review @relation(fields:[reviewId],references:[id])
   reviewId Int
- 
 }

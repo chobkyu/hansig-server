@@ -4,6 +4,7 @@ const { verify } = require('../util/jwt-util');
 const authJWT = (req:Request,res:Response,next:NextFunction) => {
     if (req.headers.authorization){
         const token = req.headers.authorization.split('Bearer ')[1];
+        //const refreshToken = req.headers.refreshToken.split('Bearer ')[1];
         const result = verify(token);
 
         //console.log(result)

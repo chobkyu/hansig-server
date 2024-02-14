@@ -1,15 +1,23 @@
 import express, {Request,Response} from "express"
 import morgan from "morgan"
+
+
 require("dotenv").config();
+const logger = require('./src/util/winston');
 const app = express();
-const cors = require('cors');
+const cors = require('cors')
 
 const hansic = require('./src/router/hansic')
 const user = require('./src/router/users')
-const owner = require('./src/router/owner');
+const owner = require('./src/router/owner')
+const review=require('./src/router/review')
+
+const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"' 
+// 기존 combined 포멧에서 timestamp만 제거
+const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : combined; // 
 
 if(process.env.NODE_ENV!=='test'){
-    app.use(morgan('dev'))
+    app.use(morgan(morganFormat,{stream:logger.stream}))
 }
 // app.get("/",(req:Request,res:Response) => {
 //     res.send("hello world");
@@ -24,7 +32,6 @@ app.use(cors());
 app.use('/hansic',hansic);
 app.use('/users',user);
 app.use('/owner',owner);
-
-
+app.use('/review',review);
 
 module.exports = app;

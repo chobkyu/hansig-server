@@ -1,7 +1,7 @@
 const {promisify} = require('util');
 const jwt = require('jsonwebtoken');
 const secret ='test_secret';
-
+const refreshSecret='test_refresh_secret';
 module.exports = {
     sign : (user:any) => {
         const payload = {
@@ -20,7 +20,7 @@ module.exports = {
         
         if(token == 'testtoken') {
             console.log('test user token')
-            return {success:true,decodedData:{id:1,userId:'test',userNickName:'giwon'}}  //테스트용 코드
+            return {success:true,decodedData:{id:137,userId:'test',userNickName:'giwon'}}  //테스트용 코드
         }
 
         if(token == 'ownertoken') {

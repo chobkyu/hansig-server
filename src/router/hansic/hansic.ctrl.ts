@@ -3,13 +3,15 @@ import express, { Express, Request, Response } from 'express';
 const prisma = new PrismaClient();
 const hansicServiceClass = require('../../service/hansic.service');
 const hansicService = new hansicServiceClass();
+const logger = require('../../util/winston');
+
 const output = {
   getAll: async (req: Request, res: Response) => {
     try {
       const response = await hansicService.getAll();
       if (response) {
         return res.json({ data: response });
-      }else {
+      } else {
         return res.status(204).end();
       }
     }
@@ -26,10 +28,10 @@ const output = {
       } else {
         const response = await hansicService.get(id);
         if (response) {
-          response.count=Number(response.count);
-          console.log(response.count,typeof response.count);
-          return res.json({data:response});
-        }else {
+          response.count = Number(response.count);
+          console.log(response.count, typeof response.count);
+          return res.json({ data: response });
+        } else {
           return res.status(400).end();
         }
       }
@@ -59,12 +61,30 @@ const output = {
   },
 
   //주소 -> 좌표 변환
-  tryGeo : async (req:Request,res:Response) => {
-    try{
+  tryGeo: async (req: Request, res: Response) => {
+    try {
       console.log('ctrl');
       const response = await hansicService.convert();
       return res.json(response).end();
-    }catch(err){
+    } catch (err) {
+      console.log(err);
+      return res.status(500).end();
+    }
+  },
+
+  //좌표를 쿼리로 받아 검색
+  getByPlace: async (req: Request, res: Response) => {
+    try {
+      const lat = req.query.lat;
+      const lng = req.query.lng;
+      const response = await hansicService.getByPlace(Number(lat), Number(lng));
+      if (response) {
+        return res.json({ data: response[0] }).end();
+      }
+      else {
+        return res.status(404).end();
+      }
+    } catch (err) {
       console.log(err);
       return res.status(500).end();
     }
@@ -95,9 +115,26 @@ const output = {
   // }
 }
 
-const process =
-{
+const process = {
+  favorite : async (req:Request, res:Response) => {
+    try{
+      const id = parseInt(req.params.id); //한식 뷔페 아이디
+      
+      //유효하지 않은 id
+      if (isNaN(id)) {
+        return res.status(400).end();
+      }
 
+      const response = await hansicService.favorite(id, req.body);
+      console.log(response);
+
+      return res.status(response.status).end();
+
+    }catch(err){
+      logger.error(err);
+      return res.status(500).end();
+    }
+  }
 }
 
 module.exports = {

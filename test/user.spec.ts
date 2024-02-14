@@ -273,6 +273,52 @@ describe('/patch users/info', function(){
     });
 });
 
+
+/**지역 조회 시 */
+describe('get user/location',function () {
+    describe('성공 시' ,async () => {
+        let body:any;
+        before(done => {
+            request(app)
+                .get('/users/location')
+                .end((err:any,res:any) => {
+                    //console.log(res.body);
+                    body = res.body.data;
+                    done();
+                });
+        });
+
+        it('리스트 형식이여야 한다.', function(){
+            body.should.be.instanceOf(Array);
+        });
+
+        it('id가 포함되어 있어야 한다.', function(){
+            body[0].should.have.property('id');
+        });
+
+        it('location이 포함되어 있어야 한다.', function(){
+            body[0].should.have.property('location');
+        });
+
+        it('전체 리스트의 길이는 12여야한다.', function(){
+            let len = body.length;
+            len.should.equal(12);
+        });
+
+        it('id는 number 타입이여야한다.', function(){
+            body[0].id.should.be.instanceOf(Number);
+        });
+
+        it('location은 string 타입이여야 한다.', function(){
+            body[0].location.should.be.instanceOf(String);
+        });
+    });
+
+    describe('실패 시 ', () => {
+
+    });
+});
+
 describe('/delete users/deleteTestUser',function(){
     describe('success...',async () => {
         it('204로 응답한다.', (done) => {
@@ -280,6 +326,6 @@ describe('/delete users/deleteTestUser',function(){
             .delete('/users/deleteTestUser')
             .expect(204)
             .end(done)
-        })
-    })
-})
+        });
+    });
+});

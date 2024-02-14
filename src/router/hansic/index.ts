@@ -1,5 +1,7 @@
 import express from "express";
-const ctrl = require('./hansic.ctrl')
+const ctrl = require('./hansic.ctrl');
+const authJWT = require('../../middleware/authJWT')
+
 /*
 ㄴ 리뷰 입력 시
 ㄴ 리뷰 수정 시
