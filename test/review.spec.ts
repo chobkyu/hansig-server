@@ -319,7 +319,7 @@ describe('get /review/:id ',function() {
 
 
 /**리뷰 리스트 조회 시  id는 식당 id*/
-describe.only('get /review/list/:id',() => {
+describe('get /review/list/:id',() => {
     describe('성공 시',() => {
         let body:any;
         before(done => {
