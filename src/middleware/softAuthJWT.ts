@@ -24,4 +24,4 @@ const softAuthJWT=(req:Request,res:Response,next:NextFunction) => {
         next();
     }
 }
-export default softAuthJWT;
+module.exports=softAuthJWT;

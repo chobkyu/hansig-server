@@ -174,13 +174,13 @@ describe('GET /hansic/loc/:id ...', function () {
 });
 
 
-describe.only('GET /hansic/:id ...', function () {
+describe('GET /hansic/:id ...', function () {
     describe('성공 시', async () => {
         let body : any;
-
         before(done => {
             request(app)
                 .get('/hansic/1796')
+                .set("authorization","Bearer testtoken")
                 .expect(200)
                 .end((err:any,res:any) => {
                     console.log(res.body);
@@ -254,12 +254,13 @@ describe.only('GET /hansic/:id ...', function () {
 });
 
 //좌표검색 기능 테스트
-describe('GET /hansic/place?lat=N&lng=E ...', function () {
+describe.only('GET /hansic/place?lat=N&lng=E ...', function () {
     describe('성공 시', async () => {
         let body : any;
         before(done => {
             request(app)
                 .get('/hansic/place?lat=37.4860146411306&lng=126.89329203683')
+                .set("authorization","Bearer testtoken")
                 .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body.data;
@@ -335,7 +336,7 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
 });
 
 //한식 뷔페 즐겨 찾기
-describe.only('post /hansic/star/:id', function (){
+describe('post /hansic/star/:id', function (){
     describe('성공 시', () =>{
         it('성공 시 201을 리턴한다', (done) =>{
             request(app)

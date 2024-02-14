@@ -1,6 +1,6 @@
 import express from "express";
 const ctrl = require('./hansic.ctrl');
-
+const softAuthJWT = require('../../middleware/softAuthJWT');
 /*
 ㄴ 리뷰 입력 시
 ㄴ 리뷰 수정 시
@@ -12,7 +12,7 @@ const ctrl = require('./hansic.ctrl');
 ㄴ 리뷰 댓글 삭제 시
 */
 const router = express.Router();
-const softAuthJWT = require('../../middleware/softAuthJWT');
+router.get('/place',softAuthJWT,ctrl.output.getByPlace);
 router.get('/all',ctrl.output.getAll);
 router.get('/loc/:id',ctrl.output.getFromLocation);
 router.get('/get/geo',ctrl.output.tryGeo);
