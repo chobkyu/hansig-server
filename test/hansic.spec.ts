@@ -225,7 +225,9 @@ describe('GET /hansic/:id ...', function () {
         it('해당 데이터는 imgUrl을 포함 하어야 한다.', async () => {
             body.should.have.property('imgUrl');
         });
-
+        it('해당 데이터는 favorite을 포함 하어야 한다.', async () => {
+            body.should.have.property('favorite');
+        });
         /**리뷰 내용 포함... 추후 작성 예정 */
 
         
@@ -254,7 +256,7 @@ describe('GET /hansic/:id ...', function () {
 });
 
 //좌표검색 기능 테스트
-describe.only('GET /hansic/place?lat=N&lng=E ...', function () {
+describe('GET /hansic/place?lat=N&lng=E ...', function () {
     describe('성공 시', async () => {
         let body : any;
         before(done => {
@@ -307,7 +309,9 @@ describe.only('GET /hansic/place?lat=N&lng=E ...', function () {
         it('해당 데이터는 imgUrl을 포함 하어야 한다.', async () => {
             body.should.have.property('imgUrl');
         });
-
+        it('해당 데이터는 favorite을 포함 하어야 한다.', async () => {
+            body.should.have.property('favorite');
+        });
         /**리뷰 내용 포함... 추후 작성 예정 */
 
         
