@@ -5,6 +5,7 @@ import { user } from "../interface/user/user";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
 const jwt = require('../util/jwt-util');
+const logger = require('../util/winston');
 
 const prisma = new PrismaClient();
 
@@ -244,6 +245,19 @@ export class UserService {
         }
     }
 
+    /**지역 리스트 조회 */
+    async getLocation() {
+        try{
+            const locations = await prisma.location.findMany();
+            
+            return {data:locations};
+        }catch(err){
+            logger.error(err);
+            return {success:false, status:500};
+        }
+    }
+
+    /*테스트용 유저 삭제*/
     async deleteTestUser() {
         try{
             console.log('??')

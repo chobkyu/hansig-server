@@ -3,6 +3,8 @@ import express, { Express, Request, Response } from 'express';
 const prisma = new PrismaClient();
 const hansicServiceClass = require('../../service/hansic.service');
 const hansicService = new hansicServiceClass();
+const logger = require('../../util/winston');
+
 const output = {
   getAll: async (req: Request, res: Response) => {
     try {
@@ -26,10 +28,10 @@ const output = {
       } else {
         const response = await hansicService.get(id);
         if (response) {
-          response.count=Number(response.count);
-          console.log(response.count,typeof response.count);
-          return res.json({data:response});
-        }else {
+          response.count = Number(response.count);
+          console.log(response.count, typeof response.count);
+          return res.json({ data: response });
+        } else {
           return res.status(400).end();
         }
       }
@@ -69,6 +71,7 @@ const output = {
       return res.status(500).end();
     }
   },
+
   //좌표를 쿼리로 받아 검색
   getByPlace: async (req: Request, res: Response) => {
     try {
@@ -112,9 +115,26 @@ const output = {
   // }
 }
 
-const process =
-{
+const process = {
+  favorite : async (req:Request, res:Response) => {
+    try{
+      const id = parseInt(req.params.id); //한식 뷔페 아이디
+      
+      //유효하지 않은 id
+      if (isNaN(id)) {
+        return res.status(400).end();
+      }
 
+      const response = await hansicService.favorite(id, req.body);
+      console.log(response);
+
+      return res.status(response.status).end();
+
+    }catch(err){
+      logger.error(err);
+      return res.status(500).end();
+    }
+  }
 }
 
 module.exports = {
