@@ -245,6 +245,7 @@ export class UserService {
         }
     }
 
+    /**지역 리스트 조회 */
     async getLocation() {
         try{
             const locations = await prisma.location.findMany();
@@ -256,6 +257,7 @@ export class UserService {
         }
     }
 
+    /*테스트용 유저 삭제*/
     async deleteTestUser() {
         try{
             console.log('??')
