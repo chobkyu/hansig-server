@@ -34,8 +34,7 @@ const output={
         {
             return res.json(reviewList);
         }
-        else
-        {
+        else {
             return res.status(204).end();
         }}
         catch(err)
@@ -44,7 +43,7 @@ const output={
         }
     }
 }
-const process=
+const process =
 {
     async writeReview (req:Request,res:Response):Promise<any>
     {
@@ -105,4 +104,4 @@ const process=
 module.exports = {
     output,
     process
-  }
+}

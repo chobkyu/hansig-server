@@ -4,6 +4,7 @@ const router = express.Router();
 const authJWT = require('../../middleware/authJWT')
 
 router.get('/userinfo', authJWT,ctrl.output.getUser);
+router.get('/location',ctrl.output.location);
 
 router.post('/',ctrl.process.insertUser);
 router.post('/login',ctrl.process.login);

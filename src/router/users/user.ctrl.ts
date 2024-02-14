@@ -1,6 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { UserService } from "../../service/user.service";
 import express,{Express,Request,Response} from 'express';
+
+const logger = require('../../util/winston');
 const prisma = new PrismaClient();
 const userService = new UserService();
 
@@ -26,6 +28,17 @@ const output = {
             return res.json({data}).status(201);
         }catch(err){
             console.log(err);
+            return res.status(500).end();
+        }
+    },
+
+    location :async (req:Request, res:Response) => {
+        try{
+            const response = await userService.getLocation();
+
+            return res.json(response).status(201);
+        }catch(err){
+            logger.error();
             return res.status(500).end();
         }
     }
