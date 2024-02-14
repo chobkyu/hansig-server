@@ -1,10 +1,9 @@
 import express,{Express,Request,Response,NextFunction} from 'express';
 const { verify } = require('../util/jwt-util');
 
-const authJWT = (req:Request,res:Response,next:NextFunction) => {
+const softAuthJWT=(req:Request,res:Response,next:NextFunction) => {
     if (req.headers.authorization){
         const token = req.headers.authorization.split('Bearer ')[1];
-        //const refreshToken = req.headers.refreshToken.split('Bearer ')[1];
         const result = verify(token);
 
         //console.log(result)
@@ -19,17 +18,10 @@ const authJWT = (req:Request,res:Response,next:NextFunction) => {
             req.body.userData = userData
             next();
         } else{
-            res.status(401).send({
-                ok:false,
-                message:result.msg
-            });
+            next();
         }
     }else{
-        res.status(401).send({
-            ok:false,
-            message:'you have not token'
-        })
+        next();
     }
 }
-
-module.exports = authJWT;
+export default softAuthJWT;

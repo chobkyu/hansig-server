@@ -6,6 +6,7 @@ const hansicService = new hansicServiceClass();
 const logger = require('../../util/winston');
 
 const output = {
+  //전체조회
   getAll: async (req: Request, res: Response) => {
     try {
       const response = await hansicService.getAll();
@@ -19,14 +20,20 @@ const output = {
       return res.status(500).end();
     }
   },
-
+//id로 단일 식당 조회
   get: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
+     
       if (isNaN(id)) {
         return res.status(400).end();
       } else {
-        const response = await hansicService.get(id);
+        let userId=0;
+        if(req.body.userData)
+        {
+          userId=req.body.userData.userId;
+        }
+        const response = await hansicService.get(id,userId);
         if (response) {
           response.count = Number(response.count);
           console.log(response.count, typeof response.count);
@@ -40,7 +47,7 @@ const output = {
     }
   },
 
-
+//지역 id로 지역내 식당조회
   getFromLocation: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);

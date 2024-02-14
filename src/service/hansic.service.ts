@@ -61,39 +61,47 @@ class HansicService {
     }
   }
   //식당id로 조회
-  async get(restaurantId: number): Promise<any> {
-    try {
-      const data = await prisma.$queryRaw<any[]>`
-        SELECT 
-          hs.id,
-          hs.name,
-          hs.addr,
-          hs."userStar",
-          hs.google_star,
-          hs.location_id,
-          hs.lat,
-          hs.lng,
-          ls.location,
-          si."imgUrl",
-          rd.count
-        FROM hansics as hs 
-        INNER JOIN location as ls 
-        on hs.location_id=ls.id 
-        LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId"
-        LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
-		on hs.id=rd."hansicsId"
-        WHERE hs.id=${restaurantId}
-      `;
+  async get(restaurantId: number,userId?:number): Promise<any> {
+    try {const data = await prisma.$queryRaw<any>`
+    SELECT 
+      hs.id,
+      hs.name,
+      hs.addr,
+      hs."userStar",
+      hs.google_star,
+      hs.location_id,
+      hs.lat,
+      hs.lng,
+      ls.location,
+      si."imgUrl",
+      rd.count
+    FROM hansics as hs 
+    INNER JOIN location as ls 
+    on hs.location_id=ls.id 
+    LEFT JOIN "sicdangImg" as si 
+    on hs.id=si."hansicsId"
+    LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
+on hs.id=rd."hansicsId"
+    WHERE hs.id=${restaurantId}
+  `;
+  let favorite;
+      if(userId)
+      {
+        favorite=await prisma.favorites.findFirst({where:{userId:userId,hansicsId:restaurantId}});
+      }
+      else{
+      favorite=false;
       //logger.info(data);
-
+      }
       if (data[0]) {
         console.log(data[0]);
         data[0].count=Number(data[0].count);
+        data[0].favorite=favorite?true:false;
         return data[0];
       } else {
         return false;
       }
+    
     } catch (err) {
       return false;
     }
