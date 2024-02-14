@@ -1,5 +1,7 @@
 import express from "express";
-const ctrl = require('./hansic.ctrl')
+const ctrl = require('./hansic.ctrl');
+const authJWT = require('../../middleware/authJWT')
+
 /*
 ㄴ 리뷰 입력 시
 ㄴ 리뷰 수정 시
@@ -17,6 +19,8 @@ router.get('/loc/:id',ctrl.output.getFromLocation);
 router.get('/get/geo',ctrl.output.tryGeo);
 router.get('/place',ctrl.output.getByPlace);
 router.get('/:id',ctrl.output.get);
+
+router.post('/star/:id',authJWT,ctrl.process.favorite);
 // router.post('/:id',ctrl.process.create);
 // router.patch('/:id',ctrl.process.update);
 // router.delete('/:id',ctrl.process.delete);

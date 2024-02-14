@@ -275,7 +275,7 @@ describe('/patch users/info', function(){
 
 
 /**지역 조회 시 */
-describe.only('get user/location',function () {
+describe('get user/location',function () {
     describe('성공 시' ,async () => {
         let body:any;
         before(done => {

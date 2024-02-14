@@ -1,4 +1,5 @@
 import { hansics, PrismaClient } from "@prisma/client";
+import { favoriteDto } from "../interface/hansic/favorite";
 const request = require('request');
 const prisma = new PrismaClient();
 const logger = require('../util/winston');
@@ -244,6 +245,66 @@ class HansicService {
       logger.error(err);
       return {success:false};
     }
+  }
+
+  async favorite(hansicId : number, body: favoriteDto){
+    try{
+      console.log(body.userData.id);
+
+      const findHansic = await this.get(hansicId);
+      console.log(findHansic);
+
+      if(!findHansic) return {success:false,status:404}
+      //transaction
+      prisma.$transaction(async (tx) => {
+        const selectFavorite = await tx.favorites.findFirst({
+          where : {
+            userId : body.userData.id,
+            hansicsId : hansicId,
+          }
+        });
+
+        if(selectFavorite != null) {
+          //즐겨찾기 데이터가 있을 시 update
+
+          const updateFavoite = selectFavorite.useFlag == true ? 
+          
+          await tx.favorites.update({
+            where: {
+              id : selectFavorite.id
+            },
+            data : {
+              useFlag :false
+            }
+          }) :
+
+          await tx.favorites.update({
+            where: {
+              id : selectFavorite.id
+            },
+            data : {
+              useFlag :true
+            }
+          });
+        }else{
+          //즐겨찾기 데이터가 없을 시 insert
+          const insertFavorite = await tx.favorites.create({
+            data : {
+              userId : body.userData.id,
+              hansicsId : hansicId,
+            }
+          });
+        }
+
+      });
+
+      return {success:true, status:201};
+
+    }catch(err){
+      logger.error(err);
+      return {success:false, status:500};
+    }
+
   }
 
 

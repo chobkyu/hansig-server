@@ -335,28 +335,38 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
 });
 
 //한식 뷔페 즐겨 찾기
-describe('post /hansic/star/:id',()=>{
-    describe('성공 시',async () =>{
-        it('성공 시 201을 리턴한다',async (done) =>{
+describe.only('post /hansic/star/:id', function (){
+    describe('성공 시', () =>{
+        it('성공 시 201을 리턴한다', (done) =>{
             request(app)
                 .post('/hansic/star/1796')
+                .set("authorization","Bearer testtoken")
                 .expect(201)
                 .end(done);
         });
     });
 
-    describe('실패 시',async () => {
-        it('해당 데이터를 찾을 수 없을 때는 404 리턴',async (done) => {
+    describe('실패 시', () => {
+        it('해당 데이터를 찾을 수 없을 때는 404 리턴', (done) => {
             request(app)
                 .post('/hansic/star/0')
+                .set("authorization","Bearer testtoken")
                 .expect(404)
                 .end(done);
         });
 
-        it('사용자가 유효하지 않는 입력을 했을 시 400 리턴', async (done) => {
+        it('사용자가 유효하지 않는 입력을 했을 시 400 리턴', (done) => {
             request(app)
                 .post('/hansic/star/hiyo')
+                .set("authorization","Bearer testtoken")
                 .expect(400)
+                .end(done);
+        });
+
+        it('로그인이 안되어 있을 시 401 리턴',(done) => {
+            request(app)
+                .post('/hansic/star/1796')
+                .expect(401)
                 .end(done);
         });
     });
