@@ -11,11 +11,11 @@ const ctrl = require('./hansic.ctrl')
 ㄴ 리뷰 댓글 삭제 시
 */
 const router = express.Router();
-//review
+const authJWT = require('../../middleware/softAuthJWT')
 router.get('/all',ctrl.output.getAll);
-router.get('/loc/:id',ctrl.output.getFromLocation);
+router.get('/loc/:id',authJWT,ctrl.output.getFromLocation);
 router.get('/get/geo',ctrl.output.tryGeo);
-router.get('/:id',ctrl.output.get);
+router.get('/:id',authJWT,ctrl.output.get);
 // router.post('/:id',ctrl.process.create);
 // router.patch('/:id',ctrl.process.update);
 // router.delete('/:id',ctrl.process.delete);
