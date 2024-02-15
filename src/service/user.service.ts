@@ -4,6 +4,7 @@ import { UpdateInfoDto } from "../interface/user/updataInfo";
 import { user } from "../interface/user/user";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
+import { Token } from "typescript";
 const jwt = require('../util/jwt-util');
 const logger = require('../util/winston');
 
@@ -205,7 +206,6 @@ export class UserService {
             return {success:false,status:500};
         }
     }
-
 
     /**유저 데이터 수정 */
     async updateUserInfo(userInfoDto :UpdateInfoDto) {

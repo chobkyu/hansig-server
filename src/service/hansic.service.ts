@@ -15,7 +15,7 @@ const logger = require('../util/winston');
 ㄴ 리뷰 댓글 삭제 시
 */
 
-class HansicService {
+export class HansicService {
   async getHansicDate() {
     try {
       const data =
@@ -145,8 +145,7 @@ on hs.id=rd."hansicsId"
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" 
-        WHERE hs.location_id=${locationId} 
+        on hs.id=si."hansicsId" WHERE hs.location_id=${locationId} 
         ORDER BY hs.id ASC
       `;
       
