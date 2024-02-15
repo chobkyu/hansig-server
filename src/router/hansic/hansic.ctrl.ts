@@ -22,7 +22,7 @@ const output = {
       return res.status(500).end();
     }
   },
-//id로 단일 식당 조회
+  //id로 단일 식당 조회
   get: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
@@ -30,13 +30,12 @@ const output = {
       if (isNaN(id)) {
         return res.status(400).end();
       } else {
-        let userId=0;
+        let userId = 0;
         //로그인되어있는지 확인
-        if(req.body.userData)
-        {
-          userId=req.body.userData.id;
+        if (req.body.userData) {
+          userId = req.body.userData.id;
         }
-        const response = await hansicService.get(id,userId);
+        const response = await hansicService.get(id, userId);
         //유효한 검색 결과가 있는지 확인
         if (response) {
           response.count = Number(response.count);
@@ -51,7 +50,7 @@ const output = {
     }
   },
 
-//지역 id로 지역내 식당조회
+  //지역 id로 지역내 식당조회
   getFromLocation: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
@@ -64,10 +63,9 @@ const output = {
         if ((id > 0) && (id < 13)) {
           const response = await hansicService.getFromLocation(id);
           //유효한 검색 결과가 있는지 확인
-          if(response){
-          return res.json({ data: response });
-          }else
-          {
+          if (response) {
+            return res.json({ data: response });
+          } else {
             return res.status(404).end();
           }
         } else {
@@ -97,13 +95,14 @@ const output = {
     try {
       const lat = req.query.lat;
       const lng = req.query.lng;
-      let userId=0;
+      let userId = 0;
       //로그인되어있는지 확인
-        if(req.body.userData)
-        {
-          userId=req.body.userData.id;
-        }
-      const response = await hansicService.getByPlace(Number(lat), Number(lng),userId);
+      if (req.body.userData) {
+        userId = req.body.userData.id;
+      }
+
+      console.log(userId);
+      const response = await hansicService.getByPlace(Number(lat), Number(lng), userId);
       //유효한 검색 결과가 있는지 확인
       if (response) {
         return res.json({ data: response });
@@ -143,10 +142,10 @@ const output = {
 }
 
 const process = {
-  favorite : async (req:Request, res:Response) => {
-    try{
+  favorite: async (req: Request, res: Response) => {
+    try {
       const id = parseInt(req.params.id); //한식 뷔페 아이디
-      
+
       //유효하지 않은 id
       if (isNaN(id)) {
         return res.status(400).end();
@@ -157,7 +156,7 @@ const process = {
 
       return res.status(response.status).end();
 
-    }catch(err){
+    } catch (err) {
       logger.error(err);
       return res.status(500).end();
     }
