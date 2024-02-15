@@ -99,27 +99,33 @@ class HansicService {
     try {
       let favorite;
       const data = await prisma.$queryRaw<any[]>`
-    SELECT 
-      hs.id,
-      hs.name,
-      hs.addr,
-      hs."userStar",
-      hs.google_star,
-      hs.location_id,
-      hs.lat,
-      hs.lng,
-      ls.location,
-      si."imgUrl",
-      rd.count
-    FROM hansics as hs 
-    INNER JOIN location as ls 
-    on hs.location_id=ls.id 
-    LEFT JOIN "sicdangImg" as si 
-    on hs.id=si."hansicsId"
-    LEFT JOIN (SELECT rv."hansicsId",COUNT(*) as count FROM hansic.review as rv GROUP BY rv."hansicsId") as rd
-on hs.id=rd."hansicsId"
-    WHERE hs.id=${restaurantId}
-  `;
+        SELECT 
+          hs.id,
+          hs.name,
+          hs.addr,
+          hs."userStar",
+          hs.google_star,
+          hs.location_id,
+          hs.lat,
+          hs.lng,
+          ls.location,
+          si."imgUrl",
+          rd.count
+        FROM hansics as hs 
+        INNER JOIN location as ls 
+        on hs.location_id=ls.id 
+        LEFT JOIN "sicdangImg" as si 
+        on hs.id=si."hansicsId"
+        LEFT JOIN (
+          SELECT 
+            rv."hansicsId",
+            COUNT(*) as count 
+          FROM hansic.review as rv 
+          GROUP BY rv."hansicsId"
+        ) as rd
+        on hs.id=rd."hansicsId"
+        WHERE hs.id=${restaurantId}
+      `;
       //user정보가 넘어왔을시 favorite확인
       if (userId) {
         favorite = await prisma.favorites.findFirst({ where: { userId: userId, hansicsId: restaurantId } });
