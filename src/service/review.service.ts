@@ -7,6 +7,55 @@ import { Logger } from "winston";
 const logger = new Logger();
 const prisma = new PrismaClient();
 class reviewService { 
+  //해당 id의 한식당이 있는지 check
+  async checkRestaurant(restaurantId:number):Promise<boolean>
+  {try{
+    const restaurant=await prisma.hansics.findUnique({where:{id:Number(restaurantId)}});
+    console.log(restaurant);
+    if(restaurant)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }}
+    catch(err)
+    {
+      logger.error(err);
+      return false;
+    }
+  }
+  //데이터 타입 체크
+  checkReviewDTO(body:any)
+  {try{
+    if(Object.keys(body).length===3)
+    {
+      if(body.review && body.userData && body.star && typeof body.review==='string' && typeof body.star==='number')
+      {
+        return true;
+      }
+      return false;
+    }
+    else if(Object.keys(body).length===4)
+    {
+      if(body.review && body.userData && body.star && body.img && typeof body.review==='string' && typeof body.star==='number' && typeof body.img==='string')
+      {
+        return true;
+      }
+      return false;
+    }
+    else
+    {
+      return false;
+    }
+  }
+    catch(err)
+    {
+      logger.error(err);
+      return false;
+    }
+  }
   // 리뷰와 리뷰코멘트들(reviewComments),imgUrl들(reviewImgs.imgUrl)을 리턴받는다
   async getReview(id: number): Promise<any|false> {
     try {

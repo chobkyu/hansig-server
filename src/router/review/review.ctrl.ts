@@ -14,6 +14,7 @@ const output={
     {
         try{
         const review=await reviewService.getReview(Number(req.params.id));
+        console.log(review);
         if(review)//검색결과가 있으면
         {
             return res.json({data:review});
@@ -52,8 +53,13 @@ const process =
     {
         try{
         const userInfo=req.body.userData;
-        const reviewId=req.params.id;
-        const isSuccess=await reviewService.writeReview(req.body,userInfo.id,reviewId);
+        const restaurantId=req.params.id;
+        const checkRestaurant=await reviewService.checkRestaurant(restaurantId);
+        
+        if(checkRestaurant){
+        const checkDTO=reviewService.checkReviewDTO(req.body);
+        if(checkDTO){
+        const isSuccess=await reviewService.writeReview(req.body,userInfo.id,restaurantId);
         if(isSuccess)//작성성공시
         {
             return res.status(201).end();
@@ -62,6 +68,17 @@ const process =
         {
             return res.status(404).end();
         }}
+        else
+        {
+            return res.status(400).end();
+        }
+    }
+    else
+    {
+        return res.status(404).end();
+    }
+
+    }
         catch(err)
         {
             logger.error(err);
