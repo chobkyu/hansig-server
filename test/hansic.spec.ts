@@ -174,13 +174,13 @@ describe('GET /hansic/loc/:id ...', function () {
 });
 
 
-describe.only('GET /hansic/:id ...', function () {
+describe('GET /hansic/:id ...', function () {
     describe('성공 시', async () => {
         let body : any;
-
         before(done => {
             request(app)
                 .get('/hansic/1796')
+                .set("authorization","Bearer testtoken")
                 .expect(200)
                 .end((err:any,res:any) => {
                     console.log(res.body);
@@ -225,7 +225,9 @@ describe.only('GET /hansic/:id ...', function () {
         it('해당 데이터는 imgUrl을 포함 하어야 한다.', async () => {
             body.should.have.property('imgUrl');
         });
-
+        it('해당 데이터는 favorite을 포함 하어야 한다.', async () => {
+            body.should.have.property('favorite');
+        });
         /**리뷰 내용 포함... 추후 작성 예정 */
 
         
@@ -260,6 +262,7 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
         before(done => {
             request(app)
                 .get('/hansic/place?lat=37.4860146411306&lng=126.89329203683')
+                .set("authorization","Bearer testtoken")
                 .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body.data;
@@ -306,7 +309,9 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
         it('해당 데이터는 imgUrl을 포함 하어야 한다.', async () => {
             body.should.have.property('imgUrl');
         });
-
+        it('해당 데이터는 favorite을 포함 하어야 한다.', async () => {
+            body.should.have.property('favorite');
+        });
         /**리뷰 내용 포함... 추후 작성 예정 */
 
         
@@ -333,3 +338,43 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
         });
     });
 });
+
+//한식 뷔페 즐겨 찾기
+describe('post /hansic/star/:id', function (){
+    describe('성공 시', () =>{
+        it('성공 시 201을 리턴한다', (done) =>{
+            request(app)
+                .post('/hansic/star/1796')
+                .set("authorization","Bearer testtoken")
+                .expect(201)
+                .end(done);
+        });
+    });
+
+    describe('실패 시', () => {
+        it('해당 데이터를 찾을 수 없을 때는 404 리턴', (done) => {
+            request(app)
+                .post('/hansic/star/0')
+                .set("authorization","Bearer testtoken")
+                .expect(404)
+                .end(done);
+        });
+
+        it('사용자가 유효하지 않는 입력을 했을 시 400 리턴', (done) => {
+            request(app)
+                .post('/hansic/star/hiyo')
+                .set("authorization","Bearer testtoken")
+                .expect(400)
+                .end(done);
+        });
+
+        it('로그인이 안되어 있을 시 401 리턴',(done) => {
+            request(app)
+                .post('/hansic/star/1796')
+                .expect(401)
+                .end(done);
+        });
+    });
+});
+
+
