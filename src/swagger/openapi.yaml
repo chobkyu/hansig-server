@@ -1,0 +1,21 @@
+openapi: '3.0.0'
+info:
+  version: 0.4.0
+  title: eedited API docs
+  description: eedited의 API 문서입니다
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:3000/
+paths:
+  /hansic/all: 
+    $ref: './hansic.yaml#/~1hansic~1all'
+components:
+  responses:
+    successResponse:
+      description: successful request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
