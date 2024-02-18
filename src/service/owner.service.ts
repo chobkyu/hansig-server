@@ -410,7 +410,13 @@ export class OwnerService {
       //string을 sql로 변환
       const query = Prisma.sql`
       SELECT
-        menu.id, menu.name, menu."userId", menu."hansicsId", menu.price, "menuImg".id as "menuImgId", "menuImg"."imgUrl"
+        menu.id,
+        menu.name,
+        menu."userId",
+        menu."hansicsId",
+        menu.price,
+        "menuImg".id as "menuImgId",
+        "menuImg"."imgUrl"
       FROM (SELECT * FROM menu WHERE "id" = ${menuId}) as menu
       INNER JOIN "menuImg"
       ON menu.id = "menuImg"."menuId";
