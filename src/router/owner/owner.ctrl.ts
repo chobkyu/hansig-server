@@ -28,6 +28,31 @@ const output = {
       return res.status(500).end();
     }
   },
+
+  //메뉴 하나 정보 반환
+  getMenu: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).end();
+      } else {
+        const response = await ownerService.getMenu(id);
+        if (response.success) {
+          return res
+            .status(response.status)
+            .json({ ...response })
+            .end();
+        } else {
+          return res
+            .status(response.status)
+            .json({ ...response })
+            .end();
+        }
+      }
+    } catch (err) {
+      return res.status(500).end();
+    }
+  },
 };
 
 const process = {
@@ -76,9 +101,57 @@ const process = {
     }
   },
 
-  deleteMenu: async (req: Request, res: Response) => {},
+  //메뉴 삭제
+  deleteMenu: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).end();
+      } else {
+        const response = await ownerService.deleteMenu(id);
+        if (response.success) {
+          return res
+            .status(response.status)
+            .json({ ...response })
+            .end();
+        } else {
+          return res
+            .status(response.status)
+            .json({ ...response })
+            .end();
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).end();
+    }
+  },
 
-  updateMenu: async (req: Request, res: Response) => {},
+  //메뉴 수정
+  updateMenu: async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).end();
+      } else {
+        const response = await ownerService.updateMenu(id, req.body);
+        if (response.success) {
+          return res
+            .status(response.status)
+            .json({ ...response })
+            .end();
+        } else {
+          return res
+            .status(response.status)
+            .json({ ...response })
+            .end();
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      return res.status(500).end();
+    }
+  },
 };
 
 module.exports = {
