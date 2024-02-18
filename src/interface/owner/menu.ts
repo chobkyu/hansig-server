@@ -11,6 +11,7 @@ export interface MenuData {
 }
 
 export function checkMenuDataCount(inputLength: number) {
-  const expectedLength = 5;
+  const expectedKeys = ["name", "hansicsId", "price", "menuImg", "userData"];
+  const expectedLength = expectedKeys.length;
   return inputLength === expectedLength ? true : false;
 }

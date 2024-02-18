@@ -12,6 +12,9 @@ const prisma = new PrismaClient();
 const userService = new UserService();
 
 export class OwnerService {
+  /**사업자 회원 가입
+   * @summary 사업자 번호 유효성 검증 및 데이터 체크 후 회원가입
+   */
   ownerSignUp = async (body: SignUpData) => {
     try {
       //데이터 체크
@@ -83,6 +86,7 @@ export class OwnerService {
     }
   };
 
+  //회원가입 시 필요한 데이터 체크
   checkData = (user: SignUpData) => {
     if (
       user.userId == null ||
@@ -113,6 +117,9 @@ export class OwnerService {
     } else return { success: true };
   };
 
+  /**사업자 로그인
+   * @summary 데이터 체크 후 로그인. JWT 토큰 반환
+   */
   ownerSignIn = async (body: Login) => {
     try {
       const user = body;
@@ -188,7 +195,9 @@ export class OwnerService {
     }
   };
 
-  //메뉴 입력
+  /**메뉴 입력
+   * @summary 데이터 체크 후 DB에 insert
+   */
   insertMenu = async (menuData: MenuData) => {
     try {
       //입력값 유효성 확인
@@ -253,7 +262,9 @@ export class OwnerService {
     }
   };
 
-  //메뉴 읽기
+  /**해당 가게 메뉴 리스트 읽기
+   * @summary 데이터 체크 후 menuList 반환
+   */
   getMenuList = async (id: number) => {
     try {
       //입력값 타입 확인
@@ -296,17 +307,51 @@ export class OwnerService {
     }
   };
 
-  //메뉴 수정
-  updateMenu = async (menuData: MenuData) => {
+  /**메뉴 수정
+   * @summary 데이터 체크 후 DB update
+   */
+  updateMenu = async (id: number, updateMenuData: MenuData) => {
     try {
       //입력값 유효성 확인
-      const dataCheck = await this.insertMenuDataCheck(menuData);
-      if (!dataCheck.success) return { success: false, status: 400 };
+      if (typeof id !== "number") return { success: false, status: 400 };
+      const dataCheck = await this.insertMenuDataCheck(updateMenuData);
+      if (!dataCheck.success)
+        return {
+          success: false,
+          status: 400,
+          msg: "데이터를 제대로 입력했는지 확인하세요",
+        };
+      //불러오기 및 DB에 존재 확인
+      const data = await this.getMenu(id);
+      if (!data.success) return { success: false, status: 400 };
+      if (!Array.isArray(data.menu)) return { success: false, status: 400 };
+      const menuId = data.menu[0].id;
+      const menuImgId = data.menu[0].menuImgId;
 
-      /*트랜잭션
-      - menu DB에 수정
-      - menuImg DB에 수정
-       */
+      //트랜잭션
+      prisma.$transaction(async (tx) => {
+        //menu DB 수정
+        const updateMenu = await tx.menu.update({
+          where: {
+            id: menuId,
+          },
+          data: {
+            name: updateMenuData.name,
+            hansicsId: updateMenuData.hansicsId,
+            price: updateMenuData.price,
+          },
+        });
+        //menuImg DB 수정
+        const updateMenuImg = await tx.menuImg.update({
+          where: {
+            id: menuImgId,
+          },
+          data: {
+            imgUrl: updateMenuData.menuImg,
+          },
+        });
+      });
+
       return { success: true, status: 201 };
     } catch (err) {
       console.error(err);
@@ -314,18 +359,73 @@ export class OwnerService {
     }
   };
 
-  //메뉴 삭제
-  deleteMenu = async (menuData: MenuData) => {
+  /**메뉴 삭제
+   * @summary 데이터 체크 후 DB에 useFlag false로 변경
+   */
+  deleteMenu = async (id: number) => {
     try {
       //입력값 유효성 확인
-      const dataCheck = await this.insertMenuDataCheck(menuData);
-      if (!dataCheck.success) return { success: false, status: 400 };
+      if (typeof id !== "number") return { success: false, status: 400 };
+      //불러오기 및 DB에 존재 확인
+      const data = await this.getMenu(id);
+      if (!data.success) return { success: false, status: 400 };
+      if (!Array.isArray(data.menu)) return { success: false, status: 400 };
+      const menuId = data.menu[0].id;
+      const menuImgId = data.menu[0].menuImgId;
 
-      /*트랜잭션
-      - menu DB에 useFlag 수정
-      - menuImg DB에 useFlag 수정
-       */
-      return { success: true, status: 201 };
+      //트랜잭션
+      prisma.$transaction(async (tx) => {
+        //menu DB에 useFlag 수정
+        const updateMenuUseFlag = await tx.menu.update({
+          where: {
+            id: menuId,
+          },
+          data: {
+            useFlag: false,
+          },
+        });
+        //menuImg DB에 useFlag 수정
+        const updateMenuImgUseFlag = await tx.menuImg.update({
+          where: {
+            id: menuImgId,
+          },
+          data: {
+            useFlag: false,
+          },
+        });
+      });
+
+      return { success: true, status: 204 };
+    } catch (err) {
+      console.error(err);
+      return { success: false, status: 500 };
+    }
+  };
+
+  /**메뉴 하나 데이터 읽기
+   * @summary menu 테이블, menuImg 테이블 조인하여 필요 정보만 반환
+   */
+  getMenu = async (menuId: number) => {
+    try {
+      //string을 sql로 변환
+      const query = Prisma.sql`
+      SELECT
+        menu.id,
+        menu.name,
+        menu."userId",
+        menu."hansicsId",
+        menu.price,
+        "menuImg".id as "menuImgId",
+        "menuImg"."imgUrl"
+      FROM (SELECT * FROM menu WHERE "id" = ${menuId}) as menu
+      INNER JOIN "menuImg"
+      ON menu.id = "menuImg"."menuId";
+      `;
+      //결과
+      const menu = await prisma.$queryRaw(query);
+      if (Array.isArray(menu) && menu.length === 0)
+        return { success: false, status: 400 };
+      return { success: true, status: 200, menu };
     } catch (err) {
       console.error(err);
       return { success: false, status: 500 };
