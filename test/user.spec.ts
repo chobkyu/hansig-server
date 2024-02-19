@@ -329,3 +329,39 @@ describe('/delete users/deleteTestUser',function(){
         });
     });
 });
+//refresh요청,expired된 accesstoken과 refreshtoken,로그인된 상태에서
+describe.only('post user/refresh',function () {
+    describe('성공 시',() => {
+        let info = {
+            userId: 'refreshToken',
+            userPw: '1234'
+        }
+        let accessToken:any;
+        let refreshToken:any;
+        before(done=> {
+            request(app)
+                .post('/users/login')
+                .send(info)
+                .expect(201)
+                .end((err:any,res:any) => {
+                     accessToken= res.body.accessToken;
+                     refreshToken=res.body.refreshToken;
+                    done();
+                });
+        });
+
+        it(done => {
+            request(app)
+                .post('/users/refresh')
+                .set("authorization",`Bearer ${accessToken}`)
+                .set("refreshToken",refreshToken)
+                .end((err:any,res:any) => {
+                    console.log(res.body);
+                    done();
+                });
+        });
+    });
+    describe('실패 시 ', () => {
+
+    });
+   });
