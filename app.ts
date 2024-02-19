@@ -1,11 +1,16 @@
 import express, {Request,Response} from "express"
 import morgan from "morgan"
-
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
+import path from 'path';
 
 require("dotenv").config();
 const logger = require('./src/util/winston');
 const app = express();
-const cors = require('cors')
+const cors = require('cors');
+
+const swaggerSpec: any = YAML.load(path.join(__dirname, './swagger.yaml'));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 const hansic = require('./src/router/hansic')
 const user = require('./src/router/users')
@@ -34,4 +39,4 @@ app.use('/users',user);
 app.use('/owner',owner);
 app.use('/review',review);
 
-module.exports = app;
+module.exports = app; 

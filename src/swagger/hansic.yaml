@@ -1,0 +1,8 @@
+/hansic/all:
+  get:
+    tags:
+      - /hansic/all
+    summary: 한식 뷔페 전체 조회
+    responses:
+      '200':
+        $ref: './openapi.yaml#/components/responses/successResponse'
