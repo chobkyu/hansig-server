@@ -10,8 +10,9 @@ module.exports = {
             userId : user.userId,
             userNickName : user.userNickName
         };
-        if(payload.id==='refreshToken')
+        if(payload.userId==='refreshToken')//refreshToken시험시
         {
+          console.log('h');
             return jwt.sign(payload, secret,{
                 algorithm:'HS256',
                 expiresIn:'0',
@@ -19,7 +20,7 @@ module.exports = {
         }
         return jwt.sign(payload, secret,{
             algorithm:'HS256',
-            expiresIn:'30m',
+            expiresIn:'3h',
         });
     },
     verify: (token:string) => {
@@ -34,16 +35,19 @@ module.exports = {
             console.log('test owner token');
             return {success:true, decodedDate:{}} //테스트용 오너 아이디 내용 추가 예정
         }
-        if(token=='refreshtest')
-        {
-            throw new Error("jwt expired");
-        }
         try{
             decoded = jwt.verify(token,secret);
             return {success:true, decodedData : decoded}
         }catch(err){
-            //console.log(err);
-            return {success:false,msg:err};
+          if(err.message)//에러 메세지 추출,'jwt expired'추출목적
+          {
+            return {success:false,msg:err.message};
+          }
+          else
+          {
+            return {success:false};
+          }
+            
         }
     },
     refresh: () => { // refresh token 발급
@@ -52,13 +56,10 @@ module.exports = {
           expiresIn: '1d',
         });
       },
-      refreshVerify: async (token:string, userId:number) => { // refresh token 검증
-        /* redis 모듈은 기본적으로 promise를 반환하지 않으므로,
-           promisify를 이용하여 promise를 반환하게 해줍니다.*/
-        const getAsync = promisify(redisClient.get).bind(redisClient);
-        
+      refreshVerify: async (token:any, userId:string) => { // refresh token 검증
         try {
-          const data = await getAsync(userId); // refresh token 가져오기
+          const data = await redisClient.get(userId); // refresh token 가져오기
+          console.log(data,token);
           if (token === data) {
             try {
               jwt.verify(token, refreshSecret);

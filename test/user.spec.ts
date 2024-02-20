@@ -330,7 +330,7 @@ describe('/delete users/deleteTestUser',function(){
     });
 });
 //refresh요청,expired된 accesstoken과 refreshtoken,로그인된 상태에서
-describe.only('post user/refresh',function () {
+describe('post user/refresh',function () {
     describe('성공 시',() => {
         let info = {
             userId: 'refreshToken',
@@ -338,27 +338,37 @@ describe.only('post user/refresh',function () {
         }
         let accessToken:any;
         let refreshToken:any;
+        let data:any;
         before(done=> {
             request(app)
                 .post('/users/login')
                 .send(info)
                 .expect(201)
                 .end((err:any,res:any) => {
-                     accessToken= res.body.accessToken;
-                     refreshToken=res.body.refreshToken;
+                     accessToken= res.body.access;
+                     refreshToken=res.body.refresh;
+                     console.log(accessToken,refreshToken);
                     done();
                 });
         });
 
-        it(done => {
+        it('success',done => {
             request(app)
-                .post('/users/refresh')
+                .get('/users/refresh')
                 .set("authorization",`Bearer ${accessToken}`)
-                .set("refreshToken",refreshToken)
+                .set("refresh",refreshToken)
+                .expect(200)
                 .end((err:any,res:any) => {
                     console.log(res.body);
+                    data=res.body.data;
                     done();
                 });
+        });
+        it('data는 refreshToken을 포함해야한다.', function(){
+            data.should.have.property('refresh');
+        });
+        it('data는 accessToken을 포함해야한다.', function(){
+            data.should.have.property('access');
         });
     });
     describe('실패 시 ', () => {
