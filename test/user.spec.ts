@@ -381,7 +381,7 @@ describe.only('post user/refresh',function () {
             data.access.should.be.instanceOf(String);
         });
     });//accesstoken이 잘못된경우,access의 소유주와 refresh의 소유주가 다른경우
-    //refresh가 만료된경우, 
+    //refresh가 만료된경우, before, it으로 분리하자
     describe('실패 시 ', () => {
         it('refreshToken이 만료되었을시',async () => {
             let info = {
@@ -413,6 +413,7 @@ describe.only('post user/refresh',function () {
                 userId: 'refreshToken',
                 userPw: '1234'
             }
+            let original=process.env.TEST_MODE;
             process.env.TEST_MODE=undefined;
             let res=await request(app)
             .post('/users/login')
@@ -423,9 +424,6 @@ describe.only('post user/refresh',function () {
             let data:any;
             accessToken= res.body.access;
             refreshToken=res.body.refresh;
-            let original=process.env.TEST_MODE;
-            process.env.TEST_MODE='refresh';
-            console.log(process.env.TEST_MODE,"testmode");
             data=await request(app)
             .get('/users/refresh')
             .set("authorization",`Bearer ${accessToken}`)

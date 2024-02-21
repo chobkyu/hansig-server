@@ -12,7 +12,7 @@ module.exports = {
             userId : user.userId,
             userNickName : user.userNickName
         };
-        if(process.env.NODE_ENV==='test' && ((process.env.TEST_MODE==='refresh')||(process.env.TEST_MODE==='access')))//refreshToken시험시
+        if((process.env.NODE_ENV==='test') && ((process.env.TEST_MODE==='refresh')||(process.env.TEST_MODE==='access')))//refreshToken시험시
         {
             return jwt.sign(payload, secret,{
                 algorithm:'HS256',
@@ -64,11 +64,8 @@ module.exports = {
           if (token === data) {
             try {
               const jr=jwt.verify(token, refreshSecret);
-              console.log(jr,"jr");
               return true;
-            } catch (err) {
-              logger.error(err);
-              console.log(err,"refreshVerify log");
+            } catch (err) { 
               return false;
             }
           } else {
