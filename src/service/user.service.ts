@@ -141,7 +141,7 @@ export class UserService {
             //redis에 userId,refreshToken저장
             await redisClient.set(res.userId,refreshToken);
             //access:accessToken,refresh:refreshToken반환
-            return {success:true,status:201,access:accessToken,refresh:refreshToken};
+            return {success:true,status:200,access:accessToken,refresh:refreshToken};
         }else return { //로그인 실패
             success:false, status:400
         }; 

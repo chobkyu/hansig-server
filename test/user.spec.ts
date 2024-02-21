@@ -98,7 +98,7 @@ describe('post /user/login...',function(){
             request(app)
                 .post('/users/login')
                 .send(info)
-                .expect(201)
+                .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body;
                     done();
@@ -106,11 +106,11 @@ describe('post /user/login...',function(){
         });
 
         it('토큰을 반환한다.',()=>{
-            body.should.have.property('token')
+            body.should.have.property('access');
         });
 
         it('토큰은 문자열이여야 한다.',()=>{
-            body.token.should.be.instanceOf(String)
+            body.access.should.be.instanceOf(String)
         });
 
     });
@@ -330,12 +330,14 @@ describe('/delete users/deleteTestUser',function(){
     });
 });
 //refresh요청,expired된 accesstoken과 refreshtoken,로그인된 상태에서
-describe('post user/refresh',function () {
+describe.only('post user/refresh',function () {
     describe('성공 시',() => {
         let info = {
             userId: 'refreshToken',
             userPw: '1234'
         }
+        let original=process.env.TEST_MODE;
+        process.env.TEST_MODE='access';
         let accessToken:any;
         let refreshToken:any;
         let data:any;
@@ -343,15 +345,17 @@ describe('post user/refresh',function () {
             request(app)
                 .post('/users/login')
                 .send(info)
-                .expect(201)
+                .expect(200)
                 .end((err:any,res:any) => {
                      accessToken= res.body.access;
                      refreshToken=res.body.refresh;
-                     console.log(accessToken,refreshToken);
                     done();
                 });
         });
-
+        after(()=>
+        {
+            process.env.TEST_MODE=original;
+        })
         it('success',done => {
             request(app)
                 .get('/users/refresh')
@@ -370,8 +374,65 @@ describe('post user/refresh',function () {
         it('data는 accessToken을 포함해야한다.', function(){
             data.should.have.property('access');
         });
-    });
+        it('refresh는 string이여야한다.', function(){
+            data.refresh.should.be.instanceOf(String);
+        });
+        it('access는 string이여야한다.', function(){
+            data.access.should.be.instanceOf(String);
+        });
+    });//accesstoken이 잘못된경우,access의 소유주와 refresh의 소유주가 다른경우
+    //refresh가 만료된경우, 
     describe('실패 시 ', () => {
-
+        it('refreshToken이 만료되었을시',async () => {
+            let info = {
+                userId: 'refreshToken',
+                userPw: '1234'
+            }
+            let original=process.env.TEST_MODE;
+            process.env.TEST_MODE='refresh';
+            let accessToken:any;
+            let refreshToken:any;
+            let data:any;
+           let res=await request(app)
+                .post('/users/login')
+                .send(info)
+                .expect(200);
+            accessToken= res.body.access;
+            refreshToken=res.body.refresh;
+            console.log(res._body);
+            data=await request(app)
+            .get('/users/refresh')
+            .set("authorization",`Bearer ${accessToken}`)
+            .set("refresh",refreshToken)
+            .expect(401)
+            console.log(data.body);
+            process.env.TEST_MODE=original;
+        });
+        it('accessToken이 미만료되었을시',async () => {
+            let info = {
+                userId: 'refreshToken',
+                userPw: '1234'
+            }
+            process.env.TEST_MODE=undefined;
+            let res=await request(app)
+            .post('/users/login')
+            .send(info)
+            .expect(200);
+            let accessToken:any;
+            let refreshToken:any;
+            let data:any;
+            accessToken= res.body.access;
+            refreshToken=res.body.refresh;
+            let original=process.env.TEST_MODE;
+            process.env.TEST_MODE='refresh';
+            console.log(process.env.TEST_MODE,"testmode");
+            data=await request(app)
+            .get('/users/refresh')
+            .set("authorization",`Bearer ${accessToken}`)
+            .set("refresh",refreshToken)
+            .expect(400)
+            console.log(data.body);
+            process.env.TEST_MODE=original;
+        });
     });
    });

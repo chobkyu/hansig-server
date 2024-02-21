@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const secret =process.env.SECRET;
 const refreshSecret=process.env.REFRESH_SECRET;
 const redisClient=require('./redis');
+import { Logger } from "winston";
+const logger = new Logger();
 module.exports = {
     sign : (user:any) => {
         const payload = {
@@ -10,9 +12,8 @@ module.exports = {
             userId : user.userId,
             userNickName : user.userNickName
         };
-        if(payload.userId==='refreshToken')//refreshToken시험시
+        if(process.env.NODE_ENV==='test' && ((process.env.TEST_MODE==='refresh')||(process.env.TEST_MODE==='access')))//refreshToken시험시
         {
-          console.log('h');
             return jwt.sign(payload, secret,{
                 algorithm:'HS256',
                 expiresIn:'0',
@@ -39,18 +40,18 @@ module.exports = {
             decoded = jwt.verify(token,secret);
             return {success:true, decodedData : decoded}
         }catch(err){
-          if(err.message)//에러 메세지 추출,'jwt expired'추출목적
-          {
             return {success:false,msg:err.message};
-          }
-          else
-          {
-            return {success:false};
-          }
-            
         }
     },
     refresh: () => { // refresh token 발급
+      if((process.env.NODE_ENV==='test') && (process.env.TEST_MODE==='refresh'))
+      {
+        console.log('refresh_expired????');
+        return jwt.sign({}, refreshSecret, {
+          algorithm: 'HS256',
+          expiresIn: '0',
+        });
+      }
         return jwt.sign({}, refreshSecret, { // refresh token은 payload 없이 발급
           algorithm: 'HS256',
           expiresIn: '1d',
@@ -62,9 +63,12 @@ module.exports = {
           console.log(data,token);
           if (token === data) {
             try {
-              jwt.verify(token, refreshSecret);
+              const jr=jwt.verify(token, refreshSecret);
+              console.log(jr,"jr");
               return true;
             } catch (err) {
+              logger.error(err);
+              console.log(err,"refreshVerify log");
               return false;
             }
           } else {
