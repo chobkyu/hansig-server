@@ -46,7 +46,6 @@ module.exports = {
     refresh: () => { // refresh token 발급
       if((process.env.NODE_ENV==='test') && (process.env.TEST_MODE==='refresh'))
       {
-        console.log('refresh_expired????');
         return jwt.sign({}, refreshSecret, {
           algorithm: 'HS256',
           expiresIn: '0',
@@ -60,10 +59,9 @@ module.exports = {
       refreshVerify: async (token:any, userId:string) => { // refresh token 검증
         try {
           const data = await redisClient.get(userId); // refresh token 가져오기
-          console.log(data,token);
           if (token === data) {
             try {
-              const jr=jwt.verify(token, refreshSecret);
+              jwt.verify(token, refreshSecret);
               return true;
             } catch (err) { 
               return false;

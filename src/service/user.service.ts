@@ -244,7 +244,7 @@ export class UserService {
 
         }catch(err){
             console.error(err);
-            return {success:false,status:500};
+            return {success:false,status:400};
         }
     }
 

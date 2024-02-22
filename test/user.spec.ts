@@ -330,7 +330,7 @@ describe('/delete users/deleteTestUser',function(){
     });
 });
 //refresh요청,expired된 accesstoken과 refreshtoken,로그인된 상태에서
-describe.only('post user/refresh',function () {
+describe('post user/refresh',function () {
     describe('성공 시',() => {
         let info = {
             userId: 'refreshToken',
@@ -363,7 +363,6 @@ describe.only('post user/refresh',function () {
                 .set("refresh",refreshToken)
                 .expect(200)
                 .end((err:any,res:any) => {
-                    console.log(res.body);
                     data=res.body.data;
                     done();
                 });
@@ -380,8 +379,8 @@ describe.only('post user/refresh',function () {
         it('access는 string이여야한다.', function(){
             data.access.should.be.instanceOf(String);
         });
-    });//accesstoken이 잘못된경우,access의 소유주와 refresh의 소유주가 다른경우
-    //refresh가 만료된경우, before, it으로 분리하자
+    });
+    //refresh가 만료된경우,accesstoken이 미만료되었을시,token이 다른값일시,token이 없을시
     describe('실패 시 ', () => {
         it('refreshToken이 만료되었을시',async () => {
             let info = {
@@ -399,15 +398,14 @@ describe.only('post user/refresh',function () {
                 .expect(200);
             accessToken= res.body.token;
             refreshToken=res.body.refresh;
-            console.log(res._body);
             data=await request(app)
             .get('/users/refresh')
             .set("authorization",`Bearer ${accessToken}`)
             .set("refresh",refreshToken)
             .expect(401)
-            console.log(data.body);
             process.env.TEST_MODE=original;
         });
+
         it('accessToken이 미만료되었을시',async () => {
             let info = {
                 userId: 'refreshToken',
@@ -415,13 +413,13 @@ describe.only('post user/refresh',function () {
             }
             let original=process.env.TEST_MODE;
             process.env.TEST_MODE=undefined;
+            let accessToken:any;
+            let refreshToken:any;
+            let data:any;
             let res=await request(app)
             .post('/users/login')
             .send(info)
             .expect(200);
-            let accessToken:any;
-            let refreshToken:any;
-            let data:any;
             accessToken= res.body.token;
             refreshToken=res.body.refresh;
             data=await request(app)
@@ -429,8 +427,21 @@ describe.only('post user/refresh',function () {
             .set("authorization",`Bearer ${accessToken}`)
             .set("refresh",refreshToken)
             .expect(400)
-            console.log(data.body);
             process.env.TEST_MODE=original;
+        });
+        it('Token이 잘못된값일시',async () => {
+        
+            let data=await request(app)
+            .get('/users/refresh')
+            .set("authorization",`Bearer accessToken`)
+            .set("refresh","refreshToken")
+            .expect(401)
+        });
+        it('Token이 없을시',async () => {
+        
+            let data=await request(app)
+            .get('/users/refresh')
+            .expect(400)
         });
     });
    });
