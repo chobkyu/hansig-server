@@ -106,11 +106,11 @@ describe('post /user/login...',function(){
         });
 
         it('토큰을 반환한다.',()=>{
-            body.should.have.property('access');
+            body.should.have.property('token');
         });
 
         it('토큰은 문자열이여야 한다.',()=>{
-            body.access.should.be.instanceOf(String)
+            body.token.should.be.instanceOf(String)
         });
 
     });
@@ -347,7 +347,7 @@ describe.only('post user/refresh',function () {
                 .send(info)
                 .expect(200)
                 .end((err:any,res:any) => {
-                     accessToken= res.body.access;
+                     accessToken= res.body.token;
                      refreshToken=res.body.refresh;
                     done();
                 });
@@ -397,7 +397,7 @@ describe.only('post user/refresh',function () {
                 .post('/users/login')
                 .send(info)
                 .expect(200);
-            accessToken= res.body.access;
+            accessToken= res.body.token;
             refreshToken=res.body.refresh;
             console.log(res._body);
             data=await request(app)
@@ -422,7 +422,7 @@ describe.only('post user/refresh',function () {
             let accessToken:any;
             let refreshToken:any;
             let data:any;
-            accessToken= res.body.access;
+            accessToken= res.body.token;
             refreshToken=res.body.refresh;
             data=await request(app)
             .get('/users/refresh')
