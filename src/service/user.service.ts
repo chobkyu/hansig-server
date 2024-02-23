@@ -119,6 +119,7 @@ export class UserService {
 
     /**유저 로그인 */
     async login(body:Login) {
+        try{
         const user = body;
  
         //데이터 체크
@@ -145,7 +146,14 @@ export class UserService {
         }else return { //로그인 실패
             success:false, status:400
         }; 
-        
+    }
+    catch(err)
+    {
+        logger.error(err);
+        return { //로그인 실패
+            success:false, status:500
+        }
+    }
     }
 
     /**로그인 데이터 체크 */
