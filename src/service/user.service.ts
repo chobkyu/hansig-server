@@ -192,6 +192,7 @@ export class UserService {
                     userName:true,
                     userNickName:true,
                     userId:true,
+                    location:true,
                     userImgs:{
                         select:{
                             imgUrl:true,

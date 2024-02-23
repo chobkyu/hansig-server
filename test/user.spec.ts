@@ -186,6 +186,9 @@ describe('GET /users/userinfo ',function() {
         it('유저 이미지가 포함되어야 한다.',async () => {
             body.should.have.property('userImgs');
         });
+        it('location이 포함되어야 한다.',async () => {
+            body.should.have.property('location');
+        });
 
     });
 
