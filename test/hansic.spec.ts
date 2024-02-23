@@ -29,7 +29,6 @@ describe('GET /hansic/all ...', function () {
                 .get('/hansic/all')
                 .expect(200)
                 .end((err: any, res: any) => {
-                    console.log(res.body)
                     body = res.body.data;
                     done();
                 });
@@ -99,7 +98,7 @@ describe('GET /hansic/loc/:id ...', function () {
                 .expect(200)
                 .end((err: any, res: any) => {
                     body = res.body.data;
-                    console.log(body);
+                    //console.log(body);
                     done();
                 });
         });
@@ -155,7 +154,7 @@ describe('GET /hansic/loc/:id ...', function () {
                 .get(encodeURIComponent('/hansic/loc/서울'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
-                    console.log(res.body);
+                    //(res.body);
                 });
         });
 
@@ -167,7 +166,7 @@ describe('GET /hansic/loc/:id ...', function () {
                 .get('/hansic/loc/5000')
                 .expect(404)
                 .end(async (err: any, res: any) => {
-                    console.log(res.body);
+                    //console.log(res.body);
                 });
         });
     });
@@ -183,9 +182,9 @@ describe('GET /hansic/:id ...', function () {
                 .set("authorization","Bearer testtoken")
                 .expect(200)
                 .end((err:any,res:any) => {
-                    console.log(res.body);
+                    //console.log(res.body);
                     body = res.body.data;
-                    console.log(body);
+                    //console.log(body);
                     done();
                 });
         });
@@ -239,8 +238,8 @@ describe('GET /hansic/:id ...', function () {
                 .get('/hansic/200000')
                 .expect(404)
                 .end(async (err: any, res: any) => {
-                    console.log(res.body);
-                    console.log(res.status);
+                   // console.log(res.body);
+                   // console.log(res.status);
                 });
         });
 
@@ -249,7 +248,6 @@ describe('GET /hansic/:id ...', function () {
                 .get(encodeURIComponent('/hansic/기원이한뷔'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
-                    console.log(res.body);
                 });
         });
     });
@@ -266,7 +264,6 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
                 .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body.data;
-                    console.log(body);
                     done();
                 });
         });
@@ -323,8 +320,6 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
                 .get('/hansic/place?lat=37&lng=126')
                 .expect(404)
                 .end(async (err: any, res: any) => {
-                    console.log(res.body);
-                    console.log(res.status);
                 });
         });
 
@@ -333,7 +328,7 @@ describe('GET /hansic/place?lat=N&lng=E ...', function () {
                 .get(encodeURIComponent('/hansic/place?lat=-1&lng=-5'))
                 .expect(400)
                 .end(async (err: any, res: any) => {
-                    console.log(res.body);
+                    //console.log(res.body);
                 });
         });
     });

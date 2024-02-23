@@ -13,14 +13,14 @@ const output = {
         try{
             
             const id = parseInt(req.body.userData.id);
-            console.log(req.body);
+            //console.log(req.body);
             //number 타입 id가 아닐시
             if(Number.isNaN(id)) return res.json({id}).status(400).end();
 
             const response = await userService.getUser(id);
 
             if(!response.success) {
-                console.log(response)
+                //console.log(response)
                 return res.status(response.status).end();
             }
 
@@ -46,7 +46,7 @@ const output = {
     getImgUrl : async (req:Request, res:Response) => {
         try{
             const url = await userService.getUrl();
-            console.log(url.url);
+            //console.log(url.url);
             if(url.success){
                 res.json(url).status(200);
             }else{
@@ -115,7 +115,7 @@ const process = {
                 return res.status(404).end();
             }
         }catch(err){
-            console.log(err);
+            console.error(err);
             return res.status(500).end();
         }
     }

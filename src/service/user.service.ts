@@ -5,6 +5,7 @@ import { user } from "../interface/user/user";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt'
 import { Token } from "typescript";
+import { Logger } from "winston";
 const jwt = require('../util/jwt-util');
 const logger = require('../util/winston');
 const redisClient = require('../util/redis');
@@ -16,7 +17,7 @@ export class UserService {
     /**회원 가입 */
     async insertUser(body:user){
         const user:user = body;
-        console.log(body)
+        //console.log(body)
         
         try{
             //데이터 체크
@@ -48,13 +49,14 @@ export class UserService {
                 }
             });
 
-            console.log(res);
+            //console.log(res);
             /**회원가입 후 토큰 발행 */
             const accessToken = jwt.sign(res);
             return {success:true,status:201,token:accessToken};
 
         }catch(err){
-            console.error(err);
+            //console.error(err);
+            logger.error(err);
             return {success:false,status:500}
         }
     }
@@ -94,7 +96,8 @@ export class UserService {
                 return {success:true};
             }
         }catch(err){
-            console.log(err);
+            //console.log(err);
+            logger.error(err);
             return {success:false};
         }
     }
@@ -108,13 +111,14 @@ export class UserService {
                 }
             });
 
-            console.log(res);
+            //console.log(res);
 
             if(res) return {success:false};
             else return {success:true};
 
         }catch(err){
-            console.log(err);
+            //console.log(err);
+            logger.log(err);
             return {success:false,status:400};
         }
     }
@@ -160,11 +164,11 @@ export class UserService {
 
     /**로그인 데이터 체크 */
     checkLoginData(user:Login){
-        console.log(user);
+        //console.log(user);
         const body = JSON.parse(JSON.stringify(user)); //깊은 복사
         const checkOther = this.checkOther(body);
-        console.log(checkOther);
-        console.log('tlqkf js')
+        //console.log(checkOther);
+        //console.log('tlqkf js')
         if(!checkOther.success) return {success:false,status:400};
         
         if(user.userId == null || user.userPw ==null){
@@ -179,7 +183,7 @@ export class UserService {
         delete body.userId;
         delete body.userPw;
 
-        console.log(body);
+        //console.log(body);
         if(body && Object.keys(body).length === 0 && body.constructor === Object)return {success:true};
         else return {success:false, status:400};
     }
@@ -209,14 +213,15 @@ export class UserService {
                     id:userId
                 }
             });
-            console.log(res);
+            //console.log(res);
 
             if(res?.userId==null) return {success:false,status:404,msg:userId};
 
             return {success:true,data:res,status:200};
 
         }catch(err){
-            console.log(err);
+            //console.log(err);
+            logger.error(err);
             return {success:false,status:500};
         }
     }
@@ -254,7 +259,8 @@ export class UserService {
             return {success:true,status:201};
 
         }catch(err){
-            console.error(err);
+           //console.error(err);
+           logger.error(err);
             return {success:false,status:400};
         }
     }
@@ -286,7 +292,7 @@ export class UserService {
     /*테스트용 유저 삭제*/
     async deleteTestUser() {
         try{
-            console.log('??')
+            //console.log('??')
             const res = await prisma.user.deleteMany({
                 where: {
                     userId : {
@@ -297,7 +303,8 @@ export class UserService {
 
             return {success: true};
         }catch(err){
-            console.log(err);
+            //console.log(err);
+            logger.error(err);
             return {success:false}
         }
     }
