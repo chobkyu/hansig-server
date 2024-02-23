@@ -64,7 +64,6 @@ const process = {
     /**로그인 */
     login : async(req:Request,res:Response) => {
         try{
-            console.log(req.body);
             const response = await userService.login(req.body);
             if(response.success) return res.json(response);
             else return res.status(response.status).end();

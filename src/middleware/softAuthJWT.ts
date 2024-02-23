@@ -18,9 +18,11 @@ const softAuthJWT=(req:Request,res:Response,next:NextFunction) => {
             req.body.userData = userData
             next();
         } else{
+            req.body.userData=false;
             next();
         }
     }else{
+        req.body.userData=false;
         next();
     }
 }

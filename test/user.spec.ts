@@ -98,7 +98,7 @@ describe('post /user/login...',function(){
             request(app)
                 .post('/users/login')
                 .send(info)
-                .expect(201)
+                .expect(200)
                 .end((err:any,res:any) => {
                     body = res.body;
                     done();
@@ -106,7 +106,7 @@ describe('post /user/login...',function(){
         });
 
         it('토큰을 반환한다.',()=>{
-            body.should.have.property('token')
+            body.should.have.property('token');
         });
 
         it('토큰은 문자열이여야 한다.',()=>{
@@ -329,3 +329,119 @@ describe('/delete users/deleteTestUser',function(){
         });
     });
 });
+//refresh요청,expired된 accesstoken과 refreshtoken,로그인된 상태에서
+describe('post user/refresh',function () {
+    describe('성공 시',() => {
+        let info = {
+            userId: 'refreshToken',
+            userPw: '1234'
+        }
+        let original=process.env.TEST_MODE;
+        process.env.TEST_MODE='access';
+        let accessToken:any;
+        let refreshToken:any;
+        let data:any;
+        before(done=> {
+            request(app)
+                .post('/users/login')
+                .send(info)
+                .expect(200)
+                .end((err:any,res:any) => {
+                     accessToken= res.body.token;
+                     refreshToken=res.body.refresh;
+                    done();
+                });
+        });
+        after(()=>
+        {
+            process.env.TEST_MODE=original;
+        })
+        it('success',done => {
+            request(app)
+                .get('/users/refresh')
+                .set("authorization",`Bearer ${accessToken}`)
+                .set("refresh",refreshToken)
+                .expect(200)
+                .end((err:any,res:any) => {
+                    data=res.body.data;
+                    done();
+                });
+        });
+        it('data는 refreshToken을 포함해야한다.', function(){
+            data.should.have.property('refresh');
+        });
+        it('data는 accessToken을 포함해야한다.', function(){
+            data.should.have.property('access');
+        });
+        it('refresh는 string이여야한다.', function(){
+            data.refresh.should.be.instanceOf(String);
+        });
+        it('access는 string이여야한다.', function(){
+            data.access.should.be.instanceOf(String);
+        });
+    });
+    //refresh가 만료된경우,accesstoken이 미만료되었을시,token이 다른값일시,token이 없을시
+    describe('실패 시 ', () => {
+        it('refreshToken이 만료되었을시',async () => {
+            let info = {
+                userId: 'refreshToken',
+                userPw: '1234'
+            }
+            let original=process.env.TEST_MODE;
+            process.env.TEST_MODE='refresh';
+            let accessToken:any;
+            let refreshToken:any;
+            let data:any;
+           let res=await request(app)
+                .post('/users/login')
+                .send(info)
+                .expect(200);
+            accessToken= res.body.token;
+            refreshToken=res.body.refresh;
+            data=await request(app)
+            .get('/users/refresh')
+            .set("authorization",`Bearer ${accessToken}`)
+            .set("refresh",refreshToken)
+            .expect(401)
+            process.env.TEST_MODE=original;
+        });
+
+        it('accessToken이 미만료되었을시',async () => {
+            let info = {
+                userId: 'refreshToken',
+                userPw: '1234'
+            }
+            let original=process.env.TEST_MODE;
+            process.env.TEST_MODE=undefined;
+            let accessToken:any;
+            let refreshToken:any;
+            let data:any;
+            let res=await request(app)
+            .post('/users/login')
+            .send(info)
+            .expect(200);
+            accessToken= res.body.token;
+            refreshToken=res.body.refresh;
+            data=await request(app)
+            .get('/users/refresh')
+            .set("authorization",`Bearer ${accessToken}`)
+            .set("refresh",refreshToken)
+            .expect(400)
+            process.env.TEST_MODE=original;
+        });
+        it('Token이 잘못된값일시',async () => {
+        
+            let data=await request(app)
+            .get('/users/refresh')
+            .set("authorization",`Bearer accessToken`)
+            .set("refresh","refreshToken")
+            .expect(401)
+        });
+        it('Token이 없을시',async () => {
+        
+            let data=await request(app)
+            .get('/users/refresh')
+            .expect(400)
+        });
+    });
+   });

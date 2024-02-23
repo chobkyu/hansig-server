@@ -18,7 +18,7 @@ const logger = require('../util/winston');
 export class HansicService {
   async getHansicDate() {
     try {
-      const data = await prisma.hansics.findMany({include : {location : true}});
+      const data = await prisma.hansics.findMany({ include: { location: true } });
       return { data, success: true }
     } catch (err) {
       logger.error(err);
@@ -65,7 +65,7 @@ export class HansicService {
 
       if (userId) {
         let findStar = await prisma.favorites.findFirst(
-            {where : {userId : Number(userId), hansicsId : data[0].id}});
+          { where: { userId: Number(userId), hansicsId: data[0].id } });
 
         favorite = findStar?.useFlag == null ? false : findStar.useFlag;
       } else {
@@ -89,7 +89,7 @@ export class HansicService {
     }
   }
   // 식당id로 단일 조회
-  async get(restaurantId: number, userId?: number): Promise<Object|false> {
+  async get(restaurantId: number, userId?: number): Promise<Object | false> {
     try {
       let favorite;
       const data = await prisma.$queryRaw<any[]>`
@@ -123,8 +123,8 @@ export class HansicService {
       // user정보가 넘어왔을시 favorite확인
       if (userId) {
         let findStar = await prisma.favorites.findFirst(
-          {where : {userId : Number(userId), hansicsId : data[0].id}});
-      favorite = findStar?.useFlag == null ? false : findStar.useFlag;
+          { where: { userId: Number(userId), hansicsId: data[0].id } });
+        favorite = findStar?.useFlag == null ? false : findStar.useFlag;
       } else {
         // 유저정보가 넘어오지 않은경우
         favorite = false;
@@ -144,7 +144,7 @@ export class HansicService {
     }
   }
   // 지역id로 지역내 식당리스트 조회
-  async getFromLocation(locationId: number): Promise<any[]|false> {
+  async getFromLocation(locationId: number): Promise<any[] | false> {
     try {
       const data = await prisma.$queryRaw<any[]>`
         SELECT
@@ -178,7 +178,7 @@ export class HansicService {
     }
   }
   // 전체조회
-  async getAll(): Promise<any[]|false> {
+  async getAll(): Promise<any[] | false> {
     try {
       const data = await prisma.$queryRaw<any[]>`
         SELECT
@@ -225,10 +225,10 @@ export class HansicService {
           await this.tryGeo(response[i])
         }
       }
-      return {success : true};
+      return { success: true };
     } catch (err) {
       logger.error(err);
-      return {success : false};
+      return { success: false };
     }
   }
 
@@ -237,9 +237,9 @@ export class HansicService {
     try {
       const addr = hansic.addr
       const option = {
-        uri : 'https://dapi.kakao.com/v2/local/search/address',
-        qs : {query : addr},
-        headers : {Authorization : `KakaoAK ${process.env.kakao_api}`}
+        uri: 'https://dapi.kakao.com/v2/local/search/address',
+        qs: { query: addr },
+        headers: { Authorization: `KakaoAK ${process.env.kakao_api}` }
       }
 
       // 카카오 api 호출
@@ -270,21 +270,21 @@ export class HansicService {
   async updateGeo(id: number, lng: number, lat: number) {
     try {
       const updateHansics = await prisma.hansics.update({
-        where : {
-          id : id,
+        where: {
+          id: id,
         },
-        data : {
-          lat : lat,
-          lng : lng,
+        data: {
+          lat: lat,
+          lng: lng,
         }
       });
 
       logger.info(updateHansics);
 
-      return {success : true};
+      return { success: true };
     } catch (err) {
       logger.error(err);
-      return {success : false};
+      return { success: false };
     }
   }
 
@@ -296,47 +296,47 @@ export class HansicService {
       console.log(findHansic);
 
       if (!findHansic)
-        return {success : false, status : 404} // transaction
-        prisma.$transaction(async (tx) => {
-          const selectFavorite = await tx.favorites.findFirst({
-            where : {
-              userId : body.userData.id,
-              hansicsId : hansicId,
-            }
-          });
-
-          if (selectFavorite != null) {
-            // 즐겨찾기 데이터가 있을 시 update
-
-            const updateFavoite = selectFavorite.useFlag == true
-                                      ?
-
-                                      await tx.favorites.update({
-                                        where : {id : selectFavorite.id},
-                                        data : {useFlag : false}
-                                      })
-                                      :
-
-                                      await tx.favorites.update({
-                                        where : {id : selectFavorite.id},
-                                        data : {useFlag : true}
-                                      });
-          } else {
-            // 즐겨찾기 데이터가 없을 시 insert
-            const insertFavorite = await tx.favorites.create({
-              data : {
-                userId : body.userData.id,
-                hansicsId : hansicId,
-              }
-            });
+        return { success: false, status: 404 } // transaction
+      prisma.$transaction(async (tx) => {
+        const selectFavorite = await tx.favorites.findFirst({
+          where: {
+            userId: body.userData.id,
+            hansicsId: hansicId,
           }
         });
 
-      return {success : true, status : 201};
+        if (selectFavorite != null) {
+          // 즐겨찾기 데이터가 있을 시 update
+
+          const updateFavoite = selectFavorite.useFlag == true
+            ?
+
+            await tx.favorites.update({
+              where: { id: selectFavorite.id },
+              data: { useFlag: false }
+            })
+            :
+
+            await tx.favorites.update({
+              where: { id: selectFavorite.id },
+              data: { useFlag: true }
+            });
+        } else {
+          // 즐겨찾기 데이터가 없을 시 insert
+          const insertFavorite = await tx.favorites.create({
+            data: {
+              userId: body.userData.id,
+              hansicsId: hansicId,
+            }
+          });
+        }
+      });
+
+      return { success: true, status: 201 };
 
     } catch (err) {
       logger.error(err);
-      return {success : false, status : 500};
+      return { success: false, status: 500 };
     }
   }
 
