@@ -40,7 +40,15 @@ module.exports = {
             decoded = jwt.verify(token,secret);
             return {success:true, decodedData : decoded}
         }catch(err){
+          if(err instanceof Error)
+          {
             return {success:false,msg:err.message};
+          }
+          else
+          {
+            return {success:false};
+          }
+            
         }
     },
     refresh: () => { // refresh token 발급
