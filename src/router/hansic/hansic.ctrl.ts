@@ -39,6 +39,7 @@ const output = {
         //유효한 검색 결과가 있는지 확인
         if (response) {
           response.count = Number(response.count);
+          console.log(response);
           return res.json({ data: response });
         } else {
           return res.status(400).end();
