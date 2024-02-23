@@ -5,6 +5,7 @@ const authJWT = require('../../middleware/authJWT');
 const refresh= require('../../middleware/refresh');
 router.get('/userinfo', authJWT,ctrl.output.getUser);
 router.get('/location',ctrl.output.location);
+router.get('/imgUrl',ctrl.output.getImgUrl);
 
 router.post('/',ctrl.process.insertUser);
 router.post('/login',ctrl.process.login);

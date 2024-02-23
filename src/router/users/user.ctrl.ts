@@ -38,7 +38,22 @@ const output = {
 
             return res.json(response).status(201);
         }catch(err){
-            logger.error();
+            logger.error(err);
+            return res.status(500).end();
+        }
+    },
+
+    getImgUrl : async (req:Request, res:Response) => {
+        try{
+            const url = await userService.getUrl();
+
+            if(url.success){
+                res.json(url).status(200);
+            }else{
+                res.json(url).status(url.status);
+            }
+        }catch(err){
+            logger.error(err);
             return res.status(500).end();
         }
     }
