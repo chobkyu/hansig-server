@@ -5,7 +5,7 @@ const request = require('supertest')
 
 /**리뷰 입력 시 ...  id는 식당 id */
 
-describe.only('post /review/:id',function() {
+describe('post /review/:id',function() {
     let testData : Review = {
         review : '맛있어요',
         star : 2,
@@ -87,7 +87,7 @@ describe.only('post /review/:id',function() {
 
 
 /**리뷰 수정 시  id는 리뷰*/
-describe.only('patch /review/update/:id',function () {
+describe('patch /review/update/:id',function () {
     describe('성공 시',() => {
         let testData : Review = {
             review : '맛있어요!!',
@@ -229,7 +229,7 @@ describe.only('patch /review/update/:id',function () {
 });
 
 /**리뷰 조회 시 id는 리뷰 id */
-describe.only('get /review/:id ',function() {
+describe('get /review/:id ',function() {
     describe('성공 시 해당 리뷰 리턴',() => {
         let body : any;
         before(done => {
@@ -319,7 +319,7 @@ describe.only('get /review/:id ',function() {
 
 
 /**리뷰 리스트 조회 시  id는 식당 id*/
-describe.only('get /review/list/:id',() => {
+describe('get /review/list/:id',() => {
     describe('성공 시',() => {
         let body:any;
         before(done => {
@@ -507,7 +507,7 @@ describe('delete /review/reply/:id',() => {
     
 });
 //리뷰 삭제 시
-describe.only('delete reivew/:id',() => {
+describe('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)

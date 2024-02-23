@@ -7,7 +7,7 @@ import bcrypt from 'bcrypt'
 import { Token } from "typescript";
 const jwt = require('../util/jwt-util');
 const logger = require('../util/winston');
-
+const redisClient = require('../util/redis');
 const prisma = new PrismaClient();
 
 export class UserService {
@@ -119,6 +119,7 @@ export class UserService {
 
     /**유저 로그인 */
     async login(body:Login) {
+        try{
         const user = body;
  
         //데이터 체크
@@ -137,12 +138,22 @@ export class UserService {
 
         if(check) { //로그인 성공
             const accessToken = jwt.sign(res);
-            //const refreshToekn
-            return {success:true,status:201,token:accessToken};
+            const refreshToken=jwt.refresh();
+            //redis에 userId,refreshToken저장
+            await redisClient.set(res.userId,refreshToken);
+            //access:accessToken,refresh:refreshToken반환
+            return {success:true,status:200,token:accessToken,refresh:refreshToken};
         }else return { //로그인 실패
             success:false, status:400
         }; 
-        
+    }
+    catch(err)
+    {
+        logger.error(err);
+        return { //로그인 실패
+            success:false, status:500
+        }
+    }
     }
 
     /**로그인 데이터 체크 */
@@ -241,7 +252,7 @@ export class UserService {
 
         }catch(err){
             console.error(err);
-            return {success:false,status:500};
+            return {success:false,status:400};
         }
     }
 
