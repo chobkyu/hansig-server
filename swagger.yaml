@@ -1,0 +1,27 @@
+openapi: 3.0.0
+info:
+  version: 0.4.0
+  title: eedited API docs
+  description: eedited의 API 문서입니다
+  license:
+    name: MIT
+servers:
+  - url: 'http://localhost:3000/'
+paths:
+  /hansic/all:
+    get:
+      tags:
+        - /hansic/all
+      summary: 한식 뷔페 전체 조회
+      responses:
+        '200':
+          $ref: '#/components/responses/successResponse'
+components:
+  responses:
+    successResponse:
+      description: successful request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties: null
