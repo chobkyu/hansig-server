@@ -9,6 +9,8 @@ const jwt = require('../util/jwt-util');
 const logger = require('../util/winston');
 const redisClient = require('../util/redis');
 const prisma = new PrismaClient();
+const {generateUploadURL} = require('../util/s3');
+
 
 export class UserService {
     /**회원 가입 */
@@ -192,6 +194,7 @@ export class UserService {
                     userName:true,
                     userNickName:true,
                     userId:true,
+                    location:true,
                     userImgs:{
                         select:{
                             imgUrl:true,
@@ -265,6 +268,18 @@ export class UserService {
         }catch(err){
             logger.error(err);
             return {success:false, status:500};
+        }
+    }
+
+    /**s3 이미지 url 불러오기 */
+    async getUrl() {
+        try{
+            const url = await generateUploadURL();
+
+            return {success:true, url: url, status:200};
+        }catch(err){
+            logger.error(err);
+            return {success:false,status:500};
         }
     }
 
