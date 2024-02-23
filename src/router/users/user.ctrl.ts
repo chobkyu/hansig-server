@@ -46,7 +46,7 @@ const output = {
     getImgUrl : async (req:Request, res:Response) => {
         try{
             const url = await userService.getUrl();
-
+            console.log(url.url);
             if(url.success){
                 res.json(url).status(200);
             }else{
