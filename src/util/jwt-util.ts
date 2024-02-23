@@ -39,7 +39,7 @@ module.exports = {
         try{
             decoded = jwt.verify(token,secret);
             return {success:true, decodedData : decoded}
-        }catch(err){
+        }catch(err:any){
             return {success:false,msg:err.message};
         }
     },
