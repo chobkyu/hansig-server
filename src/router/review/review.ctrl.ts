@@ -104,9 +104,6 @@ const process =
         const updatedReview=await reviewService.updateReview(req.body,userInfo.id,reviewId);
         if(updatedReview)//update성공시
         {
-            updatedReview.user={};
-            updatedReview.user.id=userInfo.id;
-            updatedReview.user.userNickName=userInfo.userNickName;
             return res.json(updatedReview);
         }
         else
