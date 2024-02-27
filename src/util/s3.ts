@@ -34,8 +34,7 @@ async function generateUploadURL() {
     })
   
     const uploadURL = await s3.getSignedUrlPromise('putObject', params)
-    console.log(process.env.AWS_SECRET_ACCESS_KEY)
-    console.log(s3)
+
     return uploadURL
   }
   
