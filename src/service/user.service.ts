@@ -138,6 +138,8 @@ export class UserService {
         }
         const check = await bcrypt.compare(user.userPw,res?.userPw);
 
+        console.log('check');
+        
         if(check) { //로그인 성공
             const accessToken = jwt.sign(res);
             const refreshToken=jwt.refresh();
