@@ -16,9 +16,9 @@ const output={
         const reviewId=Number(req.params.id);
         if(reviewId){
         const review=await reviewService.getReview(reviewId);
-        if(review)//검색결과가 있으면
+        if(review.success)//검색결과가 있으면
         {
-            return res.json({data:review});
+            return res.json({data:review.review});
         }
         else
         {
@@ -42,9 +42,9 @@ const output={
         try{
         const reviewList=await reviewService.getReviewList(Number(req.params.id));
         //검색결과가 있으면
-        if(reviewList)
+        if(reviewList.success)
         {
-            return res.json(reviewList);
+            return res.json(reviewList.reviewList);
         }
         else {
             return res.status(204).end();
@@ -71,7 +71,7 @@ const process =
         if(checkDTO){
         //리뷰 작성
         const isSuccess=await reviewService.writeReview(req.body,userInfo.id,restaurantId);
-        if(isSuccess)//작성성공시
+        if(isSuccess.success)//작성성공시
         {
             return res.status(201).end();
         }
@@ -101,15 +101,26 @@ const process =
         try{
         const userInfo=req.body.userData;
         const reviewId=req.params.id;
-        const updatedReview=await reviewService.updateReview(req.body,userInfo.id,reviewId);
-        if(updatedReview)//update성공시
+        if(userInfo && Number(reviewId)){
+        const updatedReview=await reviewService.updateReview(req.body,userInfo.id,Number(reviewId));
+        if(updatedReview.success)//update성공시
         {
-            return res.json(updatedReview);
+            return res.json(updatedReview).end();
+        }
+        else
+        {
+            if(updatedReview.status)
+            {
+                return res.status(updatedReview.status).end();
+            }
+            return res.status(500).end();
+        }
         }
         else
         {
             return res.status(400).end();
-        }}catch(err)
+        }
+    }catch(err)
         {
             logger.error(err);
             return res.status(500).end();
@@ -119,7 +130,7 @@ const process =
     {
         try{
         const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
-        if(isSuccess)//삭제성공시
+        if(isSuccess.success)//삭제성공시
         {
             return res.status(204).end();
         }

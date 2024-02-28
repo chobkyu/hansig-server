@@ -107,6 +107,12 @@ class reviewService {
     }
   }
   // 리뷰작성
+  /*interface Review {
+    review : string,
+    star : number,
+    img? : Array<string>
+}
+   */
   async writeReview(inputReview: Review, userInfo: Number,
                     restaurantInfo: Number): Promise<any> {
     try {
@@ -128,7 +134,9 @@ class reviewService {
             imgUrl,
             reviewId:create.id,
           }));
+          if(imgData){
           const image=await tx.reviewImg.createMany({data:imgData});
+          }
       });
     }
       else
@@ -153,33 +161,44 @@ class reviewService {
       return {success:false};
     }
   }
-  async updateReview(inputReview: ReviewUpdate, userInfo: Number,
-                     reviewInfo: Number): Promise<any> {
+  /*
+  interface ReviewUpdate {
+    review : string,
+    star : number,
+    insertImg? : Array<string>,
+    deleteImg?:Array<number>,
+}insertImg는 업로드할 imgurl,deleteimg는 삭제할 reviewimg의 id의 array
+userinfo는 유저id,reviewinfo역시 review의 id.
+  */
+  async updateReview(inputReview: ReviewUpdate, userInfo: number,
+                     reviewInfo: number): Promise<any> {
     try {
       let updatedReview:any,insertImg:any,deleteImg:any;
+      updatedReview=undefined;
       //review가 있는지 체크
       const review =
-          await prisma.review.findUnique({where : {id : Number(reviewInfo)}});
+          await prisma.review.findUnique({where : {id : reviewInfo,useFlag:true}});
           //원저작자인지 확인
-          const user=await prisma.user.findUnique({select:{id:true,userNickName:true},where : {id : Number(userInfo)}});
-      if (review?.userId === Number(userInfo)) {
+          const user=await prisma.user.findUnique({select:{id:true,userNickName:true},where : {id : userInfo}});
+      if (review?.userId === userInfo) {
         if(inputReview.insertImg)//삽입할 이미지가 있는지 확인
-        {
+        {//img array를 분리대입.
           insertImg=inputReview.insertImg?.map(imgUrl => ({
             imgUrl,
-            reviewId:Number(reviewInfo)
+            reviewId:reviewInfo
           }));
-        }
+        }//삭제할 img확인
           if(inputReview.deleteImg)
-          {
+          {//삭제할 img id를 분리
             deleteImg=inputReview.deleteImg?.map(id => ({
               id
             }));
           }
+          //트랜잭션
   await prisma.$transaction(async (tx)=>{       
         updatedReview = await tx.review.update({
           data : {review : inputReview.review, star : inputReview.star},
-          where : {id : Number(reviewInfo)}
+          where : {id : reviewInfo}
         });
         if(insertImg){
         await tx.reviewImg.createMany({data:insertImg});
@@ -190,10 +209,12 @@ class reviewService {
       }
   });
   if(updatedReview){
-        const newReviewImage = await prisma.reviewImg.findMany(
-            {select : {imgUrl : true}, where : {reviewId : Number(reviewInfo)}});
+            //수정후 이미지
+            const newReviewImage = await prisma.reviewImg.findMany(
+            {select : {imgUrl : true}, where : {reviewId : reviewInfo}});
+            //리뷰 코멘트
         const ReviewComments = await prisma.reviewComment.findMany(
-            {where : {reviewId : Number(reviewInfo)}});
+            {where : {reviewId : reviewInfo}});
         return {
           success:true,
           id : updatedReview.id,
@@ -207,20 +228,24 @@ class reviewService {
           user:user
         };
       }
-      
-      } else {
+      else//updatedReview가 실패한경우.
+      {
         return {success:false};
+      }
+      } else {//작성자가 아닌경우
+        return {success:false,status:403};
       }
     } catch (err) {
       logger.error(err);
-      return {success:false};
+      return {success:false,status:500};
     }
   }
+  //soft delete
   async deleteReview(deleteReviewId: number,
                      userInfo: number): Promise<any> {
     try {
-      const success = await prisma.review.update(
-          {data:{useFlag:false},where : {id : Number(deleteReviewId), userId : Number(userInfo)}});
+       const success = await prisma.review.update(
+          {data:{useFlag:false},where : {id : deleteReviewId, userId : userInfo}});
       if (!success) {
         return{success:false};
       }
