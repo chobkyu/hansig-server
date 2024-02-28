@@ -238,21 +238,11 @@ export class UserService {
         try{
             const updateUserId :number = userInfoDto.userData.id;
 
-             //업데이트는 타입 체크만 할 예정
-             const check = this.checkUpdateData(userInfoDto);
-             if(!check.success) return {success:false,status:400};
+            //업데이트는 타입 체크만 할 예정
+            const check = this.checkUpdateData(userInfoDto);
+            if(!check.success) return {success:false,status:400};
 
-            console.log(userInfoDto);
-            const user  = {
-                userId : userInfoDto.userId,
-                userName : userInfoDto.userName,
-                userNickName : userInfoDto.userNickName,
-                userPw : userInfoDto.userPw, //refactoring...
-                location_id : userInfoDto.locationId
-            }
-
-           
-            
+                          
             prisma.$transaction(async (tx) => {
                 const updateUser = await tx.user.updateMany({
                     where : {
