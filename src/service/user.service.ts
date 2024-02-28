@@ -120,7 +120,17 @@ export class UserService {
         }
     }
 
-    /**유저 로그인 */
+    /**
+     * 유저 로그인
+     * @param body 
+     * @returns
+     *  {
+            success: boolean;
+            status: number;
+            token: any;
+            refresh: any;
+        }
+     */
     async login(body:Login) {
         try{
         const user = body;
@@ -161,7 +171,15 @@ export class UserService {
     }
     }
 
-    /**로그인 데이터 체크 */
+   /**
+    * 로그인 시 데이터 체크
+    * @param user : Login
+    * @returns 
+    * {
+        success: boolean;
+        status?: undefined;
+      }
+    */
     checkLoginData(user:Login){
         console.log(user);
         const body = JSON.parse(JSON.stringify(user)); //깊은 복사
@@ -188,7 +206,28 @@ export class UserService {
     }
 
 
-    /**유저 데이터 조회 */    
+    /**
+     * 
+     * @param userId :number
+     * @returns 
+     * {
+            success: boolean;
+            data: {
+                id: number;
+                userId: string | null;
+                userName: string | null;
+                userNickName: string | null;
+                userImgs: {
+                    ...;
+                }[];
+                location: {
+                    ...;
+                };
+            };
+            status: number;
+            msg?: undefined;
+        } 
+     */    
     async getUser(userId:number) {
         try{
             const res = await prisma.user.findFirst({
@@ -224,25 +263,37 @@ export class UserService {
         }
     }
 
-     /**입력 값 체크 */
-     checkUpdateData(user:UpdateInfoDto){
+    /**
+     * 업데이트 시 데이터 타입 체크
+     * @param user :UpdateInfoDto
+     * @returns {success:boolean,status?:number}
+     */
+    checkUpdateData(user:UpdateInfoDto){
         if(user.userId == null || user.userName == null || user.userNickName == null ){
+            console.log('1')
             return {success:false,status:400}
         }else if(typeof user.userId != "string" || typeof user.userName != "string" || typeof user.userNickName != "string" ||  typeof user.locationId != "number" ){
+            console.log(typeof user.locationId)
             return {success:false,status:400}
         }else return {success:true};
     }
 
-    /**유저 데이터 수정 */
+    /**
+     * 유저 정보 업데이트
+     * @param userInfoDto 
+     * @returns  {success:boolean,status:number}
+     */
     async updateUserInfo(userInfoDto :UpdateInfoDto) {
         try{
+            console.log('----------------');
+            console.log(userInfoDto);
             const updateUserId :number = userInfoDto.userData.id;
 
             //업데이트는 타입 체크만 할 예정
             const check = this.checkUpdateData(userInfoDto);
             if(!check.success) return {success:false,status:400};
 
-                          
+            //transaction              
             prisma.$transaction(async (tx) => {
                 const updateUser = await tx.user.updateMany({
                     where : {

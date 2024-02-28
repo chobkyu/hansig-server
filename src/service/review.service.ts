@@ -17,10 +17,14 @@ class reviewService {
             star : true,
             user : {select : {id : true, userNickName : true}},
             reviewComments:true,
-        reviewImgs:{select:{imgUrl:true}}
+            reviewImgs:{
+              select:{
+                imgUrl:true
+              }
+            }
           },
           where : {id : id}
-        })
+        });
         //검색결과가 있으면
       if (review) {
         return review;
@@ -36,14 +40,21 @@ class reviewService {
   async getReviewList(restaurantId: number): Promise<any[]|any> {
     try {
       const review=await prisma.review.findMany({select : {
-        id:true,
-        review : true,
-        star : true,
-        user : {select : {id : true, userNickName : true}},
-        reviewComments:true,
-        reviewImgs:{select:{imgUrl:true}}
-      },
-      where : {hansicsId : restaurantId}})
+          id:true,
+          review : true,
+          star : true,
+          user : {select : {id : true, userNickName : true}},
+          reviewComments:true,
+          reviewImgs:{
+            select:{
+              imgUrl:true
+            }
+          }
+        },
+        where : {
+          hansicsId : restaurantId
+        }
+      })
        //검색결과가 있으면
       if (review) {
         return review;
@@ -91,13 +102,22 @@ class reviewService {
   async updateReview(inputReview: Review, userInfo: Number,
                      reviewInfo: Number): Promise<any|false> {
     try {
-      const review =
-          await prisma.review.findUnique({where : {id : Number(reviewInfo)}});
+      const review = await prisma.review.findUnique({
+        where : {
+          id : Number(reviewInfo)
+        }
+      });
+
       if (review?.userId === Number(userInfo)) {
         const updatedReview = await prisma.review.update({
-          data : {review : inputReview.review, star : inputReview.star},
-          where : {id : Number(reviewInfo)}
-        })
+          data : {
+            review : inputReview.review, 
+            star : inputReview.star
+          },
+          where : {
+            id : Number(reviewInfo)
+          }
+        });
         // 새로운 이미지 삽입
         // if (inputReview.img) {
         //   for (let i in inputReview.img) {
@@ -108,10 +128,32 @@ class reviewService {
         //     }
         //   }
         // }
-        const newReviewImage=await prisma.reviewImg.findMany({select:{imgUrl:true},where:{reviewId:updatedReview.id}});
-        const ReviewComments=await prisma.reviewComment.findMany({where:{reviewId:updatedReview.id}});
-        return {id:updatedReview.id,review:updatedReview.review,star:updatedReview.star,useFlag:updatedReview.useFlag,userId:updatedReview.userId,hansicsId:updatedReview.hansicsId,
-          reviewComments:ReviewComments,reviewImgs:newReviewImage};
+        const newReviewImage=await prisma.reviewImg.findMany({
+          select:{
+            imgUrl:true
+          },
+          where:{
+            reviewId:updatedReview.id
+          }
+        });
+
+        const ReviewComments=await prisma.reviewComment.findMany({
+          where:{
+            reviewId:updatedReview.id
+          }
+        });
+
+        return {
+          id:updatedReview.id,
+          review:updatedReview.review,
+          star:updatedReview.star,
+          useFlag:updatedReview.useFlag,
+          userId:updatedReview.userId,
+          hansicsId:updatedReview.hansicsId,
+          reviewComments:ReviewComments,
+          reviewImgs:newReviewImage
+        };
+
       } else {
         return false;
       }
@@ -122,8 +164,13 @@ class reviewService {
   }
   async deleteReview(deleteReviewId: number, userInfo: number): Promise<boolean> {
     try {
-      const success = await prisma.review.delete(
-          {where : {id : Number(deleteReviewId), userId : Number(userInfo)}});
+      const success = await prisma.review.delete({
+        where : {
+          id : Number(deleteReviewId), 
+          userId : Number(userInfo)
+        }
+      });
+
       if (!success) {
         return false;
       }
