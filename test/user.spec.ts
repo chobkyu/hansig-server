@@ -216,12 +216,13 @@ describe('GET /users/userinfo ',function() {
 });
 
 /**유저 정보 수정 시 */
-describe('/patch users/info', function(){
+describe.only('/patch users/info', function(){
     describe('success',async () => {
         let testData = {
             userId:'test',
             userName:'test_Name',
-            userNickName:'giwonLee'
+            userNickName:'giwonLee',
+            locationId:1
         }
         it('201으로 응답한다', (done) => {
             request(app)

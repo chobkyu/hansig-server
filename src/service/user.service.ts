@@ -79,6 +79,7 @@ export class UserService {
     }
 
 
+
     /**닉네임 중복체크 */
     async checkNickName(userName:string) : Promise<success>{
         try{
@@ -223,35 +224,66 @@ export class UserService {
         }
     }
 
+     /**입력 값 체크 */
+     checkUpdateData(user:UpdateInfoDto){
+        if(user.userId == null || user.userName == null || user.userNickName == null ){
+            return {success:false,status:400}
+        }else if(typeof user.userId != "string" || typeof user.userName != "string" || typeof user.userNickName != "string" ||  typeof user.locationId != "number" ){
+            return {success:false,status:400}
+        }else return {success:true};
+    }
+
     /**유저 데이터 수정 */
     async updateUserInfo(userInfoDto :UpdateInfoDto) {
         try{
-            const updateUserId = userInfoDto.userData.id;
-
-            const user  = {
-                userId : userInfoDto.userId,
-                userName : userInfoDto.userName,
-                userNickName : userInfoDto.userNickName,
-                userPw : userInfoDto.userPw, //refactoring...
-                location_id : userInfoDto.locationId
-            }
+            const updateUserId :number = userInfoDto.userData.id;
 
             //업데이트는 타입 체크만 할 예정
-            // const check = this.checkData(user);
-            //if(!check.success) return {success:false,status:400};
-            
+            const check = this.checkUpdateData(userInfoDto);
+            if(!check.success) return {success:false,status:400};
 
-            const updateUser = await prisma.user.updateMany({
-                where : {
-                    id: updateUserId
-                },
-                data : {
-                    userId : userInfoDto.userId,
-                    userNickName : userInfoDto.userNickName,
-                    userName : userInfoDto.userName,
-                    location_id : userInfoDto.locationId
-                }
+                          
+            prisma.$transaction(async (tx) => {
+                const updateUser = await tx.user.updateMany({
+                    where : {
+                        id: updateUserId
+                    },
+                    data : {
+                        userId : userInfoDto.userId,
+                        userNickName : userInfoDto.userNickName,
+                        userName : userInfoDto.userName,
+                        location_id : userInfoDto.locationId
+                    }
+                });
+
+                if(userInfoDto.imgUrl != null){
+                    const getImgId = await tx.userImgs.findFirst({
+                        where : {
+                            userId : updateUserId
+                        }
+                    })
+
+                    getImgId == null ? 
+                        await tx.userImgs.create({
+                            data : {
+                                imgUrl : userInfoDto.imgUrl,
+                                useFlag : true,
+                                userId : updateUserId,
+                            }
+                        })
+                    : 
+                        await tx.userImgs.updateMany({
+                            where : {
+                                userId : updateUserId
+                            },
+                            data : {
+                                imgUrl : userInfoDto.imgUrl,
+                            }
+                        });
+                } 
             });
+
+            
 
             return {success:true,status:201};
 
