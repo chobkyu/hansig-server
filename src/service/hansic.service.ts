@@ -288,9 +288,38 @@ export class HansicService {
     }
   }
 
-  async getUserFavorite() {
+  async getUserFavorite(id : number) {
     try{
+      const favoriteList = await prisma.user.findFirst({
+        where:{
+          id:id
+        },
+        select : {
+          userId:true,
+          userNickName:true,
+          favorites : {
+            where : { useFlag:true,},
+            include :{
+              hansics : {
+                select:{
+                  name : true,
+                  addr : true,
+                  google_star :true,
+                  userStar :true,
+                  id : true,
+                  location:true,
+                  location_id:true,
+                  sicdangImgs : {
+                    select : { imgUrl :true, }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
 
+      return favoriteList;
     }catch(err){
       logger.error(err);
       return {success:false, status:500};

@@ -175,7 +175,7 @@ describe('GET /hansic/loc/:id ...', function () {
 
 
 /**즐겨찾는 한식 뷔페 조회 */
-describe('GET /hansic/star ...', function () {
+describe.only('GET /hansic/star/user ...', function () {
 
 
     describe('성공 시', () => {
@@ -183,58 +183,77 @@ describe('GET /hansic/star ...', function () {
 
         before(done => {
             request(app)
-                .get('/hansic/star')
+                .get('/hansic/star/user')
                 .set("authorization","Bearer testtoken")
                 .expect(200)
                 .end((err: any, res: any) => {
-                    body = res.body.data;
+                    body = res.body;
                     console.log(body);
                     done();
                 });
         });
 
-
-        it('성공 시 지역 별 한식 뷔페 리스트 형식 반환', async () => {
-            body.should.be.instanceOf(Array);
-        });
-        
-        /**한뷔 id */
-        it('리스트 각 요소에는 id가 포함되어야 한다.', async () => {
-            body[0].should.have.property('id');
+        it('성공 시 userId가 포함되어야 한다',async () => {
+            body.should.have.property('userId');
         });
 
-        it('리스트 각 요소에는 name이 포함되어야 한다.', async () => {
-            body[0].should.have.property('name');
+        it('userID는 string이여야 한다',async () => {
+            body.userId.should.be.instanceOf(String);
         });
 
-        it('리스트 각 요소에는 addr이 포함되어야 한다.', async () => {
-            body[0].should.have.property('addr');
+        it('성공 시 userNickName가 포함되어야 한다',async () => {
+            body.should.have.property('userNickName');
         });
 
-        it('리스트 각 요소에는 userStar가 포함되어야 한다.', async () => {
-            body[0].should.have.property('userStar');
+        it('userNickName은 string이여야 한다',async () => {
+            body.userNickName.should.be.instanceOf(String);
         });
 
-        it('리스트 각 요소에는 google_star가 포함되어야 한다.', async () => {
-            body[0].should.have.property('google_star');
+        it('성공 시 favorites가 포함되어야 한다.',async () => {
+            body.should.have.property('favorites');
         });
 
-        it('리스트 각 요소에는 location이 포함되어야 한다.', async () => {
+        it('favorite은 리스트 형식 반환', async () => {
+            body.favorites.should.be.instanceOf(Array);
+        });
+
+        it('리스트 각 요소에는 hansics가 포함되어야 한다.', async () => {
+            body.favorites[0].should.have.property('hansics');
+        });
+
+        it('hansics 리스트 각 요소에는 id가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('id');
+        });
+
+        it('hansics 리스트 각 요소에는 name이 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('name');
+        });
+
+        it('hansics 리스트 각 요소에는 addr이 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('addr');
+        });
+
+        it('hansics 리스트 각 요소에는 userStar가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('userStar');
+        });
+
+        it('hansics 리스트 각 요소에는 google_star가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('google_star');
+        });
+
+        it('hansics 리스트 각 요소에는 location이 포함되어야 한다.', async () => {
             /**location name, not location id */
-            body[0].should.have.property('location');
+            body.favorites[0].hansics.should.have.property('location');
         });
 
-        it('리스트 각 요소에는 location_id가 포함되어야 한다.', async () => {
-            body[0].should.have.property('location_id');
+        it('hansics 리스트 각 요소에는 location_id가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('location_id');
         });
 
-        it('리스트 각 요소에는 imgUrl이 포함되어야 한다.', async () => {
-            body[0].should.have.property('imgUrl');
+        it('hansics 리스트 각 요소에는 sicdangImgs가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('sicdangImgs');
         });
-
-        it('리스트 요소의 location_id는 요청 id 값과 같아야 한다',async () => {
-            body[0].location_id.should.be.equal(1);
-        });
+       
 
     });
 
