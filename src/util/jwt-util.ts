@@ -26,7 +26,7 @@ module.exports = {
     },
     verify: (token:string) => {
         let decoded = null;
-        
+
         if(token == 'testtoken') {
             console.log('test user token')
             return {success:true,decodedData:{id:137,userId:'test',userNickName:'giwon'}}  //테스트용 코드

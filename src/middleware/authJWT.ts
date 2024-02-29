@@ -5,11 +5,12 @@ const authJWT = (req:Request,res:Response,next:NextFunction) => {
     if (req.headers.authorization){
         const token = req.headers.authorization.split('Bearer ')[1];
         //const refreshToken = req.headers.refreshToken.split('Bearer ')[1];
-        const result = verify(token);
+        //console.log(token)
 
+        const result = verify(token);
         //console.log(result)
         if(result.success){
-            //console.log(result.decodedData)
+            console.log(result.decodedData)
             const userData = {
                 id : result.decodedData.id,
                 userId : result.decodedData.userId,

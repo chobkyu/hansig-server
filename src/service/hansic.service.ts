@@ -288,6 +288,51 @@ export class HansicService {
     }
   }
 
+  async getUserFavorite(id : number) {
+    try{
+      const favoriteList = await prisma.user.findFirst({
+        where:{
+          id:id
+        },
+        select : {
+          userId:true,
+          userNickName:true,
+          favorites : {
+            where : { useFlag:true,},
+            include :{
+              hansics : {
+                select:{
+                  name : true,
+                  addr : true,
+                  google_star :true,
+                  userStar :true,
+                  id : true,
+                  location:true,
+                  location_id:true,
+                  sicdangImgs : {
+                    select : { imgUrl :true, }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      return favoriteList;
+    }catch(err){
+      logger.error(err);
+      return {success:false, status:500};
+    }
+  }
+
+
+  /**
+   * 즐겨찾기 추가
+   * @param hansicId 즐겨찾는 한식 식당 아이디
+   * @param body 유저 정보 
+   * @returns {success:boolean,status:number}
+   */
   async favorite(hansicId: number, body: favoriteDto) {
     try {
       console.log(body.userData.id);

@@ -216,7 +216,7 @@ describe('GET /users/userinfo ',function() {
 });
 
 /**유저 정보 수정 시 */
-describe.only('/patch users/info', function(){
+describe('/patch users/info', function(){
     describe('success',async () => {
         let testData = {
             userId:'test',
