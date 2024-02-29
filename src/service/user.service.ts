@@ -13,7 +13,15 @@ const {generateUploadURL} = require('../util/s3');
 
 
 export class UserService {
-    /**회원 가입 */
+    /**회원가입
+     * @param body : user
+     * @returns 
+     * {
+            success: boolean;
+            status: number;
+            token: any;
+        }
+     */
     async insertUser(body:user){
         const user:user = body;
         console.log(body)
