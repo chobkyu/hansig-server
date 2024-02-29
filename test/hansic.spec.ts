@@ -174,6 +174,84 @@ describe('GET /hansic/loc/:id ...', function () {
 });
 
 
+/**즐겨찾는 한식 뷔페 조회 */
+describe('GET /hansic/star ...', function () {
+
+
+    describe('성공 시', () => {
+        let body: any;
+
+        before(done => {
+            request(app)
+                .get('/hansic/star')
+                .set("authorization","Bearer testtoken")
+                .expect(200)
+                .end((err: any, res: any) => {
+                    body = res.body.data;
+                    console.log(body);
+                    done();
+                });
+        });
+
+
+        it('성공 시 지역 별 한식 뷔페 리스트 형식 반환', async () => {
+            body.should.be.instanceOf(Array);
+        });
+        
+        /**한뷔 id */
+        it('리스트 각 요소에는 id가 포함되어야 한다.', async () => {
+            body[0].should.have.property('id');
+        });
+
+        it('리스트 각 요소에는 name이 포함되어야 한다.', async () => {
+            body[0].should.have.property('name');
+        });
+
+        it('리스트 각 요소에는 addr이 포함되어야 한다.', async () => {
+            body[0].should.have.property('addr');
+        });
+
+        it('리스트 각 요소에는 userStar가 포함되어야 한다.', async () => {
+            body[0].should.have.property('userStar');
+        });
+
+        it('리스트 각 요소에는 google_star가 포함되어야 한다.', async () => {
+            body[0].should.have.property('google_star');
+        });
+
+        it('리스트 각 요소에는 location이 포함되어야 한다.', async () => {
+            /**location name, not location id */
+            body[0].should.have.property('location');
+        });
+
+        it('리스트 각 요소에는 location_id가 포함되어야 한다.', async () => {
+            body[0].should.have.property('location_id');
+        });
+
+        it('리스트 각 요소에는 imgUrl이 포함되어야 한다.', async () => {
+            body[0].should.have.property('imgUrl');
+        });
+
+        it('리스트 요소의 location_id는 요청 id 값과 같아야 한다',async () => {
+            body[0].location_id.should.be.equal(1);
+        });
+
+    });
+
+    describe('실패 시 ', async () => {
+        it('로그인이 안되어 있을 시 401 리턴', async () => {
+            request(app)
+                .get(encodeURIComponent('/hansic/star'))
+                .expect(401)
+                .end(async (err: any, res: any) => {
+                    console.log(res.body);
+                });
+        });
+    });
+});
+
+
+
 describe('GET /hansic/:id ...', function () {
     describe('성공 시', async () => {
         let body : any;
