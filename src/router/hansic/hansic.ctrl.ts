@@ -116,6 +116,7 @@ const output = {
     }
   },
 
+  //유저 별 즐겨찾는 한뷔 조회
   favorite : async (req: Request, res: Response) => {
     try{
       const response = await hansicService.getUserFavorite(req.body.userData.id);
