@@ -288,6 +288,11 @@ export class HansicService {
     }
   }
 
+  /**
+   * 유저 별 한뷔 즐겨찾는 목록 조회
+   * @param id 유저 아이디
+   * @returns //테스트 코드 참조
+   */
   async getUserFavorite(id : number) {
     try{
       const favoriteList = await prisma.user.findFirst({
