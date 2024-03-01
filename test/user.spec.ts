@@ -221,7 +221,8 @@ describe('/patch users/info', function(){
         let testData = {
             userId:'test',
             userName:'test_Name',
-            userNickName:'giwonLee'
+            userNickName:'giwonLee',
+            locationId:1
         }
         it('201으로 응답한다', (done) => {
             request(app)

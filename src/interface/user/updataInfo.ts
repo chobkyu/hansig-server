@@ -4,5 +4,6 @@ export interface UpdateInfoDto {
     userNickName? :string,
     userPw?:string,
     locationId?:number,
-    userData: any
+    imgUrl?:string,
+    userData: any,
 }

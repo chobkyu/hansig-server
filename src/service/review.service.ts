@@ -17,6 +17,7 @@ class reviewService {
           {where : {id : Number(restaurantId)}});
       if (restaurant) {
         return true;
+
       } else {
         return false;
       }
@@ -246,6 +247,7 @@ userinfo는 유저id,reviewinfo역시 review의 id.
     try {
        const success = await prisma.review.update(
           {data:{useFlag:false},where : {id : deleteReviewId, userId : userInfo}});
+
       if (!success) {
         return{success:false};
       }

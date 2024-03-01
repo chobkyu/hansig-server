@@ -80,6 +80,7 @@ const process = {
     login : async(req:Request,res:Response) => {
         try{
             const response = await userService.login(req.body);
+            console.log(response);
             if(response.success) return res.json(response);
             else return res.status(response.status).end();
 

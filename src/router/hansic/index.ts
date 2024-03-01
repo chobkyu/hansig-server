@@ -18,6 +18,7 @@ router.get('/all',ctrl.output.getAll);
 router.get('/loc/:id',ctrl.output.getFromLocation);
 router.get('/get/geo',ctrl.output.tryGeo);
 router.get('/:id',softAuthJWT,ctrl.output.get);
+router.get('/star/user',authJWT,ctrl.output.favorite);
 
 router.post('/star/:id',authJWT,ctrl.process.favorite);
 // router.post('/:id',ctrl.process.create);

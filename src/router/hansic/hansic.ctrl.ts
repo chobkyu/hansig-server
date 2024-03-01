@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import express, { Express, Request, Response } from 'express';
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
 const hansicServiceClass = require('../../service/hansic.service');
 const hansicService = new hansicServiceClass();
 const logger = require('../../util/winston');
@@ -109,6 +109,18 @@ const output = {
         return res.status(404).end();
       }
     } catch (err) {
+      logger.error(err);
+      return res.status(500).end();
+    }
+  },
+
+  //유저 별 즐겨찾는 한뷔 조회
+  favorite : async (req: Request, res: Response) => {
+    try{
+      const response = await hansicService.getUserFavorite(req.body.userData.id);
+
+      return res.json(response).end();
+    }catch(err){
       logger.error(err);
       return res.status(500).end();
     }
