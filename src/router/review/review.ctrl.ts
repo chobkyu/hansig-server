@@ -13,18 +13,27 @@ const output={
     async getReview (req:Request,res:Response):Promise<any>
     {
         try{
-        const review=await reviewService.getReview(Number(req.params.id));
-        if(review)//검색결과가 있으면
+        const reviewId=Number(req.params.id);
+        if(reviewId){
+        const review=await reviewService.getReview(reviewId);
+        if(review.success)//검색결과가 있으면
         {
-            return res.json({data:review});
+            return res.json({data:review.review});
         }
         else
         {
             return res.status(404).end();
-        }}
+        }
+        }
+        else
+        {
+            return res.status(400).end();
+        }
+       }
         catch(err)
         {
             logger.error(err);
+            return res.status(500).end();
         }
     },
     //식당id로 리뷰리스트 얻어오기
@@ -33,9 +42,9 @@ const output={
         try{
         const reviewList=await reviewService.getReviewList(Number(req.params.id));
         //검색결과가 있으면
-        if(reviewList)
+        if(reviewList.success)
         {
-            return res.json(reviewList);
+            return res.json(reviewList.reviewList);
         }
         else {
             return res.status(204).end();
@@ -43,6 +52,7 @@ const output={
         catch(err)
         {
             logger.error(err);
+            return res.status(500).end();
         }
     }
 }
@@ -52,9 +62,16 @@ const process =
     {
         try{
         const userInfo=req.body.userData;
-        const reviewId=req.params.id;
-        const isSuccess=await reviewService.writeReview(req.body,userInfo.id,reviewId);
-        if(isSuccess)//작성성공시
+        const restaurantId=req.params.id;
+        //리뷰를 쓸 한식당이 있는지 확인
+        const checkRestaurant=await reviewService.checkRestaurant(restaurantId);
+        if(checkRestaurant){
+        //데이터 양식이 맞는지 확인
+        const checkDTO=reviewService.checkReviewDTO(req.body);
+        if(checkDTO){
+        //리뷰 작성
+        const isSuccess=await reviewService.writeReview(req.body,userInfo.id,restaurantId);
+        if(isSuccess.success)//작성성공시
         {
             return res.status(201).end();
         }
@@ -62,9 +79,21 @@ const process =
         {
             return res.status(404).end();
         }}
+        else
+        {
+            return res.status(400).end();
+        }
+    }
+    else
+    {
+        return res.status(404).end();
+    }
+
+    }
         catch(err)
         {
             logger.error(err);
+            return res.status(500).end();
         }
     },
     async updateReview (req:Request,res:Response):Promise<any>
@@ -72,27 +101,36 @@ const process =
         try{
         const userInfo=req.body.userData;
         const reviewId=req.params.id;
-        const updatedReview=await reviewService.updateReview(req.body,userInfo.id,reviewId);
-        if(updatedReview)//update성공시
+        if(userInfo && Number(reviewId)){
+        const updatedReview=await reviewService.updateReview(req.body,userInfo.id,Number(reviewId));
+        if(updatedReview.success)//update성공시
         {
-            updatedReview.user={};
-            updatedReview.user.id=userInfo.id;
-            updatedReview.user.userNickName=userInfo.userNickName;
-            return res.json(updatedReview);
+            return res.json(updatedReview).end();
+        }
+        else
+        {
+            if(updatedReview.status)
+            {
+                return res.status(updatedReview.status).end();
+            }
+            return res.status(500).end();
+        }
         }
         else
         {
             return res.status(400).end();
-        }}catch(err)
+        }
+    }catch(err)
         {
             logger.error(err);
+            return res.status(500).end();
         }
     },
     async deleteReview (req:Request,res:Response):Promise<any>
     {
         try{
         const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
-        if(isSuccess)//삭제성공시
+        if(isSuccess.success)//삭제성공시
         {
             return res.status(204).end();
         }
@@ -102,6 +140,7 @@ const process =
         }}catch(err)
         {
             logger.error(err);
+            return res.status(500).end();
         }
     }
 }
