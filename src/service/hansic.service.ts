@@ -35,14 +35,14 @@ export class HansicService {
           hs.id,
           hs.name,
           hs.addr,
-          hs."userStar",
           hs.google_star,
           hs.location_id,
           hs.lat,
           hs.lng,
           ls.location,
           si."imgUrl",
-          rd.count
+          rd.count,
+          rd."userStar"
         FROM hansics as hs 
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
@@ -51,7 +51,8 @@ export class HansicService {
         LEFT JOIN (
           SELECT 
             rv."hansicsId",
-            COUNT(*) as count 
+            COUNT(*) as count,
+            AVG(star) as "userStar" 
           FROM hansic.review as rv 
           GROUP BY rv."hansicsId"
         ) as rd
@@ -92,32 +93,33 @@ export class HansicService {
     try {
       let favorite;
       const data = await prisma.$queryRaw<any[]>`
-        SELECT 
-          hs.id,
-          hs.name,
-          hs.addr,
-          hs."userStar",
-          hs.google_star,
-          hs.location_id,
-          hs.lat,
-          hs.lng,
-          ls.location,
-          si."imgUrl",
-          rd.count
-        FROM hansics as hs 
-        INNER JOIN location as ls 
-        on hs.location_id=ls.id 
-        LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId"
-        LEFT JOIN (
-          SELECT 
-            rv."hansicsId",
-            COUNT(*) as count 
-          FROM hansic.review as rv 
-          GROUP BY rv."hansicsId"
-        ) as rd
-        on hs.id=rd."hansicsId"
-        WHERE hs.id=${restaurantId}
+      SELECT
+      hs.id,
+      hs.name,
+      hs.addr,
+      hs.google_star,
+      hs.location_id,
+      hs.lat,
+      hs.lng,
+      ls.location,
+      si."imgUrl",
+  rd.count,
+  rd."userStar"
+    FROM hansic.hansics as hs 
+    INNER JOIN hansic.location as ls 
+    on hs.location_id=ls.id 
+    LEFT JOIN hansic."sicdangImg" as si 
+    on hs.id=si."hansicsId" 
+LEFT JOIN (
+      SELECT 
+        rv."hansicsId",
+        COUNT(*) as count,
+  AVG(star) as "userStar"
+      FROM hansic.review as rv 
+      GROUP BY rv."hansicsId"
+    ) as rd on hs.id=rd."hansicsId"
+    where lat != 0 AND hs.id=${restaurantId}
+    ORDER BY hs.id ASC
       `;
       // user정보가 넘어왔을시 favorite확인
       if (userId) {

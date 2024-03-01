@@ -173,7 +173,7 @@ describe('GET /hansic/loc/:id ...', function () {
 });
 
 
-describe('GET /hansic/:id ...', function () {
+describe.only('GET /hansic/:id ...', function () {
     describe('성공 시', async () => {
         let body : any;
         before(done => {
@@ -254,7 +254,7 @@ describe('GET /hansic/:id ...', function () {
 });
 
 //좌표검색 기능 테스트
-describe('GET /hansic/place?lat=N&lng=E ...', function () {
+describe.only('GET /hansic/place?lat=N&lng=E ...', function () {
     describe('성공 시', async () => {
         let body : any;
         before(done => {
