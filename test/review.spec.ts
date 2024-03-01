@@ -528,13 +528,21 @@ describe('delete reivew/:id',() => {
                 .end(done);
         });
 
-        it('리뷰 작성자가 아닐 시 401로 응답한다.',(done) => {
+        it('리뷰 작성자가 아닐 시 403로 응답한다.',(done) => {
             request(app)
-                .delete('/review/1')
+                .delete('/review/3')
                 .set("authorization","Bearer ownertoken")
-                .expect(401)
+                .expect(403)
                 .end(done);
         });
     })
+    after(done=>
+        {
+            request(app)
+            .delete('/review/-3')
+            .set("authorization","Bearer testtoken")
+            .expect(204)
+            .end(done);
+        })
 })
 

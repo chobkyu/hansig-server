@@ -245,15 +245,37 @@ userinfo는 유저id,reviewinfo역시 review의 id.
   async deleteReview(deleteReviewId: number,
                      userInfo: number): Promise<any> {
     try {
-       const success = await prisma.review.update(
+      let success;
+      //테스트인 경우, 복원허용
+      if(deleteReviewId<0 &&process.env.NODE_ENV==='test')
+      {
+        success = await prisma.review.update(
+          {data:{useFlag:true},where : {id : -deleteReviewId, userId : userInfo}});
+      }
+      else{
+        //작성자 확인
+        let res=await prisma.review.findUnique({where:{id:deleteReviewId,useFlag:true}});
+      if(!res)
+      {
+        return {success:false,status:404};
+      }
+      if(userInfo!==res?.userId)
+      {
+        return {success:false,status:403};
+      }
+       success = await prisma.review.update(
           {data:{useFlag:false},where : {id : deleteReviewId, userId : userInfo}});
-
+       }
       if (!success) {
         return{success:false};
       }
       return {success:true};
-    } catch (err) {
+    } catch (err:any) {
       logger.error(err);
+      if(err.status)
+      {
+          return {success:false,status:err.status}
+      }
       return {success:false};
     }
   }
