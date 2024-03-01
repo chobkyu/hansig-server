@@ -129,17 +129,25 @@ const process =
     async deleteReview (req:Request,res:Response):Promise<any>
     {
         try{
-        const isSuccess=await reviewService.deleteReview(req.params.id,req.body.userData.id);
+        const isSuccess=await reviewService.deleteReview(Number(req.params.id),req.body.userData.id);
         if(isSuccess.success)//삭제성공시
         {
             return res.status(204).end();
         }
         else
         {
+            if(isSuccess.status)
+            {
+                return res.status(isSuccess.status).end();
+            }
             return res.status(404).end();
-        }}catch(err)
+        }}catch(err:any)
         {
             logger.error(err);
+            if(err.status)
+            {
+                return res.status(err.status).end();
+            }
             return res.status(500).end();
         }
     }
