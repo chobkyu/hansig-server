@@ -307,6 +307,8 @@ LEFT JOIN (
                   google_star :true,
                   userStar :true,
                   id : true,
+                  lat : true,
+                  lng : true,
                   location:true,
                   location_id:true,
                   sicdangImgs : {

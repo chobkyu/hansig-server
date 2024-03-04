@@ -164,7 +164,115 @@ describe('GET /hansic/loc/:id ...', function () {
                 .get('/hansic/loc/5000')
                 .expect(404)
                 .end(async (err: any, res: any) => {
+
+                    console.log(res.body);
+                });
+        });
+    });
+});
+
+
+/**즐겨찾는 한식 뷔페 조회 */
+describe.only('GET /hansic/star/user ...', function () {
+
+
+    describe('성공 시', () => {
+        let body: any;
+
+        before(done => {
+            request(app)
+                .get('/hansic/star/user')
+                .set("authorization","Bearer testtoken")
+                .expect(200)
+                .end((err: any, res: any) => {
+                    body = res.body;
+                    console.log(body);
+                    done();
+                });
+        });
+
+        it('성공 시 userId가 포함되어야 한다',async () => {
+            body.should.have.property('userId');
+        });
+
+        it('userID는 string이여야 한다',async () => {
+            body.userId.should.be.instanceOf(String);
+        });
+
+        it('성공 시 userNickName가 포함되어야 한다',async () => {
+            body.should.have.property('userNickName');
+        });
+
+        it('userNickName은 string이여야 한다',async () => {
+            body.userNickName.should.be.instanceOf(String);
+        });
+
+        it('성공 시 favorites가 포함되어야 한다.',async () => {
+            body.should.have.property('favorites');
+        });
+
+        it('favorite은 리스트 형식 반환', async () => {
+            body.favorites.should.be.instanceOf(Array);
+        });
+
+        it('리스트 각 요소에는 hansics가 포함되어야 한다.', async () => {
+            body.favorites[0].should.have.property('hansics');
+        });
+
+        it('hansics 리스트 각 요소에는 id가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('id');
+        });
+
+        it('hansics 리스트 각 요소에는 name이 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('name');
+        });
+
+        it('hansics 리스트 각 요소에는 addr이 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('addr');
+        });
+
+        it('hansics 리스트 각 요소에는 userStar가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('userStar');
+        });
+
+        it('hansics 리스트 각 요소에는 google_star가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('google_star');
+        });
+
+        it('hansics 리스트 각 요소에는 lat가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('lat');
+        });
+
+        it('hansics 리스트 각 요소에는 lng가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('lng');
+        });
+
+        it('hansics 리스트 각 요소에는 location이 포함되어야 한다.', async () => {
+            /**location name, not location id */
+            body.favorites[0].hansics.should.have.property('location');
+        });
+
+        it('hansics 리스트 각 요소에는 location_id가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('location_id');
+        });
+
+        it('hansics 리스트 각 요소에는 sicdangImgs가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('sicdangImgs');
+        });
+       
+
+    });
+
+    describe('실패 시 ', async () => {
+        it('로그인이 안되어 있을 시 401 리턴', async () => {
+            request(app)
+                .get(encodeURIComponent('/hansic/star'))
+                .expect(401)
+                .end(async (err: any, res: any) => {
+                    console.log(res.body);
+
                     //console.log(res.body);
+
                 });
         });
     });
