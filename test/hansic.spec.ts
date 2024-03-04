@@ -241,6 +241,14 @@ describe.only('GET /hansic/star/user ...', function () {
             body.favorites[0].hansics.should.have.property('google_star');
         });
 
+        it('hansics 리스트 각 요소에는 lat가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('lat');
+        });
+
+        it('hansics 리스트 각 요소에는 lng가 포함되어야 한다.', async () => {
+            body.favorites[0].hansics.should.have.property('lng');
+        });
+
         it('hansics 리스트 각 요소에는 location이 포함되어야 한다.', async () => {
             /**location name, not location id */
             body.favorites[0].hansics.should.have.property('location');
