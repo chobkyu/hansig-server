@@ -2,6 +2,7 @@ import {PrismaClient, review} from "@prisma/client";
 import {Logger} from "winston";
 import { ReviewUpdate } from "../interface/review/reviewUpdate";
 import {Review} from "../interface/review/review";
+import { ReviewComment } from "../interface/review/reviewComment";
 import {success} from "../interface/success";
 import {user} from "../interface/user/user";
 
@@ -242,19 +243,19 @@ userinfo는 유저id,reviewinfo역시 review의 id.
     }
   }
   //soft delete
-  async deleteReview(deleteReviewId: number,
+  async deleteReview(deleteReplyId: number,
                      userInfo: number): Promise<any> {
     try {
       let success;
       //테스트인 경우, 복원허용
-      if(deleteReviewId<0 &&process.env.NODE_ENV==='test')
+      if(deleteReplyId<0 &&process.env.NODE_ENV==='test')
       {
         success = await prisma.review.update(
-          {data:{useFlag:true},where : {id : -deleteReviewId, userId : userInfo}});
+          {data:{useFlag:true},where : {id : -deleteReplyId, userId : userInfo}});
       }
       else{
         //작성자 확인
-        let res=await prisma.review.findUnique({where:{id:deleteReviewId,useFlag:true}});
+        let res=await prisma.review.findUnique({where:{id:deleteReplyId,useFlag:true}});
       if(!res)
       {
         return {success:false,status:404};
@@ -264,7 +265,7 @@ userinfo는 유저id,reviewinfo역시 review의 id.
         return {success:false,status:403};
       }
        success = await prisma.review.update(
-          {data:{useFlag:false},where : {id : deleteReviewId, userId : userInfo}});
+          {data:{useFlag:false},where : {id : deleteReplyId, userId : userInfo}});
        }
       if (!success) {
         return{success:false};
@@ -279,5 +280,161 @@ userinfo는 유저id,reviewinfo역시 review의 id.
       return {success:false};
     }
   }
+  async writeReviewComment(inputReview: ReviewComment, userInfo: Number,
+    restaurantInfo: Number): Promise<any> {
+try {
+let success;
+//img가 있는지 확인
+if(inputReview.img){
+success=await prisma.$transaction(async(tx)=>
+{
+const create=await tx.reviewComment.create({
+data : {
+comment : inputReview.review,
+hansicsId : Number(restaurantInfo),
+userId : Number(userInfo),
+useFlag : true
+}
+});
+const imgData:any=inputReview.img?.map(imgUrl => ({
+imgUrl,
+reviewId:create.id,
+}));
+if(imgData){
+const image=await tx.reviewImg.createMany({data:imgData});
+}
+});
+}
+else
+{
+success = await prisma.review.create({
+data : {
+review : inputReview.review,
+star : Number(inputReview.star),
+hansicsId : Number(restaurantInfo),
+userId : Number(userInfo),
+useFlag : true
+}
+});
+}
+
+if (!success) {
+return {success:false};
+} 
+return {success:true};
+} catch (err) {
+logger.error(err);
+return {success:false};
+}
+}
+/*
+interface ReviewUpdate {
+review : string,
+star : number,
+insertImg? : Array<string>,
+deleteImg?:Array<number>,
+}insertImg는 업로드할 imgurl,deleteimg는 삭제할 reviewimg의 id의 array
+userinfo는 유저id,reviewinfo역시 review의 id.
+*/
+async updateReviewComment(inputReview: ReviewUpdate, userInfo: number,
+     reviewInfo: number): Promise<any> {
+try {
+let updatedReview:any,insertImg:any,deleteImg:any;
+updatedReview=undefined;
+//review가 있는지 체크
+const review =
+await prisma.review.findUnique({where : {id : reviewInfo,useFlag:true}});
+//원저작자인지 확인
+const user=await prisma.user.findUnique({select:{id:true,userNickName:true},where : {id : userInfo}});
+if (review?.userId === userInfo) {
+if(inputReview.insertImg)//삽입할 이미지가 있는지 확인
+{//img array를 분리대입.
+insertImg=inputReview.insertImg?.map(imgUrl => ({
+imgUrl,
+reviewId:reviewInfo
+}));
+}//삭제할 img확인
+if(inputReview.deleteImg)
+{//삭제할 img id를 분리
+deleteImg=inputReview.deleteImg?.map(id => ({
+id
+}));
+}
+//트랜잭션
+await prisma.$transaction(async (tx)=>{       
+updatedReview = await tx.review.update({
+data : {review : inputReview.review, star : inputReview.star},
+where : {id : reviewInfo}
+});
+if(insertImg){
+await tx.reviewImg.createMany({data:insertImg});
+}
+if(deleteImg)
+{
+await tx.reviewImg.deleteMany({where:{id:deleteImg.id}});
+}
+});
+if(updatedReview){
+//수정후 이미지
+const newReviewImage = await prisma.reviewImg.findMany(
+{select : {imgUrl : true}, where : {reviewId : reviewInfo}});
+//리뷰 코멘트
+const ReviewComments = await prisma.reviewComment.findMany(
+{where : {reviewId : reviewInfo}});
+return {
+success:true,
+id : updatedReview.id,
+review : updatedReview.review,
+star : updatedReview.star,
+useFlag : updatedReview.useFlag,
+userId : updatedReview.userId,
+hansicsId : updatedReview.hansicsId,
+reviewComments : ReviewComments,
+reviewImgs : newReviewImage,
+user:user
+};
+}
+else//updatedReview가 실패한경우.
+{
+return {success:false};
+}
+} else {//작성자가 아닌경우
+return {success:false,status:403};
+}
+} catch (err) {
+logger.error(err);
+return {success:false,status:500};
+}
+}
+//soft delete
+async deleteReviewComment(deleteReplyId: number,
+     userInfo: number): Promise<any> {
+try {
+let success;
+//작성자 확인
+let res=await prisma.review.findUnique({where:{id:deleteReplyId,useFlag:true}});
+if(!res)
+{
+return {success:false,status:404};
+}
+if(userInfo!==res?.userId)
+{
+return {success:false,status:403};
+}
+success = await prisma.reviewComment.update(
+{where : {id : deleteReplyId, userId : userInfo}});
+}
+if (!success) {
+return{success:false};
+}
+return {success:true};
+} catch (err:any) {
+logger.error(err);
+if(err.status)
+{
+return {success:false,status:err.status}
+}
+return {success:false};
+}
 }
 module.exports = reviewService
