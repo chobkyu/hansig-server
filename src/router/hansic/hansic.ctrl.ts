@@ -54,7 +54,7 @@ const output = {
   getFromLocation: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      console.log(id);
+
       //로그인되어있는지 확인
       if (isNaN(id)) {
         return res.status(400).end();
@@ -81,7 +81,6 @@ const output = {
   //주소 -> 좌표 변환
   tryGeo: async (req: Request, res: Response) => {
     try {
-      console.log('ctrl');
       const response = await hansicService.convert();
       return res.json(response).end();
     } catch (err) {
@@ -101,7 +100,6 @@ const output = {
         userId = req.body.userData.id;
       }
 
-      console.log(userId);
       const response = await hansicService.getByPlace(Number(lat), Number(lng), userId);
       //유효한 검색 결과가 있는지 확인
       if (response) {
@@ -164,7 +162,6 @@ const process = {
       }
 
       const response = await hansicService.favorite(id, req.body);
-      console.log(response);
 
       return res.status(response.status).end();
 

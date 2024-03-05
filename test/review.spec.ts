@@ -102,6 +102,7 @@ describe('patch /review/update/:id',function () {
                 .send(testData)
                 .end((err:any,res:any) => {
                     body = res.body;
+                    console.log(body);
                     done();
                 });
         });
@@ -211,7 +212,7 @@ describe('patch /review/update/:id',function () {
                 .end(done);
         });
 
-        it('리뷰 작성자가 아닐 시 401로 응답',(done) => {
+        it('리뷰 작성자가 아닐 시 403로 응답',(done) => {
             let testData : Review = {
                 review : '맛있어요',
                 star : 2,
@@ -221,7 +222,7 @@ describe('patch /review/update/:id',function () {
                 .post('/review/1804')
                 .set("authorization","Bearer ownertoken")
                 .send(testData)
-                .expect(401)
+                .expect(403)
                 .end(done);
         });
 
@@ -511,7 +512,7 @@ describe('delete reivew/:id',() => {
     describe('success', () => {
         it('204로 응답',(done) => {
             request(app)
-                .delete('/review/67')
+                .delete('/review/3')
                 .set("authorization","Bearer testtoken")
                 .expect(204)
                 .end(done);
@@ -527,13 +528,21 @@ describe('delete reivew/:id',() => {
                 .end(done);
         });
 
-        it('리뷰 작성자가 아닐 시 401로 응답한다.',(done) => {
+        it('리뷰 작성자가 아닐 시 403로 응답한다.',(done) => {
             request(app)
-                .delete('/review/1')
+                .delete('/review/3')
                 .set("authorization","Bearer ownertoken")
-                .expect(401)
+                .expect(403)
                 .end(done);
         });
     })
+    after(done=>
+        {
+            request(app)
+            .delete('/review/-3')
+            .set("authorization","Bearer testtoken")
+            .expect(204)
+            .end(done);
+        })
 })
 

@@ -23,6 +23,7 @@ const output = {
         }
         catch (err) {
             logger.error(err);
+            return res.status(500).end();
         }
     },
     //식당id로 리뷰리스트 얻어오기
@@ -39,6 +40,7 @@ const output = {
         }
         catch (err) {
             logger.error(err);
+            return res.status(500).end();
         }
     }
 }
@@ -59,6 +61,7 @@ const process =
         }
         catch (err) {
             logger.error(err);
+            return res.status(500).end();
         }
     },
     async updateReview(req: Request, res: Response): Promise<any> {
@@ -78,6 +81,7 @@ const process =
             }
         } catch (err) {
             logger.error(err);
+            return res.status(500).end();
         }
     },
     async deleteReview(req: Request, res: Response): Promise<any> {
@@ -90,8 +94,13 @@ const process =
             else {
                 return res.status(404).end();
             }
-        } catch (err) {
+        } catch (err:any) {
             logger.error(err);
+            if(err.status)
+            {
+                return res.status(err.status).end();
+            }
+            return res.status(500).end();
         }
     }
 }
