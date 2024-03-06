@@ -1,4 +1,4 @@
-const aws = require('aws-sdk');
+import aws from 'aws-sdk';
 const crypto1 = require('crypto');
 const { promisify } = require('util')
 const randomBytes = promisify(crypto1.randomBytes)

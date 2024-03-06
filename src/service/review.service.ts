@@ -117,6 +117,7 @@ class reviewService {
   async writeReview(inputReview: Review, userInfo: Number,
                     restaurantInfo: Number): Promise<any> {
     try {
+      console.log(Number(inputReview.star));
       let success;
       //img가 있는지 확인
       if(inputReview.img){
