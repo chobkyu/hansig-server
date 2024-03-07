@@ -119,6 +119,107 @@ const process =
             }
             return res.status(500).end();
         }
+    },
+    async reviewCommentWrite (req:Request,res:Response):Promise<any>
+    {
+        try{
+        const userInfo=req.body.userData;
+        const reviewId=Number(req.params.id);
+        //리뷰가 있는지 확인
+        const checkReview=await reviewService.checkReview(reviewId);
+        if(checkReview){
+        //데이터 양식이 맞는지 확인
+        const checkDTO=reviewService.checkReviewCommentDTO(req.body);
+        if(checkDTO){
+        //댓글 작성
+        const isSuccess=await reviewService.reviewCommentWrite(req.body,userInfo.id,reviewId);
+        if(isSuccess.success)//작성성공시
+        {
+            return res.status(201).end();
+        }
+        else
+        {
+            return res.status(404).end();
+        }}
+        else
+        {
+            return res.status(400).end();
+        }
+    }
+    else
+    {
+        return res.status(404).end();
+    }
+
+    }
+        catch(err)
+        {
+            logger.error(err);
+            return res.status(500).end();
+        }
+    },
+    async reviewCommentUpdate (req:Request,res:Response):Promise<any>
+    {
+        try{
+            const userInfo=req.body.userData;
+            const reviewId=Number(req.params.id);
+            //댓글이 있는지 확인
+            const checkReview=await reviewService.checkReviewComment(reviewId);
+            if(checkReview){
+            //데이터 양식이 맞는지 확인
+            const checkDTO=reviewService.checkReviewCommentDTO(req.body);
+            if(checkDTO){
+            //댓글 수정
+            const isSuccess=await reviewService.reviewCommentUpdate(req.body,userInfo.id,reviewId);
+            if(isSuccess.success)//작성성공시
+            {
+                return res.status(201).end();
+            }
+            else
+            {
+                return res.status(404).end();
+            }}
+            else
+            {
+                return res.status(400).end();
+            }
+        }
+        else
+        {
+            return res.status(404).end();
+        }
+    
+        }
+            catch(err)
+            {
+                logger.error(err);
+                return res.status(500).end();
+            }
+    },
+    async reviewCommentDelete (req:Request,res:Response):Promise<any>
+    {
+        try{
+        const isSuccess=await reviewService.reviewCommentDelete(Number(req.params.id),req.body.userData.id);
+        if(isSuccess.success)//삭제성공시
+        {
+            return res.status(204).end();
+        }
+        else
+        {
+            if(isSuccess.status)
+            {
+                return res.status(isSuccess.status).end();
+            }
+            return res.status(404).end();
+        }}catch(err:any)
+        {
+            logger.error(err);
+            if(err.status)
+            {
+                return res.status(err.status).end();
+            }
+            return res.status(500).end();
+        }
     }
 }
 module.exports = {
