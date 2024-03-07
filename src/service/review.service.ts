@@ -8,7 +8,9 @@ import {user} from "../interface/user/user";
 import {UserService} from "./user.service";
 
 const logger = new Logger();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 class reviewService {
   // 해당 id의 한식당이 있는지 check
   async checkRestaurant(restaurantId: number): Promise<boolean> {
@@ -54,6 +56,7 @@ class reviewService {
   // 리턴받는다
   async getReview(id: number): Promise<any> {
     try {
+      prisma.$on
       const review = await prisma.review.findUnique({
         select : {
           id : true,
@@ -76,7 +79,7 @@ class reviewService {
     } catch (err) {
       logger.error(err);
       return {success:false};
-    }
+    } 
   }
   // 한식당의 id로 해당식당의 리뷰들과 각 리뷰들의
   // 유저정보,(user.id,user.userNickName)
@@ -105,6 +108,37 @@ class reviewService {
     } catch (err) {
       logger.error(err);
       return {success:false};
+    }
+  }
+
+  async getUserReviewList(id : number) {
+    try{
+      //console.log(id);
+      const reviewList = await prisma.review.findMany({
+        where : {
+          useFlag : true,
+          userId : id,
+        },
+        select : {
+          id :true,
+          review : true,
+          star: true,
+          hansics : {select :{id:true, name :true}},
+          reviewImgs : {select : {imgUrl:true}}
+        },
+        
+        
+      });
+
+      if(reviewList.length == 0) {
+        return {success:true,status:204,reviewList};
+      }
+
+      return {success:true, status:200, reviewList};
+
+    }catch(err){
+      logger.error(err);
+      return {success:false,status:500};
     }
   }
   // 리뷰작성

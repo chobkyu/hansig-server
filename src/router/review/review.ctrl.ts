@@ -42,6 +42,23 @@ const output = {
             logger.error(err);
             return res.status(500).end();
         }
+    },
+
+    //유저 별 리스트 조회
+    async userList(req:Request, res:Response) {
+        try{
+            const id = req.body.userData.id;
+            const response = await reviewService.getUserReviewList(id);
+
+            if(!response.success) {
+                return res.status(response.status).end();
+            }
+
+            return res.json(response.reviewList);
+        }catch(err){
+            logger.error(err);
+            return res.status(500).end();
+        }
     }
 }
 const process =

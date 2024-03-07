@@ -383,6 +383,14 @@ LEFT JOIN (
       return {success : false, status : 500};
     }
   }
+
+  async sibal (){
+    try{
+      
+    }catch(err){
+      
+    }
+  }
 }
 
 module.exports = HansicService

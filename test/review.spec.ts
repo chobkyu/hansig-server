@@ -377,7 +377,7 @@ describe('get /review/list/:id',() => {
 });
 
 /**유저 별 리뷰 리스트 조회*/
-describe('get /review/user/list',() => {
+describe.only('get /review/user/list',() => {
     describe('성공 시',() => {
         let body:any;
         before(done => {
@@ -387,6 +387,7 @@ describe('get /review/user/list',() => {
             .expect(200)
             .end((err:any,res:any) => {
                 body = res.body;
+                console.log(body);
                 done();
             });
         });
@@ -404,23 +405,42 @@ describe('get /review/user/list',() => {
             body[0].reviewImgs.should.be.instanceOf(Array);
         });
 
+        it('id을 포함해야 한다.',async () => {
+            body[0].should.have.property('id');
+        });
+
+        it('id은 number이여야 한다.',async () => {
+            body[0].id.should.be.instanceOf(Number);
+        });
+
+        it('review 을 포함해야 한다.',async () => {
+            body[0].should.have.property('review');
+        });
+
+        it('review은 String이여야 한다.',async () => {
+            body[0].review.should.be.instanceOf(String);
+        });
+
+        it('star 을 포함해야 한다.',async () => {
+            body[0].should.have.property('star');
+        });
+
+        it('star은 숫자이여야 한다.',async () => {
+            body[0].star.should.be.instanceOf(Number);
+        });
+
+        it('hansics 을 포함해야 한다.',async () => {
+            body[0].should.have.property('hansics');
+        });
+
                
     });
 
     describe('실패 시',() =>{
-        it('없는 식당 조회 시 404로 응답한다',(done) => {
-            request(app)
-                .get('review/list/0')
-                .expect(404)
-                .end((err:any, res:any) => {
-                    done();
-                });
-        });
-
-        it('잘못된 파라미터일 시 400으로 응답한다',(done) => {
+        it('로그인이 안되어 있을 시 401으로 응답한다',(done) => {
             request(app)
                 .get('review/list/sigdang')
-                .expect(400)
+                .expect(401)
                 .end((err:any, res:any) => {
                     done();
                 });

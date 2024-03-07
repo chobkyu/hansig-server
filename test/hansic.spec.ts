@@ -173,7 +173,7 @@ describe('GET /hansic/loc/:id ...', function () {
 
 
 /**즐겨찾는 한식 뷔페 조회 */
-describe.only('GET /hansic/star/user ...', function () {
+describe('GET /hansic/star/user ...', function () {
 
 
     describe('성공 시', () => {
