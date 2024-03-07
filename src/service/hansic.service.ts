@@ -307,6 +307,8 @@ LEFT JOIN (
                   google_star :true,
                   userStar :true,
                   id : true,
+                  lat : true,
+                  lng : true,
                   location:true,
                   location_id:true,
                   sicdangImgs : {
@@ -379,6 +381,14 @@ LEFT JOIN (
     } catch (err) {
       logger.error(err);
       return {success : false, status : 500};
+    }
+  }
+
+  async sibal (){
+    try{
+      
+    }catch(err){
+      
     }
   }
 }

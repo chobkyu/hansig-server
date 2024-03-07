@@ -1,56 +1,69 @@
-import {PrismaClient} from "@prisma/client";
-import express, {Express, Request, Response} from 'express';
+import { PrismaClient } from "@prisma/client";
+import express, { Express, Request, Response } from 'express';
 import { UserService } from "../../service/user.service";
 import { Login } from "../../interface/user/login";
 import { Logger } from "winston";
-const logger=new Logger();
+const logger = new Logger();
 const prisma = new PrismaClient();
 const reviewServiceClass = require('../../service/review.service');
 const reviewService = new reviewServiceClass();
-const userService=new UserService();
-const output={
+const userService = new UserService();
+const output = {
     //리뷰id로 리뷰 얻어오기
-    async getReview (req:Request,res:Response):Promise<any>
-    {
-        try{
-        const reviewId=Number(req.params.id);
-        if(reviewId){
-        const review=await reviewService.getReview(reviewId);
-        if(review.success)//검색결과가 있으면
-        {
-            return res.json({data:review.review});
+    async getReview(req: Request, res: Response): Promise<any> {
+        try {
+            const review = await reviewService.getReview(Number(req.params.id));
+            if (review.success)//검색결과가 있으면
+            {
+                if(review.status)
+                {
+                    return res.status(review.status).end();
+                }
+                return res.json({ data: review.review });
+            }
+            else {
+                return res.status(404).end();
+            }
         }
-        else
-        {
-            return res.status(404).end();
-        }
-        }
-        else
-        {
-            return res.status(400).end();
-        }
-       }
-        catch(err)
-        {
+        catch (err) {
             logger.error(err);
             return res.status(500).end();
         }
     },
     //식당id로 리뷰리스트 얻어오기
-    async getReviewList (req:Request,res:Response):Promise<any>
-    {
-        try{
-        const reviewList=await reviewService.getReviewList(Number(req.params.id));
-        //검색결과가 있으면
-        if(reviewList.success)
-        {
-            return res.json(reviewList.reviewList);
+    async getReviewList(req: Request, res: Response): Promise<any> {
+        try {
+            const reviewList = await reviewService.getReviewList(Number(req.params.id));
+            //검색결과가 있으면
+            if (reviewList.success) {
+                return res.json(reviewList.reviewList);
+            }
+            else {
+                if(reviewList.status)
+                {
+                    return res.status(reviewList.status).end();
+                }
+                return res.status(204).end();
+            }
         }
-        else {
-            return res.status(204).end();
-        }}
-        catch(err)
-        {
+        catch (err) {
+            logger.error(err);
+            return res.status(500).end();
+        }
+    },
+
+    //유저 별 리스트 조회
+    async userList(req:Request, res:Response) {
+        try{
+            const id = req.body.userData.id;
+            const response = await reviewService.getUserReviewList(id);
+
+            if(!response.success) {
+                return res.status(response.status).end();
+            }
+
+            return res.json(response.reviewList);
+        }catch(err){
             logger.error(err);
             return res.status(500).end();
         }
@@ -58,91 +71,68 @@ const output={
 }
 const process =
 {
-    async writeReview (req:Request,res:Response):Promise<any>
-    {
-        try{
-        const userInfo=req.body.userData;
-        const restaurantId=req.params.id;
-        //리뷰를 쓸 한식당이 있는지 확인
-        const checkRestaurant=await reviewService.checkRestaurant(restaurantId);
-        if(checkRestaurant){
-        //데이터 양식이 맞는지 확인
-        const checkDTO=reviewService.checkReviewDTO(req.body);
-        if(checkDTO){
-        //리뷰 작성
-        const isSuccess=await reviewService.writeReview(req.body,userInfo.id,restaurantId);
-        if(isSuccess.success)//작성성공시
-        {
-            return res.status(201).end();
+    async writeReview(req: Request, res: Response): Promise<any> {
+        try {
+            const userInfo = req.body.userData;
+            const reviewId = Number(req.params.id);
+            const isSuccess = await reviewService.writeReview(req.body, userInfo.id, reviewId);
+            console.log(isSuccess);
+            if (isSuccess.success)//작성성공시
+            {
+                return res.status(201).end();
+            }
+            else {
+                if(isSuccess.status)
+                {
+                    return res.status(isSuccess.status).end();
+                }
+                return res.status(404).end();
+            }
         }
-        else
-        {
-            return res.status(404).end();
-        }}
-        else
-        {
-            return res.status(400).end();
-        }
-    }
-    else
-    {
-        return res.status(404).end();
-    }
-
-    }
-        catch(err)
-        {
+        catch (err) {
             logger.error(err);
             return res.status(500).end();
         }
     },
-    async updateReview (req:Request,res:Response):Promise<any>
-    {
-        try{
-        const userInfo=req.body.userData;
-        const reviewId=req.params.id;
-        if(userInfo && Number(reviewId)){
-        const updatedReview=await reviewService.updateReview(req.body,userInfo.id,Number(reviewId));
-        if(updatedReview.success)//update성공시
-        {
-            return res.json(updatedReview).end();
-        }
-        else
-        {
-            if(updatedReview.status)
+    async updateReview(req: Request, res: Response): Promise<any> {
+        try {
+            const userInfo = req.body.userData;
+            const reviewId = Number(req.params.id);
+            const updatedReview = await reviewService.updateReview(req.body, userInfo.id, reviewId);
+            if (updatedReview.success)//update성공시
             {
-                return res.status(updatedReview.status).end();
+                updatedReview.user = {};
+                updatedReview.user.id = userInfo.id;
+                updatedReview.user.userNickName = userInfo.userNickName;
+                return res.json(updatedReview);
             }
-            return res.status(500).end();
-        }
-        }
-        else
-        {
-            return res.status(400).end();
-        }
-    }catch(err)
-        {
+            else {
+                if(updatedReview.status)
+                {
+                    return res.status(updatedReview.status).end();
+                }
+                return res.status(400).end();
+            }
+        } catch (err) {
             logger.error(err);
             return res.status(500).end();
         }
     },
-    async deleteReview (req:Request,res:Response):Promise<any>
-    {
-        try{
-        const isSuccess=await reviewService.deleteReview(Number(req.params.id),req.body.userData.id);
-        if(isSuccess.success)//삭제성공시
-        {
-            return res.status(204).end();
-        }
-        else
-        {
-            if(isSuccess.status)
+    async deleteReview(req: Request, res: Response): Promise<any> {
+        try {
+            const isSuccess = await reviewService.deleteReview(Number(req.params.id), req.body.userData.id);
+            if (isSuccess.success)//삭제성공시
             {
-                return res.status(isSuccess.status).end();
+                return res.status(204).end();
             }
-            return res.status(404).end();
-        }}catch(err:any)
-        {
+            else {
+                if(isSuccess.status)
+                {
+                    return res.status(isSuccess.status).end();
+                }
+                return res.status(404).end();
+            }
+        } catch (err:any) {
             logger.error(err);
             if(err.status)
             {
@@ -170,6 +160,10 @@ const process =
         }
         else
         {
+            if(isSuccess.status)
+                {
+                    return res.status(isSuccess.status).end();
+                }
             return res.status(404).end();
         }}
         else

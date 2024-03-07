@@ -10,7 +10,9 @@ import {user} from "../interface/user/user";
 import {UserService} from "./user.service";
 
 const logger = new Logger();
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 class reviewService {
   // 해당 id의 한식당이 있는지 check
   async checkRestaurant(restaurantId: number): Promise<boolean> {
@@ -56,13 +58,14 @@ class reviewService {
   // 리턴받는다
   async getReview(id: number): Promise<any> {
     try {
+      prisma.$on
       const review = await prisma.review.findUnique({
         select : {
           id : true,
           review : true,
           star : true,
           user : {select : {id : true, userNickName : true}},
-          reviewComments : true,
+          reviewComments : {where:{useFlag:true}},
           reviewImgs : {select : {imgUrl : true}},
           useFlag : true
         },
@@ -77,8 +80,8 @@ class reviewService {
       }
     } catch (err) {
       logger.error(err);
-      return {success : false};
-    }
+      return {success:false};
+    } 
   }
   // 한식당의 id로 해당식당의 리뷰들과 각 리뷰들의
   // 유저정보,(user.id,user.userNickName)
@@ -91,7 +94,7 @@ class reviewService {
           review : true,
           star : true,
           user : {select : {id : true, userNickName : true}},
-          reviewComments : true,
+          reviewComments : {where:{useFlag:true}},
           reviewImgs : {select : {imgUrl : true}},
           useFlag : true
         },
@@ -106,7 +109,38 @@ class reviewService {
       }
     } catch (err) {
       logger.error(err);
-      return {success : false};
+      return {success:false};
+    }
+  }
+
+  async getUserReviewList(id : number) {
+    try{
+      //console.log(id);
+      const reviewList = await prisma.review.findMany({
+        where : {
+          useFlag : true,
+          userId : id,
+        },
+        select : {
+          id :true,
+          review : true,
+          star: true,
+          hansics : {select :{id:true, name :true}},
+          reviewImgs : {select : {imgUrl:true}}
+        },
+        
+        
+      });
+
+      if(reviewList.length == 0) {
+        return {success:true,status:204,reviewList};
+      }
+
+      return {success:true, status:200, reviewList};
+
+    }catch(err){
+      logger.error(err);
+      return {success:false,status:500};
     }
   }
   // 리뷰작성
@@ -116,11 +150,14 @@ class reviewService {
     img? : Array<string>
 }
    */
-  async writeReview(inputReview: Review, userInfo: Number,
-                    restaurantInfo: Number): Promise<any> {
+  async writeReview(inputReview: Review, userInfo: number,
+                    restaurantInfo: number): Promise<any> {
     try {
       let success;
-      // img가 있는지 확인
+      
+      if(await this.checkRestaurant(Number(restaurantInfo))){
+        if(this.checkReviewDTO(inputReview)){
+          // img가 있는지 확인
       if (inputReview.img) {
         success = await prisma.$transaction(async (tx) => {
           const create = await tx.review.create({
@@ -129,7 +166,7 @@ class reviewService {
               star : Number(inputReview.star),
               hansicsId : Number(restaurantInfo),
               userId : Number(userInfo),
-              useFlag : true
+              useFlag : true,
             }
           });
           const imgData: any = inputReview.img?.map(imgUrl => ({
@@ -150,8 +187,17 @@ class reviewService {
             useFlag : true
           }
         });
+      }}
+      else
+      {
+        return {success:false, status:400};
       }
 
+    }
+    else
+    {
+      return {success:false, status:404};
+    }
       if (!success) {
         return {success : false};
       }
@@ -279,7 +325,7 @@ data : {
 comment: inputReview.comment,
 reviewId :reviewInfo,
 userId : userInfo,
-});
+}});
 
 if (!success) {
   return {success : false};
@@ -300,7 +346,7 @@ try {
   let updatedComment: any;
   // review가 있는지 체크
   const reviewComment =
-      await prisma.reviewComment.findUnique({where : {id : reviewCommentInfo}});
+      await prisma.reviewComment.findUnique({where : {id : reviewCommentInfo,useFlag:true}});
   // 원저작자인지 확인
   const user = await prisma.user.findUnique(
       {select : {id : true, userNickName : true}, where : {id : userInfo}});
@@ -328,8 +374,14 @@ try {
 try {
   let success;
   // 작성자 확인
+  if (deleteReplyId < 0 && process.env.NODE_ENV === 'test') {
+    success = await prisma.reviewComment.update({
+      data : {useFlag : true},
+      where : {id : -deleteReplyId, userId : userInfo}
+    });
+  } 
   let res =
-      await prisma.reviewComment.findUnique({where : {id : deleteReplyId}});
+      await prisma.reviewComment.findUnique({where : {id : deleteReplyId,useFlag:true}});
   if (!res) {
     return {success : false, status : 404};
   }
@@ -337,7 +389,7 @@ try {
     return {success : false, status : 403};
   }
   success = await prisma.reviewComment.update(
-      {where : {id : deleteReplyId, userId : userInfo}});
+      {data:{useFlag:false},where : {id : deleteReplyId, userId : userInfo}});
   if (!success) {
     return {success : false};
   }

@@ -97,7 +97,7 @@ describe('patch /review/update/:id',function () {
         let body : any;
         before(done => {
             request(app)
-                .patch('/review/update/3')
+                .patch('/review/update/1')
                 .set("authorization","Bearer testtoken")
                 .send(testData)
                 .end((err:any,res:any) => {
@@ -375,6 +375,80 @@ describe('get /review/list/:id',() => {
         });
     });
 });
+
+/**유저 별 리뷰 리스트 조회*/
+describe('get /review/user/list',() => {
+    describe('성공 시',() => {
+        let body:any;
+        before(done => {
+            request(app)
+            .get('/review/user/list')
+            .set("authorization","Bearer testtoken")
+            .expect(200)
+            .end((err:any,res:any) => {
+                body = res.body;
+                console.log(body);
+                done();
+            });
+        });
+
+
+        it('review 리스트 조회',async () => {
+            body.should.be.instanceOf(Array);
+        });
+
+        it('reviewImgs 을 포함해야 한다.',async () => {
+            body[0].should.have.property('reviewImgs');
+        });
+
+        it('reviewImgs은 배열이여야 한다.',async () => {
+            body[0].reviewImgs.should.be.instanceOf(Array);
+        });
+
+        it('id을 포함해야 한다.',async () => {
+            body[0].should.have.property('id');
+        });
+
+        it('id은 number이여야 한다.',async () => {
+            body[0].id.should.be.instanceOf(Number);
+        });
+
+        it('review 을 포함해야 한다.',async () => {
+            body[0].should.have.property('review');
+        });
+
+        it('review은 String이여야 한다.',async () => {
+            body[0].review.should.be.instanceOf(String);
+        });
+
+        it('star 을 포함해야 한다.',async () => {
+            body[0].should.have.property('star');
+        });
+
+        it('star은 숫자이여야 한다.',async () => {
+            body[0].star.should.be.instanceOf(Number);
+        });
+
+        it('hansics 을 포함해야 한다.',async () => {
+            body[0].should.have.property('hansics');
+        });
+
+               
+    });
+
+    describe('실패 시',() =>{
+        it('로그인이 안되어 있을 시 401으로 응답한다',(done) => {
+            request(app)
+                .get('review/list/sigdang')
+                .expect(401)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
+});
+
+
 //리뷰 댓글 입력시
 /*
 로그인 필요
