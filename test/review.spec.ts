@@ -375,6 +375,60 @@ describe('get /review/list/:id',() => {
         });
     });
 });
+
+/**유저 별 리뷰 리스트 조회*/
+describe('get /review/user/list',() => {
+    describe('성공 시',() => {
+        let body:any;
+        before(done => {
+            request(app)
+            .get('/review/user/list')
+            .set("authorization","Bearer testtoken")
+            .expect(200)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+
+
+        it('review 리스트 조회',async () => {
+            body.should.be.instanceOf(Array);
+        });
+
+        it('reviewImgs 을 포함해야 한다.',async () => {
+            body[0].should.have.property('reviewImgs');
+        });
+
+        it('reviewImgs은 배열이여야 한다.',async () => {
+            body[0].reviewImgs.should.be.instanceOf(Array);
+        });
+
+               
+    });
+
+    describe('실패 시',() =>{
+        it('없는 식당 조회 시 404로 응답한다',(done) => {
+            request(app)
+                .get('review/list/0')
+                .expect(404)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+
+        it('잘못된 파라미터일 시 400으로 응답한다',(done) => {
+            request(app)
+                .get('review/list/sigdang')
+                .expect(400)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
+});
+
+
 //리뷰 댓글 입력시
 /*
 로그인 필요
