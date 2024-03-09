@@ -12,6 +12,7 @@ const output = {
     //리뷰id로 리뷰 얻어오기
     async getReview(req: Request, res: Response): Promise<any> {
         try {
+            if(Number(req.params.id)){
             const review = await reviewService.getReview(Number(req.params.id));
             if (review.success)//검색결과가 있으면
             {
@@ -23,6 +24,10 @@ const output = {
             }
             else {
                 return res.status(404).end();
+            }}
+            else
+            {
+                return res.status(400).end();
             }
         }
         catch (err) {
@@ -75,6 +80,7 @@ const process =
         try {
             const userInfo = req.body.userData;
             const reviewId = Number(req.params.id);
+            if(reviewId && userInfo){
             const isSuccess = await reviewService.writeReview(req.body, userInfo.id, reviewId);
             console.log(isSuccess);
             if (isSuccess.success)//작성성공시
@@ -89,6 +95,11 @@ const process =
                 return res.status(404).end();
             }
         }
+        else
+        {
+            return res.status(400).end();
+        }
+        }
         catch (err) {
             logger.error(err);
             return res.status(500).end();
@@ -98,12 +109,10 @@ const process =
         try {
             const userInfo = req.body.userData;
             const reviewId = Number(req.params.id);
+            if(userInfo && reviewId){
             const updatedReview = await reviewService.updateReview(req.body, userInfo.id, reviewId);
             if (updatedReview.success)//update성공시
             {
-                updatedReview.user = {};
-                updatedReview.user.id = userInfo.id;
-                updatedReview.user.userNickName = userInfo.userNickName;
                 return res.json(updatedReview);
             }
             else {
@@ -111,6 +120,10 @@ const process =
                 {
                     return res.status(updatedReview.status).end();
                 }
+                return res.status(400).end();
+            }}
+            else
+            {
                 return res.status(400).end();
             }
         } catch (err) {
@@ -141,19 +154,20 @@ const process =
             return res.status(500).end();
         }
     },
+   
     async reviewCommentWrite (req:Request,res:Response):Promise<any>
     {
         try{
         const userInfo=req.body.userData;
+        delete(req.body.userData);
         const reviewId=Number(req.params.id);
         //리뷰가 있는지 확인
+        if(reviewId&& userInfo && req.body.comment){
         const checkReview=await reviewService.checkReview(reviewId);
+       
         if(checkReview){
-        //데이터 양식이 맞는지 확인
-        const checkDTO=reviewService.checkReviewCommentDTO(req.body);
-        if(checkDTO){
         //댓글 작성
-        const isSuccess=await reviewService.reviewCommentWrite(req.body,userInfo.id,reviewId);
+        const isSuccess=await reviewService.writeReviewComment(req.body.comment,userInfo.id,reviewId);
         if(isSuccess.success)//작성성공시
         {
             return res.status(201).end();
@@ -170,12 +184,12 @@ const process =
         {
             return res.status(400).end();
         }
-    }
-    else
-    {
-        return res.status(404).end();
-    }
-
+    
+        }
+        else
+        {
+            return res.status(400).end();
+        }
     }
         catch(err)
         {
@@ -183,37 +197,41 @@ const process =
             return res.status(500).end();
         }
     },
+     //성공시 댓글이 업테이트된 리뷰 페이지 리턴
     async reviewCommentUpdate (req:Request,res:Response):Promise<any>
     {
         try{
             const userInfo=req.body.userData;
+            delete(req.body.userData);
             const reviewId=Number(req.params.id);
             //댓글이 있는지 확인
+            if(reviewId&&userInfo&&req.body.comment){
             const checkReview=await reviewService.checkReviewComment(reviewId);
             if(checkReview){
-            //데이터 양식이 맞는지 확인
-            const checkDTO=reviewService.checkReviewCommentDTO(req.body);
-            if(checkDTO){
             //댓글 수정
-            const isSuccess=await reviewService.reviewCommentUpdate(req.body,userInfo.id,reviewId);
+            const isSuccess=await reviewService.updateReviewComment(req.body.comment,userInfo.id,reviewId);
             if(isSuccess.success)//작성성공시
             {
                 return res.status(201).end();
             }
             else
             {
-                return res.status(404).end();
+                if(isSuccess.status)
+                {
+                    return res.status(isSuccess.status).end();
+                }
+                return res.status(500).end();
             }}
             else
             {
                 return res.status(400).end();
             }
-        }
-        else
-        {
-            return res.status(404).end();
-        }
-    
+        
+            }
+            else
+            {
+                return res.status(400).end();
+            }
         }
             catch(err)
             {
@@ -224,19 +242,37 @@ const process =
     async reviewCommentDelete (req:Request,res:Response):Promise<any>
     {
         try{
-        const isSuccess=await reviewService.reviewCommentDelete(Number(req.params.id),req.body.userData.id);
-        if(isSuccess.success)//삭제성공시
-        {
-            return res.status(204).end();
-        }
-        else
-        {
-            if(isSuccess.status)
+            const userInfo=req.body.userData;
+            delete(req.body.userData);
+            const reviewId=Number(req.params.id);
+            if(userInfo&&reviewId)
             {
-                return res.status(isSuccess.status).end();
+                if(await reviewService.checkReviewComment(reviewId))
+                {
+                    const isSuccess=await reviewService.deleteReviewComment(reviewId,userInfo.id);
+                    if(isSuccess.success)//삭제성공시
+                    {
+                        return res.status(204).end();
+                    }
+                    else
+                    {
+                        if(isSuccess.status)
+                        {
+                            return res.status(isSuccess.status).end();
+                        }
+                        return res.status(500).end();
+                    }
+                }
+                else
+                {
+                    return res.status(404).end();
+                }
             }
-            return res.status(404).end();
-        }}catch(err:any)
+            else
+            {
+                return res.status(400).end();
+            }
+       }catch(err:any)
         {
             logger.error(err);
             if(err.status)

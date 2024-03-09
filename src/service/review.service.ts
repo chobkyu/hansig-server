@@ -30,6 +30,36 @@ class reviewService {
       return false;
     }
   }
+  //해당 리뷰가 있는지 확인
+  async checkReview(reviewId:number):Promise<boolean>
+  {
+    try{
+    const review=await prisma.review.findUnique({where:{id:Number(reviewId)}});
+    if(review){
+    return true;}
+    else{return false;}
+    }
+    catch(err:any)
+    {
+      logger.error(err);
+      return false;
+    }
+  }
+    //해당 리뷰댓글이 있는지 확인
+    async checkReviewComment(reviewCommentId:number):Promise<boolean>
+    {
+      try{
+      const review=await prisma.reviewComment.findUnique({where:{id:Number(reviewCommentId)}});
+      if(review){
+      return true;}
+      else{return false;}
+      }
+      catch(err:any)
+      {
+        logger.error(err);
+        return false;
+      }
+    }
   // 데이터 타입 체크
   checkReviewDTO(body: any) {
     try {
@@ -56,7 +86,7 @@ class reviewService {
   }
   // 리뷰와 리뷰코멘트들(reviewComments),imgUrl들(reviewImgs.imgUrl)을
   // 리턴받는다
-  async getReview(id: number): Promise<any> {
+  async getReview(reviewId: number): Promise<any> {
     try {
       prisma.$on
       const review = await prisma.review.findUnique({
@@ -69,7 +99,7 @@ class reviewService {
           reviewImgs : {select : {imgUrl : true}},
           useFlag : true
         },
-        where : {id : id}
+        where : {id : reviewId}
       })
       // 검색결과가 있으면
       if (review) {
@@ -317,12 +347,12 @@ userinfo는 유저id,reviewinfo역시 review의 id.
       return {success : false};
     }
   }
-  async writeReviewComment(inputReview: ReviewComment, userInfo: number,
+  async writeReviewComment(inputReview: string, userInfo: number,
                            reviewInfo: number): Promise<any> {
     try {
 const success = await prisma.reviewComment.create({
 data : {
-comment: inputReview.comment,
+comment: inputReview,
 reviewId :reviewInfo,
 userId : userInfo,
 }});
@@ -336,11 +366,7 @@ return {success : true};
         return {success : false};
 }
     }
-    /*
-    interface ReviewUpdate {
-    comment : string,
-    */
-    async updateReviewComment(input: reviewComment, userInfo: number,
+    async updateReviewComment(input: string, userInfo: number,
                               reviewCommentInfo: number): Promise<any> {
 try {
   let updatedComment: any;
@@ -352,11 +378,11 @@ try {
       {select : {id : true, userNickName : true}, where : {id : userInfo}});
   if (reviewComment?.userId === userInfo) {
     updatedComment = await prisma.reviewComment.update({
-      data : {comment : input.comment},
+      data : {comment : input},
       where : {id : reviewCommentInfo, userId : userInfo}
     });
     if (updatedComment) {
-      return await this.getReview(reviewCommentInfo);
+      return await this.getReview(Number(updatedComment.reviewId));
     } else {
       return {success : false};
     }
@@ -374,26 +400,29 @@ try {
 try {
   let success;
   // 작성자 확인
+  let commentUser=await prisma.reviewComment.findUnique({where:{id:deleteReplyId,useFlag:true}});
+  if(commentUser?.userId===userInfo){
+    //테스트모드인 경우 복원허용
   if (deleteReplyId < 0 && process.env.NODE_ENV === 'test') {
     success = await prisma.reviewComment.update({
       data : {useFlag : true},
       where : {id : -deleteReplyId, userId : userInfo}
     });
-  } 
-  let res =
-      await prisma.reviewComment.findUnique({where : {id : deleteReplyId,useFlag:true}});
-  if (!res) {
-    return {success : false, status : 404};
-  }
-  if (userInfo !== res?.userId) {
-    return {success : false, status : 403};
-  }
-  success = await prisma.reviewComment.update(
-      {data:{useFlag:false},where : {id : deleteReplyId, userId : userInfo}});
-  if (!success) {
+    if (!success) {
     return {success : false};
   }
-  return {success : true};
+  return {success : true};}
+  success = await prisma.reviewComment.update(
+      {data:{useFlag:false},where : {id : deleteReplyId, userId : userInfo}});
+ //삭제실패시
+      if (!success) {
+    return {success : false};
+  }
+  return {success : true};}
+  else
+  {
+    return {success:false,status:403};
+  }
 } catch (err: any) {
   logger.error(err);
   if (err.status) {
