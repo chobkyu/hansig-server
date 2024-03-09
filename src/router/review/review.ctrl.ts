@@ -154,7 +154,11 @@ const process =
             return res.status(500).end();
         }
     },
-   
+   /*interface ReviewComment {
+    comment : string,
+} 
+성공시 201
+*/
     async reviewCommentWrite (req:Request,res:Response):Promise<any>
     {
         try{
@@ -197,7 +201,10 @@ const process =
             return res.status(500).end();
         }
     },
-     //성공시 댓글이 업테이트된 리뷰 페이지 리턴
+        /*interface ReviewComment {
+    comment : string,
+} */
+//성공시 코멘트가 업데이트된 리뷰페이지 리턴
     async reviewCommentUpdate (req:Request,res:Response):Promise<any>
     {
         try{
