@@ -1,6 +1,5 @@
 import {PrismaClient, review, reviewComment} from "@prisma/client";
 import {Logger} from "winston";
-
 import {Review} from "../interface/review/review";
 import {ReviewComment} from "../interface/review/reviewComment";
 import {ReviewUpdate} from "../interface/review/reviewUpdate";
@@ -63,6 +62,7 @@ class reviewService {
   // 데이터 타입 체크
   checkReviewDTO(body: any) {
     try {
+      console.log(body,Object.keys(body).length);
       if (Object.keys(body).length === 3) {
         if (body.review && body.userData && body.star &&
             typeof body.review === 'string' && typeof body.star === 'number') {
@@ -71,8 +71,7 @@ class reviewService {
         return false;
       } else if (Object.keys(body).length === 4) {
         if (body.review && body.userData && body.star && body.img &&
-            typeof body.review === 'string' && typeof body.star === 'number' &&
-            typeof body.img === 'string') {
+            typeof body.review === 'string' && typeof body.star === 'number') {
           return true;
         }
         return false;
@@ -184,7 +183,6 @@ class reviewService {
                     restaurantInfo: number): Promise<any> {
     try {
       let success;
-      
       if(await this.checkRestaurant(Number(restaurantInfo))){
         if(this.checkReviewDTO(inputReview)){
           // img가 있는지 확인

@@ -2,7 +2,7 @@ import { Review } from "../src/interface/review/review"
 
 const app = require('../app')
 const request = require('supertest')
-
+const s3=require('../src/util/s3');
 /**리뷰 입력 시 ...  id는 식당 id */
 describe('review',function(){
 describe('post /review/:id',function() {
@@ -21,7 +21,27 @@ describe('post /review/:id',function() {
                 .end(done);
         });
     });
-
+    describe('성공 시2',async() => {
+        let testData2:any;
+        before(async () => {
+            testData2 = {
+                review: '맛있어요',
+                star: 2,
+                img: [`${await s3.generateUploadURL()}`, `${await s3.generateUploadURL()}`]
+            };
+        });
+    
+        it('201로 응답한다', (done) => {
+            request(app)
+                .post('/review/1804')
+                .set("authorization", "Bearer testtoken")
+                .send(testData2)
+                .expect(201)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
     describe('실패 시',() => {
         it('찾을 수 없는 id일시 404로 응답',(done) => {
             request(app)
@@ -151,8 +171,28 @@ describe('patch /review/update/:id',function () {
             body.user.id.should.be.instanceOf(Number);
         });
     });
-
-
+    describe('성공 시2',async() => {
+        let testData2:any;
+        before(async () => {
+            testData2 = {
+                review: '맛있어요',
+                star: 2,
+                insertImg: [await s3.generateUploadURL(), await s3.generateUploadURL()],
+                deleteImg:[]
+            };
+        });
+    
+        it('200로 응답한다', (done) => {
+            request(app)
+            .patch('/review/update/1')
+                .set("authorization", "Bearer testtoken")
+                .send(testData2)
+                .expect(200)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
     describe('실패 시 ',() => {
         it('입력이 잘못 되었을 시 400을 응답한다.',(done) =>{
             let wrongData = {

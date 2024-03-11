@@ -82,7 +82,6 @@ const process =
             const reviewId = Number(req.params.id);
             if(reviewId && userInfo){
             const isSuccess = await reviewService.writeReview(req.body, userInfo.id, reviewId);
-            console.log(isSuccess);
             if (isSuccess.success)//작성성공시
             {
                 return res.status(201).end();
