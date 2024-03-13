@@ -479,4 +479,91 @@ describe('post /hansic/star/:id', function (){
     });
 });
 
+//내가 아는 한식 뷔페 등록하기
+describe('post /hansic/enroll', function (){
+    describe('성공 시', () => {
+        let body = {
+            name: '기원이한뷔',
+            addr: '서울특별시 강남구',
+            location : 1,
+            imgUrl : 'https://puda.s3.ap-northeast-2.amazonaws.com/client/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2024-02-07+152742.png'
+        }
+        it('성공 시 201을 리턴한다', (done) => {
+            request(app)
+                .post('/hansic/enroll')
+                .set("authorization","Bearer testtoken")
+                .send(body)
+                .expect(201)
+                .end(done);
+        });
+    });
+
+    describe('실패 시',() => {
+      
+        it('로그인이 안되어 있을 시 401로 응답', (done) => {
+            let body = {
+                name: '기원이한뷔',
+                addr: '서울특별시 강남구',
+                location : 1,
+                imgUrl : 'https://puda.s3.ap-northeast-2.amazonaws.com/client/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2024-02-07+152742.png'
+            }
+
+            request(app)
+                .post('/hansic/enroll')
+                .send(body)
+                .expect(401)
+                .end(done);
+        });
+
+        it('입력값이 잘못 되었을 경우 400으로 응답',(done) => {
+            let body = {
+                name: '기원이한뷔',
+                addr: 1,
+                location : 1,
+                imgUrl : 'https://puda.s3.ap-northeast-2.amazonaws.com/client/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2024-02-07+152742.png'
+            }
+
+            request(app)
+                .post('/hansic/enroll')
+                .set("authorization","Bearer testtoken")
+                .send(body)
+                .expect(400)
+                .end(done);
+        });
+
+        it('입력값이 누락 되었을 경우 400으로 응답', (done) => {
+            let body = {
+                name: '기원이한뷔',
+                addr: '서울특별시 강남구',
+                imgUrl : 'https://puda.s3.ap-northeast-2.amazonaws.com/client/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2024-02-07+152742.png'
+            }
+
+            request(app)
+                .post('/hansic/enroll')
+                .set("authorization","Bearer testtoken")
+                .send(body)
+                .expect(401)
+                .end(done);
+        });
+
+        it('다른 입력 값이 들어왔을 경우 400로 응답', (done) => {
+            let body = {
+                name: '기원이한뷔',
+                addr: '서울특별시 강남구',
+                location_id : 1,
+                imgUrl : 'https://puda.s3.ap-northeast-2.amazonaws.com/client/%EC%8A%A4%ED%81%AC%EB%A6%B0%EC%83%B7+2024-02-07+152742.png'
+            }
+
+            request(app)
+                .post('/hansic/enroll')
+                .set("authorization","Bearer testtoken")
+                .send(body)
+                .expect(400)
+                .end(done);
+        });
+
+
+    });
+});
+
 
