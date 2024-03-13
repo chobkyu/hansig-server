@@ -20,7 +20,7 @@ describe('GET /hansic is ...', function () {
 });
 
 /**한긱 뷔페 전체 조회 */
-describe('GET /hansic/all ...', function () {
+describe.only('GET /hansic/all ...', function () {
     describe('성공 시', async () => {
         let body: any;
 
@@ -30,6 +30,7 @@ describe('GET /hansic/all ...', function () {
                 .expect(200)
                 .end((err: any, res: any) => {
                     body = res.body.data;
+                    //console.log(body[0]);
                     done();
                 });
         });
@@ -86,7 +87,7 @@ describe('GET /hansic/all ...', function () {
 });
 
 /**한식 뷔페 지역 별 조회 */
-describe('GET /hansic/loc/:id ...', function () {
+describe.only('GET /hansic/loc/:id ...', function () {
     describe('성공 시', () => {
         let body: any;
 
