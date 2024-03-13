@@ -32,6 +32,7 @@ model user {
   location_id Int @default(1)
   favorites favorites[]
   reviewComments reviewComment[]
+  enrollHansics enrollHansic[]
 }
 
 //사용자 프로필 이미지 테이블
@@ -79,6 +80,7 @@ model location {
   location String? @db.VarChar(50)
   hansics hansics[]
   users user[]
+  enrollHansics enrollHansic[]
 }
 
 //한식 뷔페 테이블
@@ -162,4 +164,15 @@ model reviewComment {
   useFlag Boolean @default(true)
   user user @relation(fields:[userId],references:[id])
   userId Int
+}
+
+model enrollHansic {
+  id Int @id @default(autoincrement())
+  name String? @db.VarChar(100)
+  addr String? @db.VarChar(500)
+  location location @relation(fields:[location_id],references:[id])
+  location_id Int
+  user user @relation(fields:[userId],references:[id])
+  userId Int
+  isApproved Boolean @default(false)
 }
