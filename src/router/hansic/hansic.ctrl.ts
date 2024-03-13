@@ -173,6 +173,7 @@ const process = {
     }
   },
 
+  //내가 아는 한식 뷔페 등록하기
   enrollHansic:async (req:Request, res :Response) => {
     try{
       const body = req.body;

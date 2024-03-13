@@ -23,7 +23,7 @@ router.get('/:id',softAuthJWT,ctrl.output.get);
 router.get('/star/user',authJWT,ctrl.output.favorite);
 
 router.post('/star/:id',authJWT,ctrl.process.favorite);
-router.post('/enroll',authJWT,ctrl.process.enrollHansic);
+router.post('/enroll',authJWT,ctrl.process.enrollHansic); //내가 아는 한식 뷔페 등록하기
 // router.post('/:id',ctrl.process.create);
 // router.patch('/:id',ctrl.process.update);
 // router.delete('/:id',ctrl.process.delete);

@@ -483,6 +483,11 @@ export class HansicService {
     }
   }
 
+  /**
+   * 내가 아는 한식 뷔페 등록하기
+   * @param body :EnrollHansicDto
+   * @returns {success:boolean,status}
+   */
   async enrollHansic (body:EnrollHansicDto){
     try{
       const check = this.checkEnrollDto(body);
@@ -506,6 +511,11 @@ export class HansicService {
     }
   }
 
+  /**
+   * enroll 시 타입 체크
+   * @param body 
+   * @returns bool
+   */
   checkEnrollDto(body:any){
     try{
       if(body.name && body.addr && body.location && body.imgUrl &&
