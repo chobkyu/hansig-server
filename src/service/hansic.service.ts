@@ -1,6 +1,7 @@
 import {hansics, PrismaClient} from "@prisma/client";
 
 import {favoriteDto} from "../interface/hansic/favorite";
+import { EnrollHansicDto } from "../interface/hansic/enrollHansic";
 
 const request = require('request');
 const prisma = new PrismaClient({
@@ -263,34 +264,34 @@ export class HansicService {
       else
       {
         data = await prisma.$queryRaw<any[]>`
-        SELECT
-          hs.id,
-          hs.name,
-          hs.addr,
-          hs."userStar",
-          hs.google_star,
-          hs.location_id,
-          hs.lat,
-          hs.lng,
-          ls.location,
-          si."imgUrl",
-          rd.count,
-          rd."userStar"
-        FROM hansics as hs 
-        INNER JOIN location as ls 
-        on hs.location_id=ls.id 
-        LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" 
-        LEFT JOIN (
-          SELECT 
-            rv."hansicsId",
-            COUNT(*) as count,
-          AVG(star) as "userStar"
-          FROM review as rv 
-          GROUP BY rv."hansicsId"
-        ) as rd on rd."hansicsId"=hs.id 
-        where lat != 0
-        ORDER BY rd.count DESC NULLS LAST
+          SELECT
+            hs.id,
+            hs.name,
+            hs.addr,
+            hs."userStar",
+            hs.google_star,
+            hs.location_id,
+            hs.lat,
+            hs.lng,
+            ls.location,
+            si."imgUrl",
+            rd.count,
+            rd."userStar"
+          FROM hansics as hs 
+          INNER JOIN location as ls 
+          on hs.location_id=ls.id 
+          LEFT JOIN "sicdangImg" as si 
+          on hs.id=si."hansicsId" 
+          LEFT JOIN (
+            SELECT 
+              rv."hansicsId",
+              COUNT(*) as count,
+            AVG(star) as "userStar"
+            FROM review as rv 
+            GROUP BY rv."hansicsId"
+          ) as rd on rd."hansicsId"=hs.id 
+          where lat != 0
+          ORDER BY rd.count DESC NULLS LAST
         `;
       }
       
@@ -482,11 +483,41 @@ export class HansicService {
     }
   }
 
-  async sibal (){
+  async enrollHansic (body:EnrollHansicDto){
     try{
-      
+      const check = this.checkEnrollDto(body);
+
+      if(!check) return {success:false, status:400};
+
+      await prisma.enrollHansic.create({
+        data : {
+          name : body.name,
+          addr : body.addr,
+          location_id : body.location,
+          userId : body.userData.id,
+        }
+      });
+
+      return {success:true, status:201};
     }catch(err){
-      
+      console.log(err);
+      logger.error(err);
+      return {success : false, status : 500};
+    }
+  }
+
+  checkEnrollDto(body:any){
+    try{
+      if(body.name && body.addr && body.location && body.imgUrl &&
+        typeof body.name === 'string' && typeof body.addr === 'string' && 
+        typeof body.location ==='number' && typeof body.imgUrl ==='string'){
+          return Object.keys(body).length === 5 ?  true : false;
+      }else{
+        return false;
+      }
+    }catch(err){
+      logger.error(err);
+      return false;
     }
   }
 }
