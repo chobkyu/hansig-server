@@ -3,7 +3,9 @@ import {hansics, PrismaClient} from "@prisma/client";
 import {favoriteDto} from "../interface/hansic/favorite";
 
 const request = require('request');
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: ['query', 'info', 'warn', 'error'],
+});
 const logger = require('../util/winston');
 /*
 ㄴ 리뷰 입력 시
@@ -145,9 +147,10 @@ LEFT JOIN (
     }
   }
   // 지역id로 지역내 식당리스트 조회
-  async getFromLocation(locationId: number): Promise<any[]|false> {
-    try {
-      const data = await prisma.$queryRaw<any[]>`
+  async getFromLocation(locationId: number,sortby?:number): Promise<any[]|false> {
+    try {let data;
+      if(sortby){
+      data = await prisma.$queryRaw<any[]>`
         SELECT
           hs.id,
           hs.name,
@@ -163,9 +166,53 @@ LEFT JOIN (
         INNER JOIN location as ls 
         on hs.location_id=ls.id 
         LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" WHERE hs.location_id=${locationId} 
-        ORDER BY hs.id ASC
+        on hs.id=si."hansicsId"
+        LEFT JOIN (
+          SELECT 
+            rv."hansicsId",
+            COUNT(*) as count,
+      AVG(star) as "userStar"
+          FROM hansic.review as rv 
+          GROUP BY rv."hansicsId"
+        ) as rd on hs.id=rd."hansicsId" 
+        WHERE hs.location_id=${locationId} 
+        ORDER BY rd."userStar" DESC NULLS LAST
+      `;}
+      else
+      {
+        data = await prisma.$queryRaw<any[]>`
+        SELECT
+          hs.id,
+          hs.name,
+          hs.addr,
+          hs."userStar",
+          hs.google_star,
+          hs.location_id,
+          hs.lat,
+          hs.lng,
+          ls.location,
+          si."imgUrl"
+        FROM hansics as hs 
+        INNER JOIN location as ls 
+        on hs.location_id=ls.id 
+        LEFT JOIN "sicdangImg" as si 
+        on hs.id=si."hansicsId"
+        LEFT JOIN (
+          SELECT 
+            rv."hansicsId",
+            COUNT(*) as count,
+      AVG(star) as "userStar"
+          FROM hansic.review as rv 
+          GROUP BY rv."hansicsId"
+        ) as rd on hs.id=rd."hansicsId" 
+        WHERE hs.location_id=${locationId} 
+        ORDER BY rd.count DESC NULLS LAST
       `;
+      }
+      data=data.map(item => ({
+        ...item,
+        count: item.count?item.count.toString():null, // BigInt 필드를 문자열로 변환
+      }));
       if (data) {
         return data;
       } else {
@@ -177,29 +224,80 @@ LEFT JOIN (
     }
   }
   // 전체조회
-  async getAll(): Promise<any[]|false> {
+  async getAll(sortby?:number): Promise<any[]|false> {
     try {
-      const data = await prisma.$queryRaw<any[]>`
+      let data;
+      if(sortby)
+      {
+        data = await prisma.$queryRaw<any[]>`
         SELECT
-          hs.id,
-          hs.name,
-          hs.addr,
-          hs."userStar",
-          hs.google_star,
-          hs.location_id,
-          hs.lat,
-          hs.lng,
-          ls.location,
-          si."imgUrl" 
-        FROM hansics as hs 
-        INNER JOIN location as ls 
-        on hs.location_id=ls.id 
-        LEFT JOIN "sicdangImg" as si 
-        on hs.id=si."hansicsId" 
-        where lat != 0
-        ORDER BY hs.id ASC
-      `;
-
+        hs.id,
+        hs.name,
+        hs.addr,
+        hs."userStar",
+        hs.google_star,
+        hs.location_id,
+        hs.lat,
+        hs.lng,
+        ls.location,
+        si."imgUrl",
+        rd.count,
+    rd."userStar"
+      FROM hansics as hs 
+      INNER JOIN location as ls 
+      on hs.location_id=ls.id 
+      LEFT JOIN "sicdangImg" as si 
+      on hs.id=si."hansicsId" 
+      LEFT JOIN (
+        SELECT 
+          rv."hansicsId",
+          COUNT(*) as count,
+        AVG(star) as "userStar"
+        FROM review as rv 
+        GROUP BY rv."hansicsId"
+      ) as rd on rd."hansicsId"=hs.id 
+      where lat != 0
+      ORDER BY rd."userStar" DESC NULLS LAST
+        `;
+      }
+      else
+      {
+        data = await prisma.$queryRaw<any[]>`
+        SELECT
+        hs.id,
+        hs.name,
+        hs.addr,
+        hs."userStar",
+        hs.google_star,
+        hs.location_id,
+        hs.lat,
+        hs.lng,
+        ls.location,
+        si."imgUrl",
+        rd.count,
+    rd."userStar"
+      FROM hansics as hs 
+      INNER JOIN location as ls 
+      on hs.location_id=ls.id 
+      LEFT JOIN "sicdangImg" as si 
+      on hs.id=si."hansicsId" 
+      LEFT JOIN (
+        SELECT 
+          rv."hansicsId",
+          COUNT(*) as count,
+        AVG(star) as "userStar"
+        FROM review as rv 
+        GROUP BY rv."hansicsId"
+      ) as rd on rd."hansicsId"=hs.id 
+      where lat != 0
+      ORDER BY rd.count DESC NULLS LAST
+        `;
+      }
+      
+      data=data.map(item => ({
+        ...item,
+        count: item.count?item.count.toString():null, // BigInt 필드를 문자열로 변환
+      }));
       if (data) {
         return data;
       } else {
@@ -381,6 +479,14 @@ LEFT JOIN (
     } catch (err) {
       logger.error(err);
       return {success : false, status : 500};
+    }
+  }
+
+  async sibal (){
+    try{
+      
+    }catch(err){
+      
     }
   }
 }

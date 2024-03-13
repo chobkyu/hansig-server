@@ -9,16 +9,18 @@ const output = {
   //전체조회
   getAll: async (req: Request, res: Response) => {
     try {
-      const response = await hansicService.getAll();
+      const option=parseInt(req.params.sortOption);
+      const response = option?await hansicService.getAll(option):await hansicService.getAll();
       //유효한 검색 결과가 있는지 확인
       if (response) {
-        return res.json({ data: response });
+        return res.json({data: response});
       } else {
         return res.status(204).end();
       }
     }
     catch (err) {
       logger.error(err);
+      console.log(err);
       return res.status(500).end();
     }
   },
@@ -54,14 +56,14 @@ const output = {
   getFromLocation: async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-
+      const option=parseInt(req.params.sortOption);
       //로그인되어있는지 확인
       if (isNaN(id)) {
         return res.status(400).end();
       } else {
         //유효한 지역값인지 확인
         if ((id > 0) && (id < 13)) {
-          const response = await hansicService.getFromLocation(id);
+           const response =option? await hansicService.getFromLocation(id,option):await hansicService.getFromLocation(id);
           //유효한 검색 결과가 있는지 확인
           if (response) {
             return res.json({ data: response });

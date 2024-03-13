@@ -14,6 +14,8 @@ const authJWT = require('../../middleware/authJWT');
 */
 const router = express.Router();
 router.get('/place',softAuthJWT,ctrl.output.getByPlace);
+router.get('/all/:sortOption',ctrl.output.getAll);//sortOption이 있으면 userStar로정렬,
+router.get('/loc/:id/:sortOption',ctrl.output.getFromLocation);
 router.get('/all',ctrl.output.getAll);
 router.get('/loc/:id',ctrl.output.getFromLocation);
 router.get('/get/geo',ctrl.output.tryGeo);

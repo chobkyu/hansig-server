@@ -30,6 +30,7 @@ describe('GET /hansic/all ...', function () {
                 .expect(200)
                 .end((err: any, res: any) => {
                     body = res.body.data;
+                    //console.log(body[0]);
                     done();
                 });
         });
@@ -173,7 +174,7 @@ describe('GET /hansic/loc/:id ...', function () {
 
 
 /**즐겨찾는 한식 뷔페 조회 */
-describe.only('GET /hansic/star/user ...', function () {
+describe('GET /hansic/star/user ...', function () {
 
 
     describe('성공 시', () => {

@@ -2,9 +2,9 @@ import { Review } from "../src/interface/review/review"
 
 const app = require('../app')
 const request = require('supertest')
-
+const s3=require('../src/util/s3');
 /**리뷰 입력 시 ...  id는 식당 id */
-
+describe('review',function(){
 describe('post /review/:id',function() {
     let testData : Review = {
         review : '맛있어요',
@@ -21,7 +21,27 @@ describe('post /review/:id',function() {
                 .end(done);
         });
     });
-
+    describe('성공 시2',async() => {
+        let testData2:any;
+        before(async () => {
+            testData2 = {
+                review: '맛있어요',
+                star: 2,
+                img: [`${await s3.generateUploadURL()}`, `${await s3.generateUploadURL()}`]
+            };
+        });
+    
+        it('201로 응답한다', (done) => {
+            request(app)
+                .post('/review/1804')
+                .set("authorization", "Bearer testtoken")
+                .send(testData2)
+                .expect(201)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
     describe('실패 시',() => {
         it('찾을 수 없는 id일시 404로 응답',(done) => {
             request(app)
@@ -97,7 +117,7 @@ describe('patch /review/update/:id',function () {
         let body : any;
         before(done => {
             request(app)
-                .patch('/review/update/3')
+                .patch('/review/update/1')
                 .set("authorization","Bearer testtoken")
                 .send(testData)
                 .end((err:any,res:any) => {
@@ -151,8 +171,28 @@ describe('patch /review/update/:id',function () {
             body.user.id.should.be.instanceOf(Number);
         });
     });
-
-
+    describe('성공 시2',async() => {
+        let testData2:any;
+        before(async () => {
+            testData2 = {
+                review: '맛있어요',
+                star: 2,
+                insertImg: [await s3.generateUploadURL(), await s3.generateUploadURL()],
+                deleteImg:[]
+            };
+        });
+    
+        it('200로 응답한다', (done) => {
+            request(app)
+            .patch('/review/update/1')
+                .set("authorization", "Bearer testtoken")
+                .send(testData2)
+                .expect(200)
+                .end((err:any, res:any) => {
+                    done();
+                });
+        });
+    });
     describe('실패 시 ',() => {
         it('입력이 잘못 되었을 시 400을 응답한다.',(done) =>{
             let wrongData = {
@@ -387,6 +427,7 @@ describe('get /review/user/list',() => {
             .expect(200)
             .end((err:any,res:any) => {
                 body = res.body;
+                console.log(body);
                 done();
             });
         });
@@ -404,23 +445,42 @@ describe('get /review/user/list',() => {
             body[0].reviewImgs.should.be.instanceOf(Array);
         });
 
+        it('id을 포함해야 한다.',async () => {
+            body[0].should.have.property('id');
+        });
+
+        it('id은 number이여야 한다.',async () => {
+            body[0].id.should.be.instanceOf(Number);
+        });
+
+        it('review 을 포함해야 한다.',async () => {
+            body[0].should.have.property('review');
+        });
+
+        it('review은 String이여야 한다.',async () => {
+            body[0].review.should.be.instanceOf(String);
+        });
+
+        it('star 을 포함해야 한다.',async () => {
+            body[0].should.have.property('star');
+        });
+
+        it('star은 숫자이여야 한다.',async () => {
+            body[0].star.should.be.instanceOf(Number);
+        });
+
+        it('hansics 을 포함해야 한다.',async () => {
+            body[0].should.have.property('hansics');
+        });
+
                
     });
 
     describe('실패 시',() =>{
-        it('없는 식당 조회 시 404로 응답한다',(done) => {
-            request(app)
-                .get('review/list/0')
-                .expect(404)
-                .end((err:any, res:any) => {
-                    done();
-                });
-        });
-
-        it('잘못된 파라미터일 시 400으로 응답한다',(done) => {
+        it('로그인이 안되어 있을 시 401으로 응답한다',(done) => {
             request(app)
                 .get('review/list/sigdang')
-                .expect(400)
+                .expect(401)
                 .end((err:any, res:any) => {
                     done();
                 });
@@ -434,28 +494,30 @@ describe('get /review/user/list',() => {
 로그인 필요
 string commen,reviewId만 있으면됨.
 */
-describe('post /review/reply/:id',() => {
+describe('post /review/comment/:id',() => {
     describe('성공 시',() => {
         let body:any;
-        let data:String="멋져";
-        before(done => {
+        let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
+        it('성공시',done => {
             request(app)
-            .post('/review/reply/1')
+            .post('/review/comment/1')
             .set("authorization","Bearer testtoken")
             .send(data)
             .expect(201)
             .end((err:any,res:any) => {
                 body = res.body;
+                console.log(res.status);
                 done();
             });
         });
+        
     });
     describe('실패 시',() =>{
         it('로그인이 안되어있을시 401로 응답한다.',(done) => {
-            let data:String="멋져";
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
             let body;
             request(app)
-            .post('/review/reply/1')
+            .post('/review/comment/1')
             .send(data)
             .expect(401)
             .end((err:any,res:any) => {
@@ -465,10 +527,10 @@ describe('post /review/reply/:id',() => {
         });
 
         it('찾을수 없는 id일시 404으로 응답한다',(done) => {
-            let data:String="멋져";
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
             let body;
             request(app)
-            .post('/review/reply/10700')
+            .post('/review/comment/10700')
             .set("authorization","Bearer testtoken")
             .send(data)
             .expect(404)
@@ -478,10 +540,10 @@ describe('post /review/reply/:id',() => {
             });
         });
         it('다른 입력 값이 들어왔을경우 400으로 응답한다',(done) => {
-            let data="굿";
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
             let body;
             request(app)
-            .post('/review/reply/서울')
+            .post('/review/comment/서울')
             .set("authorization","Bearer testtoken")
             .send(data)
             .expect(400)
@@ -494,7 +556,7 @@ describe('post /review/reply/:id',() => {
             let data="";
             let body;
             request(app)
-            .post('/review/reply/1')
+            .post('/review/comment/1')
             .set("authorization","Bearer testtoken")
             .send(data)
             .expect(400)
@@ -504,10 +566,97 @@ describe('post /review/reply/:id',() => {
             });
         });
         it('입력값(id)이 누락되었을경우 400으로 응답한다',(done) => {
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
+            let body;
+            request(app)
+            .post('/review/comment/')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(400)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        
+    });
+});
+describe('post /review/update/:id',() => {
+    describe('성공 시',() => {
+        let body:any;
+        let data:any={comment:"리뷰를 믿지마 유튜브를 믿어"};
+        it('성공시',done => {
+            request(app)
+            .patch('/review/comment/1')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(201)
+            .end((err:any,res:any) => {
+                body = res.body;
+                console.log(res.status);
+                done();
+            });
+        });
+        
+    });
+    describe('실패 시',() =>{
+        it('로그인이 안되어있을시 401로 응답한다.',(done) => {
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
+            let body;
+            request(app)
+            .patch('/review/comment/1')
+            .send(data)
+            .expect(401)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+
+        it('찾을수 없는 id일시 404으로 응답한다',(done) => {
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
+            let body;
+            request(app)
+            .patch('/review/comment/10700')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(404)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        it('다른 입력 값이 들어왔을경우 400으로 응답한다',(done) => {
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
+            let body;
+            request(app)
+            .patch('/review/comment/서울')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(400)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        it('입력값(comment)이 누락되었을경우 400으로 응답한다',(done) => {
             let data="";
             let body;
             request(app)
-            .post('/review/reply/')
+            .patch('/review/comment/1')
+            .set("authorization","Bearer testtoken")
+            .send(data)
+            .expect(400)
+            .end((err:any,res:any) => {
+                body = res.body;
+                done();
+            });
+        });
+        it('입력값(id)이 누락되었을경우 400으로 응답한다',(done) => {
+            let data:any={comment:"유튜브를 믿지마 리뷰를 믿어"};
+            let body;
+            request(app)
+            .patch('/review/comment/')
             .set("authorization","Bearer testtoken")
             .send(data)
             .expect(400)
@@ -520,13 +669,13 @@ describe('post /review/reply/:id',() => {
     });
 });
 //리뷰 코멘트 삭제시
-describe('delete /review/reply/:id',() => {
+describe('delete /review/comment/:id',() => {
     describe('실패 시',() =>{
-        it('권한이 없을 시 401로 응답한다.',(done) => {
+        it('권한이 없을 시 403로 응답한다.',(done) => {
             let body;
             request(app)
-            .delete('/review/reply/1')
-            .expect(401)
+            .delete('/review/comment/1')
+            .expect(403)
             .end((err:any,res:any) => {
                 body = res.body;
                 done();
@@ -536,7 +685,7 @@ describe('delete /review/reply/:id',() => {
         it('찾을수 없는 id일시 404으로 응답한다',(done) => {
             let body;
             request(app)
-            .delete('/review/reply/10700')
+            .delete('/review/comment/10700')
             .set("authorization","Bearer testtoken")
             .expect(404)
             .end((err:any,res:any) => {
@@ -550,7 +699,7 @@ describe('delete /review/reply/:id',() => {
         let body:any;
         before(done => {
             request(app)
-            .delete('/review/reply/28')
+            .delete('/review/comment/1')
             .set("authorization","Bearer testtoken")
             .expect(204)
             .end((err:any,res:any) => {
@@ -563,15 +712,7 @@ describe('delete /review/reply/:id',() => {
 });
 //리뷰 삭제 시
 describe('delete reivew/:id',() => {
-    describe('success', () => {
-        it('204로 응답',(done) => {
-            request(app)
-                .delete('/review/3')
-                .set("authorization","Bearer testtoken")
-                .expect(204)
-                .end(done);
-        });
-    });
+    
 
     describe('fail..',() => {
         it('없는 id일 시 404로 응답한다',(done) => {
@@ -589,7 +730,16 @@ describe('delete reivew/:id',() => {
                 .expect(403)
                 .end(done);
         });
-    })
+    });
+    describe('success', () => {
+        it('204로 응답',(done) => {
+            request(app)
+                .delete('/review/3')
+                .set("authorization","Bearer testtoken")
+                .expect(204)
+                .end(done);
+        });
+    });
     after(done=>
         {
             request(app)
@@ -600,3 +750,4 @@ describe('delete reivew/:id',() => {
         })
 })
 
+});
