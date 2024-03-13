@@ -29,7 +29,7 @@ module.exports = {
 
         if(token == 'testtoken') {
             console.log('test user token')
-            return {success:true,decodedData:{id:1,userId:'hiyo1234@naver.com',userNickName:'hihihi'}}  //테스트용 코드
+            return {success:true,decodedData:{id:137,userId:'test',userNickName:'test_Name'}}  //테스트용 코드
         }
 
         if(token == 'ownertoken') {

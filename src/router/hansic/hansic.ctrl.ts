@@ -171,6 +171,19 @@ const process = {
       logger.error(err);
       return res.status(500).end();
     }
+  },
+
+  //내가 아는 한식 뷔페 등록하기
+  enrollHansic:async (req:Request, res :Response) => {
+    try{
+      const body = req.body;
+      const response = await hansicService.enrollHansic(body);
+
+      return res.status(response.status).end();
+    }catch(err){
+      logger.error(err);
+      return res.status(500).end();
+    }
   }
 }
 
