@@ -36,6 +36,12 @@ module.exports = {
             console.log('test owner token');
             return {success:true, decodedDate:{}} //테스트용 오너 아이디 내용 추가 예정
         }
+
+        /**관리자 테스트 코드용 */
+        if(token == 'admintoken') {
+          console.log('test admin token');
+          return {success:true, decodedData : {id:152,userId:'hiyo@naver.com',userNickName:'hiyo123'}}
+        }
         try{
             decoded = jwt.verify(token,secret);
             return {success:true, decodedData : decoded}
