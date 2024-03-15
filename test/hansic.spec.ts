@@ -480,7 +480,7 @@ describe('post /hansic/star/:id', function (){
 });
 
 //내가 아는 한식 뷔페 등록하기
-describe.only('post /hansic/enroll', function (){
+describe('post /hansic/enroll', function (){
     describe('성공 시', () => {
         let body = {
             name: '기원이한뷔',
