@@ -15,6 +15,27 @@ const output = {
             console.log(err);
             return res.status(500).end();
         }
+    },
+
+    getEnrollOne : async (req:Request, res:Response) => {
+        try{
+            const id = parseInt(req.params.id);
+            const userId = req.body.userData.id;
+
+            //check number type 
+            if(isNaN(id)){
+                return res.status(400).end();
+            }
+
+            const response = await adminService.getEnrollOne(id,userId);
+
+            return res.status(response.status).json({data:response.response});
+
+        }catch(err){
+            logger.error(err);
+            console.log(err);
+            return res.status(500).end();
+        }
     }
 }
 
