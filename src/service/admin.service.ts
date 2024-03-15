@@ -16,8 +16,8 @@ export class AdminService{
                 }
             });
 
-            if(check){
-                return { success:true };
+            if(check?.userGradeId == 2){ 
+                return { success:true }; //admin
             }else{
                 return { success:false };
             }
