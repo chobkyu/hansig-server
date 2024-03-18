@@ -8,7 +8,7 @@ import { MenuData, checkMenuDataCount } from "../interface/owner/menu";
 const { checkOwner } = require("../util/checkOwner");
 const jwt = require("../util/jwt-util");
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
 const userService = new UserService();
 
 export class OwnerService {

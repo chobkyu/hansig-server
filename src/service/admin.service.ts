@@ -1,7 +1,12 @@
 import { PrismaClient  } from "@prisma/client";
+import { InsertHansicDto } from "../interface/admin/insertHansic";
+import { HansicService } from "./hansic.service";
+
+const hansicServiceClass = require('./hansic.service');
+const hansicService = new hansicServiceClass();
 
 const logger = require("../util/winston");
-const prisma = new PrismaClient();
+const prisma = new PrismaClient(/*{log: ['query', 'info', 'warn', 'error']}*/);
 export class AdminService{
      /**
      * 관리자 id 판단
@@ -97,6 +102,81 @@ export class AdminService{
         }catch(err){
             logger.error(err);
             return {success:false,status:500}
+        }
+    }
+
+    async enrollHansic(data:InsertHansicDto) {
+        try{
+            const checkAdmin = await this.checkAdmin(data.userData.id);
+
+            if(!checkAdmin.success){
+                return {success:false,status:403};
+            }
+
+            const checkData = this.checkData(data);
+
+            if(!checkData.success){
+                return {success:false, status:400};
+            }
+            const selectData = await prisma.enrollHansic.findUnique({
+                where : { id:data.id, name:data.name, addr:data.addr, location_id:data.location, isApproved:false }
+            });
+
+            if(!selectData){
+                return {success:false,status:404};
+            };
+            
+            const getLatlng =  await hansicService.tryGeo();
+
+
+            prisma.$transaction(async (tx) => {
+                const insertHansic = await tx.hansics.create({
+                    data: {
+                        name:data.name,
+                        addr : data.name,
+                        google_star : '리뷰 없음',
+                        location_id:data.location,
+                        lat: getLatlng.lat,
+                        lng: getLatlng.lng
+                    }
+                });
+
+                const updateEnroll = await tx.enrollHansic.update({
+                    where : { id : data.id },
+                    data : { isApproved : true},
+                });
+            });
+
+            return { success: true, status:201};
+        }catch(err){
+            logger.error(err);
+            console.log(err);
+            return { success : false , status : 500 }
+        }
+    }
+
+    checkData(body:InsertHansicDto){
+        console.log(body);
+        if(
+          body.id == null ||
+          body.addr == null ||
+          /*body.imgUrl == null ||*/ //나중에 추가 예정
+          body.location == null ||
+          body.userId == null ||
+          body.name == null 
+        ){
+            return { success: false, status : 400};
+        }else if(
+            typeof body.id != "number" ||
+            typeof body.addr != "string" ||
+            /*typeof body.imgUrl != "string" ||*/
+            typeof body.location != "number" ||
+            typeof body.userId != "number" ||
+            typeof body.name != "string" 
+        ){
+            return { success:false, status : 400};
+        }else{
+            return {success:true};
         }
     }
 }

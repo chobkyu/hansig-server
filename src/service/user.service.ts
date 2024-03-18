@@ -9,7 +9,7 @@ import { Logger } from "winston";
 const jwt = require('../util/jwt-util');
 const logger = require('../util/winston');
 const redisClient = require('../util/redis');
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
 const {generateUploadURL} = require('../util/s3');
 
 
