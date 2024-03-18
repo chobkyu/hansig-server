@@ -105,16 +105,23 @@ export class AdminService{
         }
     }
 
+    /**
+     * 등록하기 허용
+     * @param data : InsertHansicDto
+     * @returns {success:boolean,status:number}
+     */
     async enrollHansic(data:InsertHansicDto) {
         try{
             const checkAdmin = await this.checkAdmin(data.userData.id);
 
+            //관리자 체크
             if(!checkAdmin.success){
                 return {success:false,status:403};
             }
 
             const checkData = this.checkData(data);
 
+            //데이터 체크
             if(!checkData.success){
                 return {success:false, status:400};
             }
@@ -122,6 +129,7 @@ export class AdminService{
                 where : { id:data.id, name:data.name, addr:data.addr, location_id:data.location, isApproved:false }
             });
 
+            //존재 유무 확인
             if(!selectData){
                 return {success:false,status:404};
             };
@@ -145,6 +153,8 @@ export class AdminService{
                     where : { id : data.id },
                     data : { isApproved : true},
                 });
+
+                //나중에 이미지 url 추가 및 등록 유저 point 제도 도입 예정
             });
 
             return { success: true, status:201};
