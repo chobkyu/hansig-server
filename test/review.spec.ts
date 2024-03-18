@@ -5,16 +5,16 @@ const request = require('supertest')
 const s3=require('../src/util/s3');
 /**리뷰 입력 시 ...  id는 식당 id */
 describe('review',function(){
-describe('post /review/:id',function() {
+describe.only('post /review/:id',function() {
     let testData : Review = {
         review : '맛있어요',
-        star : 2,
+        star : 5,
     }
 
     describe('성공 시',() => {
         it('201로 응답한다',(done) => {
             request(app)
-                .post('/review/1804')
+                .post('/review/2973')
                 .set("authorization","Bearer testtoken")
                 .send(testData)
                 .expect(201)
