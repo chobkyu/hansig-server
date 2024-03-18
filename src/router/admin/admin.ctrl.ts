@@ -40,7 +40,23 @@ const output = {
 }
 
 const process = {
+    enrollHansic : async (req:Request, res:Response) => {
+        try{
+            const id = parseInt(req.params.id);
 
+            if(isNaN(id)){
+                return res.status(400).end();
+            }
+
+            const response = await adminService.enrollHansic(req.body);
+
+            return res.status(response.status).end();
+        }catch(err){
+            logger.error(err);
+            console.log(err);
+            return res.status(500).end();
+        }
+    }
 }
 
 module.exports = {

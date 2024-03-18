@@ -78,7 +78,7 @@ describe('GET /admin/enroll', function(){
     });
 });
 
-describe.only('enroll 상세 조회',() =>{
+describe('enroll 상세 조회',() =>{
     describe('성공 시', () => {
         let body:any;
 
@@ -94,8 +94,6 @@ describe.only('enroll 상세 조회',() =>{
                     done();
                 });
         });
-
-      
 
         it('성공 시 id가 포함되어야 한다',() => {
             body.should.have.property('id');
@@ -170,5 +168,86 @@ describe.only('enroll 상세 조회',() =>{
     })
     
 });
+
+describe.only('한식 등록 허용',function() {
+    describe('성공 시 ',() => {
+        let body = {
+            id : 3, name:'기원이한뷔',addr:'서울특별시 강남구',location:1,userId:137
+        }
+        it('201로 응답한다.',(done) =>{
+            request(app)
+                .post('/admin/enroll/3')
+                .set("authorization","Bearer admintoken")
+                .send(body)
+                .expect(201)
+                .end(done);
+        });
+    });
+        
+        
+
+    describe('실패 시',async () => {
+        it('관리자가 아닐 시 403으로 응답.', (done) => {
+            let body = {
+                id : 3, name:'기원이한뷔',addr:'서울특별시 강남구',location:1,userId:137
+            }
+            request(app)
+                .post('/admin/enroll/3')
+                .set("authorization","Bearer testtoken")
+                .send(body)
+                .expect(403)
+                .end(done);
+        });
+
+        it('로그인이 안되어있을 시 401으로 응답한다.',(done) => {
+            let body = {
+                id : 3, name:'기원이한뷔',addr:'서울특별시 강남구',location:1,userId:137
+            }
+            request(app)
+                .post('/admin/enroll/3')
+                .send(body)
+                .expect(401)
+                .end(done);
+        });
+
+        it('없는 id 시 404으로 응답한다.', (done) => {
+            let body = {
+                id : 3, name:'기원이한뷔',addr:'서울특별시 강남구',location:1,userId:137
+            }
+            request(app)
+                .post('/admin/enroll/0')
+                .set("authorization","Bearer admintoken")
+                .send(body)
+                .expect(404)
+                .end(done);
+        });
+
+        it('잘못된 파라미터 일 시 400으로 응답한다.', (done) => {
+            let body = {
+                id : 3, name:'기원이한뷔',addr:'서울특별시 강남구',location:1,user_Id:137
+            }
+            request(app)
+                .post('/admin/enroll/rrr')
+                .set("authorization","Bearer admintoken")
+                .send(body)
+                .expect(400)
+                .end(done);
+        });
+
+        it('바디 값이 누락 되었을 시 400', (done) => {
+            let body = {
+                id : 3, name:'기원이한뷔',addr:'서울특별시 강남구'
+            }
+            request(app)
+                .post('/admin/enroll/3')
+                .set("authorization","Bearer admintoken")
+                .send(body)
+                .expect(400)
+                .end(done);
+        });
+
+       
+    });
+})
 
 

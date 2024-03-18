@@ -319,7 +319,11 @@ export class HansicService {
         // logger.info(response[i].addr);
 
         if (response[i].addr != '주소 없음') {
-          await this.tryGeo(response[i])
+          const getGeo = await this.tryGeo(response[i]);
+          if(getGeo.success){
+            await this.updateGeo(response.id, getGeo.lng, getGeo.lat);
+          }
+
         }
       }
       return {success : true};
@@ -338,27 +342,28 @@ export class HansicService {
         qs : {query : addr},
         headers : {Authorization : `KakaoAK ${process.env.kakao_api}`}
       }
-
+      let lng = 0;
+      let lat = 0;
       // 카카오 api 호출
       request(option, async (err: any, response: any, body: any) => {
         const obj = JSON.parse(body);
 
         if (!obj["documents"]?.length) {
           // logger.info('can not find address');
+          return {success:false ,lat,lng}
         } else {
           // logger.info(obj["documents"][0].x) // lng
           // logger.info(obj["documents"][0].y) // lat
-          let lng = parseFloat(obj["documents"][0].x);
-          let lat = parseFloat(obj["documents"][0].y);
+          lng = parseFloat(obj["documents"][0].x);
+          lat = parseFloat(obj["documents"][0].y);
 
-          await this.updateGeo(hansic.id, lng, lat);
         }
       });
 
-      return true;
+      return {success:true,lat,lng};
     } catch (err) {
       logger.error(err);
-      return false;
+      return {success:false,lat:0,lng:0};
     }
   }
 
