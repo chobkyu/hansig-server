@@ -180,13 +180,14 @@ class reviewService {
   async writeReview(inputReview: Review, userInfo: number,
     restaurantInfo: number): Promise<any> {
     try {
-      let success;
+      let success=false;
+      let create:any;
       if (await this.checkRestaurant(Number(restaurantInfo))) {
         if (this.checkReviewDTO(inputReview)) {
           // img가 있는지 확인
           if (inputReview.img) {
-            success = await prisma.$transaction(async (tx) => {
-              const create = await tx.review.create({
+           await prisma.$transaction(async (tx) => {
+              create = await tx.review.create({
                 data: {
                   review: inputReview.review,
                   star: Number(inputReview.star),
@@ -202,9 +203,13 @@ class reviewService {
               if (imgData) {
                 const image = await tx.reviewImg.createMany({ data: imgData });
               }
+              const us=(await tx.review.aggregate({_avg:{star:true},where:{hansicsId:restaurantInfo}}))._avg;
+              await tx.hansics.update({data:{userStar:String(us.star)},where:{id:restaurantInfo}});
+              success=true;
             });
           } else {
-            success = await prisma.review.create({
+            await prisma.$transaction(async (tx) => {
+              create=await tx.review.create({
               data: {
                 review: inputReview.review,
                 star: Number(inputReview.star),
@@ -213,6 +218,9 @@ class reviewService {
                 useFlag: true
               }
             });
+            const us=await tx.review.aggregate({_avg:{star:true},where:{hansicsId:restaurantInfo}});
+              await tx.hansics.update({data:{userStar:String(us._avg.star)},where:{id:restaurantInfo}});});
+              success=true;
           }
         }
         else {
@@ -223,10 +231,9 @@ class reviewService {
       else {
         return { success: false, status: 404 };
       }
-      if (!success) {
-        return { success: false };
+      if(success){
+      return { success: true,data:create };
       }
-      return { success: true };
     } catch (err) {
       logger.error(err);
       return { success: false };
@@ -273,7 +280,8 @@ userinfo는 유저id,reviewinfo역시 review의 id.
           if (deleteImg) {
             await tx.reviewImg.deleteMany({ where: { id: deleteImg.id } });
           }
-        });
+          const us=await tx.review.aggregate({_avg:{star:true},where:{hansicsId:review.hansicsId}});
+              await tx.hansics.update({data:{userStar:String(us._avg.star)},where:{id:review.hansicsId}});});
         if (updatedReview) {
           // 수정후 이미지
           const newReviewImage = await prisma.reviewImg.findMany(
@@ -283,6 +291,7 @@ userinfo는 유저id,reviewinfo역시 review의 id.
             { where: { reviewId: reviewInfo } });
           return {
             success: true,
+            data:{
             id: updatedReview.id,
             review: updatedReview.review,
             star: updatedReview.star,
@@ -291,8 +300,9 @@ userinfo는 유저id,reviewinfo역시 review의 id.
             hansicsId: updatedReview.hansicsId,
             reviewComments: ReviewComments,
             reviewImgs: newReviewImage,
-            user: user
+            user: user}
           };
+          
         } else // updatedReview가 실패한경우.
         {
           return { success: false };

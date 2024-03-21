@@ -84,7 +84,7 @@ const process =
             const isSuccess = await reviewService.writeReview(req.body, userInfo.id, reviewId);
             if (isSuccess.success)//작성성공시
             {
-                return res.status(201).end();
+                return res.status(201).json({data:isSuccess.data}).end();
             }
             else {
                 if(isSuccess.status)
@@ -112,7 +112,7 @@ const process =
             const updatedReview = await reviewService.updateReview(req.body, userInfo.id, reviewId);
             if (updatedReview.success)//update성공시
             {
-                return res.json(updatedReview);
+                return res.json(updatedReview.data);
             }
             else {
                 if(updatedReview.status)
