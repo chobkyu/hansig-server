@@ -57,6 +57,7 @@ export class HansicService {
             COUNT(*) as count,
             AVG(star) as "userStar" 
           FROM hansic.review as rv 
+          where rv."useFlag" = true
           GROUP BY rv."hansicsId"
         ) as rd
         on hs.id=rd."hansicsId"
