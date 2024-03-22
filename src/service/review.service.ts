@@ -186,7 +186,8 @@ class reviewService {
           // img가 있는지 확인
           if (inputReview.img) {
             success = await prisma.$transaction(async (tx) => {
-              const create = await tx.review.create({
+              // 리뷰 데이터 삽입
+              const review = await tx.review.create({
                 data: {
                   review: inputReview.review,
                   star: Number(inputReview.star),
@@ -195,12 +196,18 @@ class reviewService {
                   useFlag: true,
                 }
               });
+
               const imgData: any = inputReview.img?.map(imgUrl => ({
                 imgUrl,
-                reviewId: create.id,
+                reviewId: review.id,
               }));
-              if (imgData) {
-                const image = await tx.reviewImg.createMany({ data: imgData });
+
+              if(imgData) {
+                // 리뷰 이미지 삽입
+                const image = await tx.reviewImg.createMany({data: imgData});
+                return image;
+              } else {
+                throw new Error(`invalid imageData`);
               }
             });
           } else {
