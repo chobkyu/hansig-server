@@ -125,7 +125,7 @@ class reviewService {
           reviewImgs: { select: { imgUrl: true } },
           useFlag: true
         },
-        where: { hansicsId: restaurantId }
+        where: { hansicsId: restaurantId,useFlag:true }
       })
       // 검색결과가 있으면
       if (review) {
@@ -152,6 +152,8 @@ class reviewService {
           id: true,
           review: true,
           star: true,
+          user: { select: { id: true, userNickName: true } },
+          reviewComments: { where: { useFlag: true } },
           hansics: { select: { id: true, name: true } },
           reviewImgs: { select: { imgUrl: true } }
         },
