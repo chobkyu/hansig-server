@@ -2,27 +2,18 @@ import express from "express";
 const ctrl = require('./hansic.ctrl');
 const softAuthJWT = require('../../middleware/softAuthJWT');
 const authJWT = require('../../middleware/authJWT');
-/*
-ㄴ 리뷰 입력 시
-ㄴ 리뷰 수정 시
-ㄴ 리뷰 삭제 시
-ㄴ 메뉴 입력 시
-ㄴ 메뉴 수정 시
-ㄴ 메뉴 삭제 시
-ㄴ 리뷰 댓글 입력 시
-ㄴ 리뷰 댓글 삭제 시
-*/
+
 const router = express.Router();
-router.get('/place',softAuthJWT,ctrl.output.getByPlace);
+router.get('/place',softAuthJWT,ctrl.output.getByPlace);//좌표를 쿼리로 받아 검색
 router.get('/all/:sortOption',ctrl.output.getAll);//sortOption이 있으면 userStar로정렬,
 router.get('/loc/:id/:sortOption',ctrl.output.getFromLocation);
-router.get('/all',ctrl.output.getAll);
-router.get('/loc/:id',ctrl.output.getFromLocation);
-router.get('/get/geo',ctrl.output.tryGeo);
-router.get('/:id',softAuthJWT,ctrl.output.get);
-router.get('/star/user',authJWT,ctrl.output.favorite);
+router.get('/all',ctrl.output.getAll); //한식 뷔페 전체 조회
+router.get('/loc/:id',ctrl.output.getFromLocation); //지역 id로 지역내 식당조회
+router.get('/get/geo',ctrl.output.tryGeo); //주소 -> 좌표 변환
+router.get('/:id',softAuthJWT,ctrl.output.get);//id로 단일 식당 조회
+router.get('/star/user',authJWT,ctrl.output.favorite); //유저 별 즐겨찾는 한뷔 조회
 
-router.post('/star/:id',authJWT,ctrl.process.favorite);
+router.post('/star/:id',authJWT,ctrl.process.favorite); //즐겨찾기 추가
 router.post('/enroll',authJWT,ctrl.process.enrollHansic); //내가 아는 한식 뷔페 등록하기
 // router.post('/:id',ctrl.process.create);
 // router.patch('/:id',ctrl.process.update);
