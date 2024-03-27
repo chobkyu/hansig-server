@@ -32,6 +32,12 @@ const output = {
         }
     },
 
+    /**
+     * 지역 리스트 조회
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     location :async (req:Request, res:Response) => {
         try{
             const response = await userService.getLocation();

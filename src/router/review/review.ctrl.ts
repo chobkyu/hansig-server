@@ -104,6 +104,7 @@ const process =
             return res.status(500).end();
         }
     },
+    /*/review update*/
     async updateReview(req: Request, res: Response): Promise<any> {
         try {
             const userInfo = req.body.userData;
@@ -130,6 +131,8 @@ const process =
             return res.status(500).end();
         }
     },
+
+    /**review delete */
     async deleteReview(req: Request, res: Response): Promise<any> {
         try {
             const isSuccess = await reviewService.deleteReview(Number(req.params.id), req.body.userData.id);
@@ -153,7 +156,9 @@ const process =
             return res.status(500).end();
         }
     },
-   /*interface ReviewComment {
+
+   /* review comment create
+   interface ReviewComment {
     comment : string,
 } 
 성공시 201
@@ -200,10 +205,13 @@ const process =
             return res.status(500).end();
         }
     },
-        /*interface ReviewComment {
-    comment : string,
-} */
-//성공시 코멘트가 업데이트된 리뷰페이지 리턴
+
+    /*
+        review comment update
+        interface ReviewComment {
+        comment : string,
+    } */
+    //성공시 코멘트가 업데이트된 리뷰페이지 리턴
     async reviewCommentUpdate (req:Request,res:Response):Promise<any>
     {
         try{
@@ -245,6 +253,13 @@ const process =
                 return res.status(500).end();
             }
     },
+
+    /**
+     * review comment delete
+     * @param req 
+     * @param res 
+     * @returns 
+     */
     async reviewCommentDelete (req:Request,res:Response):Promise<any>
     {
         try{

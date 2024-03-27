@@ -7,172 +7,165 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model books {
   id          Int     @id @default(autoincrement())
   name        String? @db.VarChar(100)
   description String?
 }
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 
-//사용자 테이블
 model user {
-  id Int @id @default(autoincrement())
-  userId String? @db.VarChar(50)
-  userPw String? @db.VarChar(500)
-  userName String? @db.VarChar(50)
-  userNickName String? @db.VarChar(50)
-  userImgs userImgs[]
-  reviews review[]
-  menus menu[]
-  userGrade userGrade @relation(fields:[userGradeId],references:[id])
-  userGradeId Int
-  owners ownerData[]
-  location location @relation(fields:[location_id],references:[id])
-  location_id Int @default(1)
-  favorites favorites[]
+  id             Int             @id @default(autoincrement())
+  userId         String?         @db.VarChar(50)
+  userPw         String?         @db.VarChar(500)
+  userName       String?         @db.VarChar(50)
+  userNickName   String?         @db.VarChar(50)
+  userGradeId    Int
+  location_id    Int             @default(1)
+  bank_id        Int             @default(1)       
+  account_no     String?         @db.VarChar(100)
+  point          Int?            @default(0)
+  enrollHansics  enrollHansic[]
+  favorites      favorites[]
+  menus          menu[]
+  owners         ownerData[]
+  reviews        review[]
   reviewComments reviewComment[]
-  enrollHansics enrollHansic[]
+  location       location        @relation(fields: [location_id], references: [id])
+  userGrade      userGrade       @relation(fields: [userGradeId], references: [id])
+  bank           bank            @relation(fields: [bank_id], references: [id])
+  userImgs       userImgs[]
 }
 
-//사용자 프로필 이미지 테이블
 model userImgs {
-  id Int @id @default(autoincrement())
-  imgUrl String? @db.VarChar(500)
+  id      Int     @id @default(autoincrement())
+  imgUrl  String? @db.VarChar(500)
   useFlag Boolean @default(true)
-  user user @relation(fields:[userId],references:[id])
-  userId Int
-  
+  userId  Int
+  user    user    @relation(fields: [userId], references: [id])
 }
 
-//유저 등급 테이블
 model userGrade {
-  id Int @id @default(autoincrement())
-  userGrade String? @db.VarChar(10)
+  id          Int     @id @default(autoincrement())
+  userGrade   String? @db.VarChar(10)
   description String? @db.VarChar(100)
-  users user[]
+  users       user[]
 }
 
-//사업자 정보 테이블
 model ownerData {
-  id Int @id @default(autoincrement())
-  ownerNum String? @db.VarChar(100)
+  id         Int     @id @default(autoincrement())
+  ownerNum   String? @db.VarChar(100)
   isApproved Boolean @default(false)
-  hansics hansics @relation(fields:[hansicsId],references:[id])
-  hansicsId Int @unique
-  user user @relation(fields:[userId],references:[id])
-  userId Int
+  hansicsId  Int     @unique
+  userId     Int
+  hansics    hansics @relation(fields: [hansicsId], references: [id])
+  user       user    @relation(fields: [userId], references: [id])
 }
 
-//즐겨찾기 테이블
-model favorites {
+model bank {
   id Int @id @default(autoincrement())
-  user user @relation(fields:[userId],references:[id])
-  userId Int
-  hansics hansics @relation(fields:[hansicsId],references:[id])
-  hansicsId Int
-  useFlag Boolean @default(true)
-}
-
-//지역 정보 테이블
-model location {
-  id Int @id @default(autoincrement())
-  location String? @db.VarChar(50)
-  hansics hansics[]
+  bank_name String? @db.VarChar(100)
+  sft_cd String? @db.VarChar(100)
   users user[]
+}
+model favorites {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  hansicsId Int
+  useFlag   Boolean @default(true)
+  hansics   hansics @relation(fields: [hansicsId], references: [id])
+  user      user    @relation(fields: [userId], references: [id])
+}
+
+model location {
+  id            Int            @id @default(autoincrement())
+  location      String?        @db.VarChar(50)
   enrollHansics enrollHansic[]
+  hansics       hansics[]
+  users         user[]
 }
 
-//한식 뷔페 테이블
 model hansics {
-  id   Int     @id(map: "hansic_pkey") @default(autoincrement())
-  name String? @db.VarChar(100)
-  addr String? @db.VarChar(500)
-  google_star String? @db.VarChar(100)
-  userStar String? @db.VarChar(50)
-  lat Float? @default(0)
-  lng Float? @default(0)
-  location location @relation(fields:[location_id],references:[id])
+  id          Int          @id(map: "hansic_pkey") @default(autoincrement())
+  name        String?      @db.VarChar(100)
+  addr        String?      @db.VarChar(500)
+  userStar    String?      @db.VarChar(50)
+  google_star String?      @db.VarChar(100)
   location_id Int
-  reviews review[]
+  lat         Float?       @default(0)
+  lng         Float?       @default(0)
+  favorites   favorites[]
+  location    location     @relation(fields: [location_id], references: [id])
+  menus       menu[]
+  owner       ownerData?
+  reviews     review[]
   sicdangImgs sicdangImg[]
-  menus menu[]
-  owner ownerData?
-  favorites favorites[]
 }
 
-//한식 뷔페 이미지 테이블
 model sicdangImg {
-  id Int @id @default(autoincrement())
-  imgUrl String? @db.VarChar(500)
-  useFlag Boolean @default(true)
-  hansics hansics @relation(fields:[hansicsId],references:[id])
+  id        Int     @id @default(autoincrement())
+  imgUrl    String? @db.VarChar(500)
+  useFlag   Boolean @default(true)
   hansicsId Int
+  hansics   hansics @relation(fields: [hansicsId], references: [id])
 }
 
-//한식 뷔페 메뉴 테이블
 model menu {
-  id Int @id @default(autoincrement())
-  name String? @db.VarChar(100)
-  useFlag Boolean @default(false)
-  price Int
-  user user @relation(fields:[userId],references:[id])
-  userId Int
-  hansics hansics @relation(fields:[hansicsId],references:[id])
+  id        Int       @id @default(autoincrement())
+  name      String?   @db.VarChar(100)
+  useFlag   Boolean   @default(false)
+  userId    Int
   hansicsId Int
-  menuImgs menuImg[]
+  price     Int
+  hansics   hansics   @relation(fields: [hansicsId], references: [id])
+  user      user      @relation(fields: [userId], references: [id])
+  menuImgs  menuImg[]
 }
 
-
-//메뉴 이미지 테이블
 model menuImg {
-  id Int @id @default(autoincrement())
-  imgUrl String? @db.VarChar(500)
+  id      Int     @id @default(autoincrement())
+  imgUrl  String? @db.VarChar(500)
   useFlag Boolean @default(false)
-  menu menu @relation(fields:[menuId],references:[id])
-  menuId Int
+  menuId  Int
+  menu    menu    @relation(fields: [menuId], references: [id])
 }
 
-//한식 뷔페 리뷰 테이블
 model review {
-  id Int @id @default(autoincrement())
-  review String? @db.VarChar(1000)
-  star Int
-  useFlag Boolean @default(true)
-  user user @relation(fields:[userId],references:[id])
-  userId Int
-  hansics hansics @relation(fields:[hansicsId],references:[id])
-  hansicsId Int
-  reviewImgs reviewImg[]
+  id             Int             @id @default(autoincrement())
+  review         String?         @db.VarChar(1000)
+  star           Int
+  useFlag        Boolean         @default(true)
+  userId         Int
+  hansicsId      Int
+  hansics        hansics         @relation(fields: [hansicsId], references: [id])
+  user           user            @relation(fields: [userId], references: [id])
   reviewComments reviewComment[]
+  reviewImgs     reviewImg[]
 }
 
-//리뷰 삽입 이미지 테이블
 model reviewImg {
-  id Int @id @default(autoincrement())
-  imgUrl String? @db.VarChar(500)
-  review review @relation(fields:[reviewId],references:[id])
+  id       Int     @id @default(autoincrement())
+  imgUrl   String? @db.VarChar(500)
   reviewId Int
+  review   review  @relation(fields: [reviewId], references: [id])
 }
 
-//리뷰 관련 코멘트 테이블(댓글)
 model reviewComment {
-  id Int @id @default(autoincrement())
-  comment String? @db.VarChar(500)
-  review review @relation(fields:[reviewId],references:[id])
+  id       Int     @id @default(autoincrement())
+  comment  String? @db.VarChar(500)
   reviewId Int
-  useFlag Boolean @default(true)
-  user user @relation(fields:[userId],references:[id])
-  userId Int
+  useFlag  Boolean @default(true)
+  userId   Int
+  review   review  @relation(fields: [reviewId], references: [id])
+  user     user    @relation(fields: [userId], references: [id])
 }
 
 model enrollHansic {
-  id Int @id @default(autoincrement())
-  name String? @db.VarChar(100)
-  addr String? @db.VarChar(500)
-  location location @relation(fields:[location_id],references:[id])
+  id          Int      @id @default(autoincrement())
+  name        String?  @db.VarChar(100)
+  addr        String?  @db.VarChar(500)
   location_id Int
-  user user @relation(fields:[userId],references:[id])
-  userId Int
-  isApproved Boolean @default(false)
+  userId      Int
+  isApproved  Boolean  @default(false)
+  location    location @relation(fields: [location_id], references: [id])
+  user        user     @relation(fields: [userId], references: [id])
 }
