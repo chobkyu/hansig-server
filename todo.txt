@@ -4,3 +4,6 @@ todo list
 - 별점 순 한식 뷔페
 - 백엔드 배포
 - 주소 부정확한거 어떻게 할지 의논
+
+
+https://defineall.tistory.com/1052#DB%EB%A5%BC%20%EC%88%98%EB%8F%99%EC%9C%BC%EB%A1%9C%20%EC%88%98%EC%A0%95%ED%95%9C%EB%92%A4%EC%97%90%2C%20%08schema%20%EC%88%98%EC%A0%95%EC%82%AC%ED%95%AD%20%EC%A0%80%EC%9E%A5%ED%95%98%EA%B8%B0-1
