@@ -250,6 +250,7 @@ export class UserService {
                     userId:true,
                     location:true,
                     point:true,
+                    account_no:true,
                     userImgs:{
                         select:{
                             imgUrl:true,
