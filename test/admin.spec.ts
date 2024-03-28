@@ -169,7 +169,7 @@ describe('enroll 상세 조회',() =>{
     
 });
 
-describe.only('한식 등록 허용',function() {
+describe('한식 등록 허용',function() {
     describe('성공 시 ',() => {
         let body = {
             id : 3, name:'기원이한뷔',addr:'서울특별시 강남구',location:1,userId:137

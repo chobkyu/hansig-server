@@ -2,7 +2,7 @@ const app = require('../app')
 const request = require('supertest')
 
 //포인트 적립 이벤트
-describe('patch /point', function(){
+describe.only('patch /point', function(){
     describe('성공 시',() => {
         it('201로 응답한다.', (done) => {
             request(app)
