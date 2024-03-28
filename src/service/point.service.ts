@@ -16,9 +16,9 @@ export class PointService {
                     }
                 });
 
-                point = userData?.point==null ? 0 : JSON.parse(JSON.stringify(userData?.point)) ; //type check 
+                point = userData?.point==null ? 0 : userData?.point ; //type check 
                 console.log(point);
-                randNum = JSON.parse(JSON.stringify(randomPoint())); //포인트 적립
+                randNum = randomPoint(); //포인트 적립
                 console.log(randNum);
                 point+=randNum;
 
