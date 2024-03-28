@@ -5,20 +5,21 @@ const prisma = new PrismaClient({log: ['query', 'info', 'warn', 'error']});
 
 export class PointService {
     async getPoint( id : number ){
-        let point:number  = 0;
-        let randNum:number = 0;
+       
         try{
-            prisma.$transaction(async (tx) => {
+            let point = 0;
+            let randNum = 0;
+            await prisma.$transaction(async (tx) => {
                 const userData = await tx.user.findUnique({
                     where : {
                         id : id
                     }
                 });
 
-
-                point = userData?.point==null ? 0 : userData?.point ; //type check 
-
-                randNum = randomPoint(); //포인트 적립
+                point = userData?.point==null ? 0 : JSON.parse(JSON.stringify(userData?.point)) ; //type check 
+                console.log(point);
+                randNum = JSON.parse(JSON.stringify(randomPoint())); //포인트 적립
+                console.log(randNum);
                 point+=randNum;
 
                 await tx.user.update({
@@ -29,10 +30,13 @@ export class PointService {
                         point : point
                     }
                 });
-            });
 
-            return { success: true, status:201 , point, randNum }
-           
+                return { success: true, status:201 , point:point, randNum:randNum }
+            });
+            
+            
+            //console.log(res);
+            return { success: true, status:201 , point:point, randNum:randNum }
         }catch(err){
             //console.error(err);
             logger.error(err);

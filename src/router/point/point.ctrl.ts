@@ -13,6 +13,9 @@ const process = {
             const userId = req.body.userData.id;
             const response = await pointService.getPoint(userId);
 
+            if(response.status != 201){
+                return res.status(response.status).end();
+            }
             const pointObj = {
                 point : response.point, 
                 randNum : response.randNum 
